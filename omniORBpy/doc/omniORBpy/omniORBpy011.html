@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+
+<META http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<META name="GENERATOR" content="hevea 1.10">
+<LINK rel="stylesheet" type="text/css" href="omniORBpy.css">
+<TITLE>Asynchronous Method Invocation</TITLE>
+</HEAD>
+<BODY >
+<A HREF="omniORBpy010.html"><IMG SRC="previous_motif.gif" ALT="Previous"></A>
+<A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
+<A HREF="omniORBpy012.html"><IMG SRC="next_motif.gif" ALT="Next"></A>
+<HR>
+<H1 CLASS="chapter"><A NAME="htoc122">Chapter&#XA0;11</A>&#XA0;&#XA0;Asynchronous Method Invocation</H1><P>
+<A NAME="chap:ami"></A></P><P>omniORB 4.2 supports Asynchronous Method Invocation, AMI, as defined
+in the CORBA Messaging specification. It supports both the polling and
+callback models of asynchronous calls. Note that omniORB does not
+support the other parts of the Messaging specification such as Quality
+of Service, Routing and Persistent requests.</P><P>While omniORB mainly targets the 2.6 version of the CORBA
+specification, the AMI support follows the CORBA Messaging
+specification as described in the CORBA 3.1 specification, chapter
+17&#XA0;[<A HREF="omniORBpy013.html#corba31-spec">OMG08</A>]. That version of the specification is largely
+the same as the one in CORBA 2.6. The only significant difference is
+that exception replies in the callback model use a simpler
+interface-independent mapping.</P><H2 CLASS="section"><A NAME="toc51"></A><A NAME="htoc123">11.1</A>&#XA0;&#XA0;Implied IDL</H2><P>AMI works by defining some additional <I>implied IDL</I> for each
+interface in the real IDL. The implied IDL contains type and
+operation definitions that enable asynchronous calls.</P><P>As a guide to the implied IDL, there is a special <TT>ami</TT>
+back-end to omniidl that outputs the implied IDL for the given input
+IDL. For example, given the Echo example IDL:</P><DIV CLASS="lstlisting"><I>// echo.idl</I>
+<B>interface</B> Echo {
+  <B>string</B> echoString(<B>in</B> <B>string</B> mesg);
+};</DIV><P>You can output the implied IDL using</P><BLOCKQUOTE CLASS="quote">
+<TT>omniidl -bami echo.idl</TT>
+</BLOCKQUOTE><P>That outputs the following to standard out:</P><DIV CLASS="lstlisting"><I>// ReplyHandler for interface Echo</I>
+<B>interface</B> AMI_EchoHandler : Messaging::ReplyHandler {
+  <B>void</B> echoString(<B>in</B> <B>string</B> ami_return_val);
+  <B>void</B> echoString_excep(<B>in</B> ::Messaging::ExceptionHolder excep_holder);
+};
+
+<I>// Poller valuetype for interface Echo</I>
+<B>abstract</B> <B>valuetype</B> AMI_EchoPoller : Messaging::Poller {
+  <B>void</B> echoString(<B>in</B> <B>unsigned</B> <B>long</B> ami_timeout, <B>out</B> <B>string</B> ami_return_val);
+};
+
+<I>// AMI implied operations for interface Echo</I>
+<B>interface</B> Echo {
+  <B>void</B> sendc_echoString(<B>in</B> ::AMI_EchoHandler ami_handler, <B>in</B> <B>string</B> mesg);
+  ::AMI_EchoPoller sendp_echoString(<B>in</B> <B>string</B> mesg);
+};</DIV><P>Alternatively, you can use the <TT>-Wbdump</TT> option to
+output an interleaved version that shows the original IDL and the
+implied IDL together.</P><P>Note that the implied IDL output is for information only. You should
+not compile it, but rather instruct the omniidl Python back-end to
+generate the corresponding Python definitions.</P><H2 CLASS="section"><A NAME="toc52"></A><A NAME="htoc124">11.2</A>&#XA0;&#XA0;Generating AMI stubs</H2><P>To generate stub code including AMI types and operations, give the
+<TT>-Wbami</TT> command line option to omniidl&#X2019;s <TT>python</TT>
+back-end:</P><BLOCKQUOTE CLASS="quote">
+<TT>omniidl -bpython -Wbami echo.idl</TT>
+</BLOCKQUOTE><P>That generates the normal Python stubs and skeletons, plus
+all the definitions in the implied IDL.</P><H2 CLASS="section"><A NAME="toc53"></A><A NAME="htoc125">11.3</A>&#XA0;&#XA0;AMI examples</H2><P>Example AMI clients for the <TT>Example::Echo</TT> server can be found in
+<TT>examples/ami</TT>.</P><HR>
+<A HREF="omniORBpy010.html"><IMG SRC="previous_motif.gif" ALT="Previous"></A>
+<A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
+<A HREF="omniORBpy012.html"><IMG SRC="next_motif.gif" ALT="Next"></A>
+</BODY>
+</HTML>

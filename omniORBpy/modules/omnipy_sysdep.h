@@ -1,0 +1,69 @@
+// -*- Mode: C++; -*-
+//                            Package   : omniORBpy
+// omnipy_sysdep.h            Created on: 2000/03/07
+//                            Author    : Duncan Grisby (dpg1)
+//
+//    Copyright (C) 2002-2012 Apasphere Ltd
+//    Copyright (C) 2000 AT&T Laboratories Cambridge
+//
+//    This file is part of the omniORBpy library
+//
+//    The omniORBpy library is free software; you can redistribute it
+//    and/or modify it under the terms of the GNU Lesser General
+//    Public License as published by the Free Software Foundation;
+//    either version 2.1 of the License, or (at your option) any later
+//    version.
+//
+//    This library is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Lesser General Public
+//    License along with this library; if not, write to the Free
+//    Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+//    MA 02111-1307, USA
+//
+//
+// Description:
+//    Additional system dependencies
+
+#ifndef _omnipy_sysdep_h_
+#define _omnipy_sysdep_h_
+
+
+//
+// Python version dependencies
+
+// Boolean type support
+#if (PY_VERSION_HEX < 0x02030000)
+#  define PyBool_FromLong(x) PyInt_FromLong(x ? 1 : 0)
+#  define PyBool_Check(x) 0
+#endif
+
+
+//
+// Compiler dependencies
+
+// Defaults for things we'd like to do
+
+#define PY_OMNISERVANT_BASE omniPy::Py_omniServant
+
+// Some compilers will do some flow analysis and might get tricked if
+// a function always throws an exception.
+
+#ifdef NEED_DUMMY_RETURN
+#  define NEED_DUMMY_THROW
+#elif defined(__DECCXX)
+#  define NEED_DUMMY_THROW
+#endif
+
+// Things that are broken
+
+#if defined(_MSC_VER)
+#  undef  PY_OMNISERVANT_BASE
+#  define PY_OMNISERVANT_BASE Py_omniServant
+
+#endif
+
+#endif // _omnipy_sysdep_h_

@@ -1,0 +1,534 @@
+Mon Apr 28 17:48:32 BST 2014 dgrisby
+====================================
+
+- This is omniORBpy 4.2.0.
+
+README.txt
+ReleaseNotes.txt
+THIS_IS_OMNIORBPY_4_2_0
+THIS_IS_OMNIORBPY_DEVELOPMENT_BRANCH
+bin/scripts/distdate.py
+bin/scripts/makeminors.py
+mk/version.mk
+
+
+Tue Mar 11 16:30:46 GMT 2014 dgrisby
+====================================
+
+- Remove old bugfixes files.
+
+bugfixes-30.xml
+bugfixes-31.xml
+bugfixes-32.xml
+bugfixes-33.xml
+bugfixes-34.xml
+
+
+Tue Mar 11 16:29:21 GMT 2014 dgrisby
+====================================
+
+- Document extended attribute mapping.
+
+doc/omniORBpy.pdf
+doc/omniORBpy/index.html
+doc/omniORBpy/omniORBpy.html
+doc/omniORBpy/omniORBpy003.html
+doc/omniORBpy/omniORBpy004.html
+doc/omniORBpy/omniORBpy005.html
+doc/omniORBpy/omniORBpy006.html
+doc/omniORBpy/omniORBpy007.html
+doc/omniORBpy/omniORBpy008.html
+doc/omniORBpy/omniORBpy009.html
+doc/omniORBpy/omniORBpy010.html
+doc/omniORBpy/omniORBpy011.html
+doc/omniORBpy/omniORBpy012.html
+doc/tex/omniORBpy.tex
+
+
+Fri Jan 24 11:41:40 GMT 2014 dgrisby
+====================================
+
+- Pass Py_BAD_PARAM info through AMI calls.
+
+modules/omnipy.h
+modules/pyCallDescriptor.cc
+modules/pyExceptions.cc
+
+
+Fri Jan 17 15:15:23 GMT 2014 dgrisby
+====================================
+
+- Documentation updates.
+
+doc/omniORBpy.pdf
+doc/omniORBpy/index.html
+doc/omniORBpy/omniORBpy.html
+doc/omniORBpy/omniORBpy001.html
+doc/omniORBpy/omniORBpy002.html
+doc/omniORBpy/omniORBpy003.html
+doc/omniORBpy/omniORBpy004.html
+doc/omniORBpy/omniORBpy005.html
+doc/omniORBpy/omniORBpy006.html
+doc/omniORBpy/omniORBpy007.html
+doc/omniORBpy/omniORBpy008.html
+doc/omniORBpy/omniORBpy009.html
+doc/omniORBpy/omniORBpy010.html
+doc/omniORBpy/omniORBpy011.html
+doc/omniORBpy/omniORBpy012.html
+doc/omniORBpy/omniORBpy013.html
+doc/tex/omniORBpy.bib
+doc/tex/omniORBpy.tex
+
+
+Mon 30 Dec 15:07:34 GMT 2013 dgrisby
+====================================
+
+- Rebuild configure scripts.
+
+aclocal.m4
+configure
+
+
+Tue Jul 30 14:38:44 BST 2013 dgrisby
+====================================
+
+- Add missing omniZIOP.py.
+
+python/omniORB/omniZIOP.py
+
+
+Wed Jul 24 14:17:40 BST 2013 dgrisby
+====================================
+
+- New endpoint publishing policy.
+
+modules/pyPOAFunc.cc
+python/omniORB/PortableServer.py
+python/omniORB/__init__.py
+python/omniORB/dir.mk
+python/omniORB/omniPolicy.py
+
+
+Thu Jul 18 12:26:45 BST 2013 dgrisby
+====================================
+
+- Removed lots of old CVS log lines.
+
+*Many files*
+
+
+Wed Jun 19 14:52:38 BST 2013 dgrisby
+====================================
+
+- Support ZIOP.
+
+examples/ziop
+examples/ziop/ziop_clt.py
+examples/ziop/ziop_srv.py
+include/omniORBpy.h
+mk/beforeauto.mk.in
+modules/dir.mk
+modules/omnipy.cc
+modules/omnipy.h
+modules/pyObjectRef.cc
+modules/pyPOAFunc.cc
+modules/ziop
+modules/ziop/GNUmakefile.in
+modules/ziop/GNUmakefile
+modules/ziop/dir.mk
+modules/ziop/pyZIOP.cc
+python/omniORB/BiDirPolicy.py
+python/omniORB/CORBA.py
+python/omniORB/Compression.py
+python/omniORB/PortableServer.py
+python/omniORB/ZIOP.py
+python/omniORB/__init__.py
+python/omniORB/dir.mk
+
+
+Wed May 22 15:02:51 BST 2013 dgrisby
+====================================
+
+- Refactored rope management and transport rules.
+
+modules/pyObjectRef.cc
+
+
+Wed May 22 13:10:29 BST 2013 dgrisby
+====================================
+
+- Remove old TypeCode cyclic garbage collection scheme.
+
+python/omniORB/tcInternal.py
+
+
+Fri Apr 12 13:57:21 BST 2013 dgrisby
+====================================
+
+- AMI PollableSet implementation; generic exception throwing code.
+
+modules/omnipy.cc
+modules/omnipy.h
+modules/pyCallDescriptor.cc
+modules/pyExceptions.cc
+modules/pyORBFunc.cc
+modules/pyObjectRef.cc
+modules/pyPOACurrentFunc.cc
+modules/pyPOAManagerFunc.cc
+python/omniORB/CORBA.py
+python/omniORB/ami.py
+
+
+Thu Mar  7 11:09:28 GMT 2013 dgrisby
+====================================
+
+- Update examples.
+
+examples/fortune/fortune_server.py
+examples/random
+examples/random/README
+examples/random/random.idl
+examples/random/random_clt.py
+examples/weather
+examples/weather/README
+examples/weather/gauge.py
+examples/weather/weather.py
+examples/weather/weatherInfo.idl
+examples/weather/wserver.py
+
+- Replace generic twin type with specific Python types.
+
+modules/cxxAPI.cc
+modules/omnipy.cc
+modules/omnipy.h
+modules/pyAbstractIntf.cc
+modules/pyCallDescriptor.cc
+modules/pyExceptions.cc
+modules/pyLocalObjects.cc
+modules/pyMarshal.cc
+modules/pyORBFunc.cc
+modules/pyObjectRef.cc
+modules/pyPOACurrentFunc.cc
+modules/pyPOAFunc.cc
+modules/pyPOAManagerFunc.cc
+modules/pyServant.cc
+modules/pyTypeCode.cc
+modules/pyomniFunc.cc
+omniidl_be/python.py
+python/omniORB/CORBA.py
+python/omniORB/PortableServer.py
+python/omniORB/__init__.py
+
+
+Tue Feb 12 23:00:15 GMT 2013 dgrisby
+====================================
+
+- Expose setClientThreadCallDeadline.
+
+modules/pyomniFunc.cc
+
+- Use properties for all attributes; remove __methods__.
+
+omniidl_be/python.py
+python/omniORB/BiDirPolicy.py
+python/omniORB/CORBA.py
+python/omniORB/PortableServer.py
+python/omniORB/PortableServer__POA.py
+python/omniORB/URI.py
+python/omniORB/codesets.py
+python/omniORB/interceptors.py
+python/omniORB/sslTP.py
+
+- Clean generated code.
+
+python/omniORB/dir.mk
+
+
+Fri Jan 11 17:41:44 GMT 2013 dgrisby
+====================================
+
+- Properly quote M4 macro ugliness.
+
+aclocal.m4
+configure
+
+- Rename string helper free() to dealloc().
+
+modules/pyMarshal.cc
+
+
+Mon Jan  7 13:18:52 GMT 2013 dgrisby
+====================================
+
+- Track ORB core API change.
+
+modules/pyInterceptors.cc
+modules/pyObjectRef.cc
+
+
+Tue Dec  4 14:29:32 GMT 2012 dgrisby
+====================================
+
+- Properly handle generator used as an interceptor.
+
+modules/pyInterceptors.cc
+
+
+Tue Dec  4 10:29:49 GMT 2012 dgrisby
+====================================
+
+- Release interpreter lock in thread interceptor run.
+
+modules/pyInterceptors.cc
+
+
+Mon Dec  3 14:39:34 GMT 2012 dgrisby
+====================================
+
+- Poller implementation base __init__ called incorrectly.
+
+omniidl_be/python.py
+
+
+Wed Nov 28 09:58:54 GMT 2012 dgrisby
+====================================
+
+- Incorrect import for messaging_idl when stubs are in a package.
+
+omniidl_be/python.py
+
+
+Thu Sep 20 23:12:47 BST 2012 dgrisby
+====================================
+
+- Further AMI.
+
+examples/ami
+examples/ami/ami_callback.py
+examples/ami/ami_poller.py
+examples/ami/example_echo.idl
+examples/echo/example_echo_clt.py
+modules/omnipy.cc
+modules/omnipy.h
+modules/omnipy_sysdep.h
+modules/pyCallDescriptor.cc
+modules/pyExceptions.cc
+modules/pyFixed.cc
+modules/pyFixed.h
+modules/pyLocalObjects.cc
+modules/pyMarshal.cc
+modules/pyORBFunc.cc
+modules/pyPOACurrentFunc.cc
+modules/pyPOAFunc.cc
+modules/pyPOAManagerFunc.cc
+modules/pyServant.cc
+modules/pyThreadCache.cc
+modules/pyThreadCache.h
+modules/sslTP/pysslTP.cc
+omniidl_be/python.py
+python/omniORB/ami.py
+
+
+Thu Aug 16 10:42:29 BST 2012 dgrisby
+====================================
+
+- Start of AMI support.
+
+modules/omnipy.cc
+modules/omnipy.h
+modules/pyInterceptors.cc
+omniidl_be/python.py
+python/omniORB/__init__.py
+python/omniORB/ami.py
+python/omniORB/dir.mk
+
+
+Sat Apr 14 10:43:59 BST 2012 dgrisby
+====================================
+
+- Merge from 4_1 branch, up to revision 6093.
+
+configure.ac
+configure
+contrib/RPMs/omniORBpy.spec
+doc/omniORBpy.pdf
+doc/omniORBpy/omniORBpy.html
+doc/omniORBpy/omniORBpy001.html
+doc/omniORBpy/omniORBpy004.html
+doc/tex/omniORBpy.tex
+modules/omnipy_sysdep.h
+modules/pyServant.cc
+python/COS/dir.mk
+python/omniORB/tcInternal.py
+
+
+Fri Feb 24 17:09:40 GMT 2012 dgrisby
+====================================
+
+- Update repository ids to track ORB core change.
+
+python/omniORB/PortableServer.py
+
+
+Mon Aug  8 16:16:42 BST 2011 dgrisby
+====================================
+
+- Error unpickling object references due to change to new-style classes.
+
+python/omniORB/CORBA.py
+
+
+Fri May 20 16:06:12 BST 2011 dgrisby
+====================================
+
+- Add flag to omniORBpyLock to make it optional.
+
+include/omniORBpy.h
+
+
+Wed Apr 20 18:25:15 BST 2011 dgrisby
+====================================
+
+- Expose GIL locking to C++ API.
+
+include/omniORBpy.h
+modules/cxxAPI.cc
+modules/pyThreadCache.h
+
+
+Thu Feb 17 12:49:03 GMT 2011 dgrisby
+====================================
+
+- omniidl Python clean-up and reorg. Now require Python 2.x.
+
+omniidl_be/python.py
+
+
+Sat Feb 12 19:44:40 GMT 2011 dgrisby
+====================================
+
+- Fix a couple of things broken by transition to new-style classes.
+
+modules/pyPOAFunc.cc
+python/omniORB/__init__.py
+
+
+Wed Feb  9 14:31:05 GMT 2011 dgrisby
+====================================
+
+- Start of AMI support: implied IDL generation.
+
+omniidl_be/python.py
+python/CosNaming
+python/CosNaming/GNUmakefile.in
+python/CosNaming/GNUmakefile
+python/CosNaming/__init__.py
+python/CosNaming/dir.mk
+python/CosNaming__POA
+python/CosNaming__POA/GNUmakefile.in
+python/CosNaming__POA/GNUmakefile
+python/CosNaming__POA/__init__.py
+python/CosNaming__POA/dir.mk
+python/omniORB/__init__.py
+python/omniORB/dir.mk
+
+
+Thu Jan  6 14:36:29 GMT 2011 dgrisby
+====================================
+
+- Use CORBA::TIMEOUT exception by default; new timeout handler; option
+  to revert to CORBA::TRANSIENT.
+
+modules/pyomniFunc.cc
+python/omniORB/__init__.py
+
+
+Tue Dec 28 23:31:41 GMT 2010 dgrisby
+====================================
+
+- Huge merge from 4_1 branch, up to revision 6012.
+
+README.txt
+ReleaseNotes.txt
+aclocal.m4
+bin/scripts/binrelease.sh
+bugfixes-34.xml
+configure
+contrib/RPMs/omniORBpy.spec
+modules/dir.mk
+modules/omnipy.cc
+modules/pyInterceptors.cc
+modules/pyTypeCode.cc
+python/omniORB/CORBA.py
+python/omniORB/__init__.py
+
+
+Wed Dec  1 17:11:58 GMT 2010 dgrisby
+====================================
+
+- Use new-style classes; report reason for BAD_PARAM exceptions;
+  support attributes as properties; support simple dynamic
+  invocations.
+
+examples/tests/TypeTest.idl
+examples/tests/tclient.py
+examples/tests/tserver.py
+modules/cxxAPI.cc
+modules/omnipy.cc
+modules/omnipy.h
+modules/pyAbstractIntf.cc
+modules/pyCallDescriptor.cc
+modules/pyContext.cc
+modules/pyExceptions.cc
+modules/pyMarshal.cc
+modules/pyObjectRef.cc
+modules/pyServant.cc
+modules/pyTypeCode.cc
+modules/pyValueType.cc
+omniidl_be/python.py
+python/omniORB/CORBA.py
+python/omniORB/PortableServer.py
+python/omniORB/__init__.py
+python/omniORB/tcInternal.py
+
+
+Mon Mar  1 16:09:32 GMT 2010 dgrisby
+====================================
+
+- Merge changes from 4_1 branch, up to r5946.
+
+modules/pyObjectRef.cc
+omniidl_be/python.py
+python/omniORB/__init__.py
+
+
+Wed Oct  7 16:46:32 BST 2009 dgrisby
+====================================
+
+- Name update.
+
+contrib/RPMs/omniORBpy_new.spec
+
+
+Thu Sep 24 11:06:54 BST 2009 dgrisby
+====================================
+
+- Update spec files.
+
+contrib/RPMs/omniORBpy.spec
+contrib/RPMs/omniORBpy_new.spec
+
+
+Thu Sep 24 11:04:21 BST 2009 dgrisby
+====================================
+
+- Fix some compiler warnings.
+
+modules/pyFixed.cc
+modules/pyFixed.cc
+
+
+Fri Jul 24 00:15:32 BST 2009 dgrisby
+====================================
+
+- Start of the omniORBpy 4.2.x development branch.

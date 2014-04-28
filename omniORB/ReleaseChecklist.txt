@@ -1,0 +1,23 @@
+mk/version.mk
+  version
+  hex version
+
+omniORBpy/mk/version.mk
+
+README.FIRST.txt
+
+THIS_IS_OMNIORB...
+
+ReleaseNotes.txt
+
+bugfixes-XXX.xml
+
+configure.ac
+
+spec files
+
+tag repository
+
+Features web page
+
+Wiki
