@@ -1,3 +1,163 @@
+Mon Jun  8 12:39:12 BST 2015 dgrisby
+====================================
+
+- Python 3.4 has changed threading._get_ident to threading.get_ident.
+
+python/omniORB/__init__.py
+python3/omniORB/__init__.py
+
+
+Wed  6 May 14:54:14 BST 2015 dgrisby
+====================================
+
+- Add uclinux to platform list.
+
+configure.ac
+configure
+
+
+Fri Oct  3 16:50:25 BST 2014 dgrisby
+====================================
+
+- Avoid log message in shutdown race with startup.
+
+modules/pyThreadCache.cc
+
+- Fix methods broken by twin type refactor.
+
+python/omniORB/CORBA.py
+python3/omniORB/CORBA.py
+
+
+Wed Sep  3 10:35:01 BST 2014 dgrisby
+====================================
+
+- _NP_Disconnect method on object references for Python 3.
+
+python3/omniORB/CORBA.py
+update.log
+
+
+Tue Sep  2 12:06:05 BST 2014 dgrisby
+====================================
+
+- _NP_Disconnect method on object references.
+
+modules/pyObjectRef.cc
+python/omniORB/CORBA.py
+
+
+Fri Aug  8 18:17:22 BST 2014 dgrisby
+====================================
+
+- Option to set SSL CA path.
+
+modules/sslTP/pysslTP.cc
+
+
+Wed Jul 23 10:07:17 BST 2014 dgrisby
+====================================
+
+- Initial Python 3 support.
+
+bin/scripts/makeminors.py
+configure.ac
+configure
+dir.mk
+examples/tests/pclient.py
+mk/python.mk
+modules/codesets/dir.mk
+modules/codesets/pyCodeSets.cc
+modules/connections/dir.mk
+modules/connections/pyConnectionMgmt.cc
+modules/dir.mk
+modules/omnipy.cc
+modules/omnipy.h
+modules/omnipy_sysdep.h
+modules/pyAbstractIntf.cc
+modules/pyCallDescriptor.cc
+modules/pyContext.cc
+modules/pyExceptions.cc
+modules/pyFixed.cc
+modules/pyFixed.h
+modules/pyInterceptors.cc
+modules/pyLocalObjects.cc
+modules/pyMarshal.cc
+modules/pyORBFunc.cc
+modules/pyObjectRef.cc
+modules/pyPOACurrentFunc.cc
+modules/pyPOAFunc.cc
+modules/pyPOAManagerFunc.cc
+modules/pyServant.cc
+modules/pyThreadCache.cc
+modules/pyThreadCache.h
+modules/pyTypeCode.cc
+modules/pyValueType.cc
+modules/pyomniFunc.cc
+modules/sslTP/dir.mk
+modules/sslTP/pysslTP.cc
+modules/ziop/dir.mk
+modules/ziop/pyZIOP.cc
+omniidl_be
+omniidl_be/GNUmakefile.in
+omniidl_be/GNUmakefile
+omniidl_be/__init__.py
+omniidl_be/dir.mk
+omniidl_be/python.py
+python/COS/dir.mk
+python/dir.mk
+python/omniORB/CORBA.py
+python/omniORB/URI.py
+python/omniORB/__init__.py
+python/omniORB/any.py
+python/omniORB/dir.mk
+python/omniORB/tcInternal.py
+python/omniidl_be
+python/omniidl_be/GNUmakefile.in
+python/omniidl_be/GNUmakefile
+python/omniidl_be/python.py
+python3
+python3/CORBA.py
+python3/COS
+python3/COS/GNUmakefile.in
+python3/COS/GNUmakefile
+python3/COS/__init__.py
+python3/COS/dir.mk
+python3/GNUmakefile.in
+python3/GNUmakefile
+python3/PortableServer.py
+python3/PortableServer__POA.py
+python3/dir.mk
+python3/omniORB
+python3/omniORB/BiDirPolicy.py
+python3/omniORB/CORBA.py
+python3/omniORB/Compression.py
+python3/omniORB/GNUmakefile.in
+python3/omniORB/GNUmakefile
+python3/omniORB/PortableServer.py
+python3/omniORB/PortableServer__POA.py
+python3/omniORB/URI.py
+python3/omniORB/ZIOP.py
+python3/omniORB/__init__.py
+python3/omniORB/ami.py
+python3/omniORB/any.py
+python3/omniORB/codesets.py
+python3/omniORB/dir.mk
+python3/omniORB/interceptors.py
+python3/omniORB/omniConnectionMgmt.py
+python3/omniORB/omniPolicy.py
+python3/omniORB/omniZIOP.py
+python3/omniORB/sslTP.py
+python3/omniORB/tcInternal.py
+python3/omniidl_be
+python3/omniidl_be/GNUmakefile.in
+python3/omniidl_be/GNUmakefile
+python3/omniidl_be/__init__.py
+python3/omniidl_be/__pycache__
+python3/omniidl_be/dir.mk
+python3/omniidl_be/python.py
+
+
 Mon Apr 28 17:48:32 BST 2014 dgrisby
 ====================================
 

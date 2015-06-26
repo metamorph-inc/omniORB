@@ -87,12 +87,23 @@ public:
   // nested value away, but later receives an indirection to it.
 
 private:
+  void resizeTable();
+
+  inline void add()
+  {
+    if (++pd_table_count == pd_table_limit)
+      resizeTable();
+  }
+
   static _dyn_attr const CORBA::ULong PD_MAGIC; // "C+OV"
-  CORBA::ULong pd_magic;
+  CORBA::ULong       pd_magic;
 
   CORBA::ULong       pd_in_truncatable;
   OutputTableEntry** pd_table;
+  CORBA::ULong       pd_table_count;
   CORBA::ULong       pd_table_size;
+  CORBA::ULong       pd_table_limit;
+  CORBA::ULong       pd_table_next_idx;
 };
 
 class InputValueTracker : public ValueIndirectionTracker {
@@ -134,12 +145,23 @@ public:
   // As above for list of repoIds.
 
 private:
+  void resizeTable();
+
+  inline void add()
+  {
+    if (++pd_table_count == pd_table_limit)
+      resizeTable();
+  }
+
   static _dyn_attr const CORBA::ULong PD_MAGIC; // "C+IV"
-  CORBA::ULong pd_magic;
+  CORBA::ULong      pd_magic;
 
   CORBA::ULong      pd_in_truncatable;
   InputTableEntry** pd_table;
+  CORBA::ULong      pd_table_count;
   CORBA::ULong      pd_table_size;
+  CORBA::ULong      pd_table_limit;
+  CORBA::ULong      pd_table_next_idx;
 };
 
 

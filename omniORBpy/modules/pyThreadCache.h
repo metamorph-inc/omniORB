@@ -66,7 +66,6 @@ public:
 
     CORBA::Boolean   used;
     CORBA::Boolean   can_scavenge;
-    CORBA::Boolean   reused_state;
     int              active;
 
 #if PY_VERSION_HEX >= 0x02030000
@@ -92,16 +91,14 @@ public:
     PyThreadState* tstate = PyGILState_GetThisThreadState();
     if (tstate) {
       cn = 0;
-      PyEval_AcquireLock();
-      PyThreadState_Swap(tstate);
+      PyEval_RestoreThread(tstate);
     }
     else
 #endif
     {
       long id = PyThread_get_thread_ident();
       cn      = acquireNode(id);
-      PyEval_AcquireLock();
-      PyThreadState_Swap(cn->threadState);
+      PyEval_RestoreThread(cn->threadState);
     }
     return cn;
   }
@@ -109,8 +106,7 @@ public:
   // Release the global interpreter lock
   static inline void release(CacheNode* cn)
   {
-    PyThreadState_Swap(0);
-    PyEval_ReleaseLock();
+    PyEval_SaveThread();
     if (cn)
       releaseNode(cn);
   }

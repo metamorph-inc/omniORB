@@ -1,3 +1,5 @@
+include $(BASE_OMNI_TREE)/mk/python.mk
+
 DIR_CPPFLAGS += -DOMNIPY_MAJOR=$(OMNIPY_MAJOR) -DOMNIPY_MINOR=$(OMNIPY_MINOR) \
 		-DOMNIPY_VERSION_STRING='"$(OMNIPY_VERSION)"'
 
@@ -72,14 +74,7 @@ endif
 ifdef UnixPlatform
 #CXXDEBUGFLAGS = -g
 
-PYPREFIX  := $(shell $(PYTHON) -c 'import sys; print sys.exec_prefix')
-PYVERSION := $(shell $(PYTHON) -c 'import sys; print sys.version[:3]')
-PYINCDIR  := $(PYPREFIX)/include
-PYINCFILE := "<Python.h>"
-PYINCTHRD := "<pythread.h>"
-DIR_CPPFLAGS += -I$(PYINCDIR)/python$(PYVERSION) -I$(PYINCDIR) -DPYTHON_INCLUDE=$(PYINCFILE) -DPYTHON_THREAD_INC=$(PYINCTHRD)
 DIR_CPPFLAGS += $(CORBA_CPPFLAGS)
-
 endif
 
 
@@ -89,7 +84,7 @@ endif
 
 ifeq ($(platform),autoconf)
 
-namespec := _omnipymodule _ $(OMNIPY_MAJOR) $(OMNIPY_MINOR)
+namespec := _omnipy$(PY_MODULE_SUFFIX) _ $(OMNIPY_MAJOR) $(OMNIPY_MINOR)
 
 ifdef PythonSHAREDLIB_SUFFIX
 SHAREDLIB_SUFFIX = $(PythonSHAREDLIB_SUFFIX)
@@ -131,6 +126,49 @@ veryclean::
 	(dir=.; $(CleanSharedLibrary))
 
 else
+
+#############################################################################
+#   Make rules for Windows                                                  #
+#############################################################################
+
+ifdef Win32Platform
+
+PYPREFIX1 := "$(shell $(PYTHON) -c 'import sys,string; sys.stdout.write(string.lower(sys.prefix))')"
+PYPREFIX  := $(subst program files,progra~1,$(subst \,/,$(PYPREFIX1)))
+PYVERSION := $(shell $(PYTHON) -c 'import sys; sys.stdout.write(sys.version[:3])')
+PYINCDIR  := $(PYPREFIX)/include
+PYLIBDIR  := $(PYPREFIX)/libs
+PYLIB     := python$(subst .,,$(PYVERSION)).lib
+
+DIR_CPPFLAGS += -I$(PYINCDIR) -I$(PYINCDIR)/python$(PYVERSION) \
+                -DPYTHON_INCLUDE="<Python.h>" -DPYTHON_THREAD_INC="<pythread.h>"
+
+PYLIBPATH = $(patsubst %,-libpath:%,$(PYLIBDIR))
+
+implib = _omnipy.lib
+lib = $(patsubst %.lib,%.pyd,$(implib))
+
+all:: $(lib)
+
+$(lib): $(OBJS)
+	(set -x; \
+	 $(RM) $@; \
+	 libs="$(OMNIORB_LIB_NODYN) $(PYLIB)"; \
+	 $(CXXLINK) -out:$@ -DLL $(CXXLINKOPTIONS) $(IMPORT_LIBRARY_FLAGS) $(PYLIBPATH) $(OBJS) $$libs; \
+         $(MANIFESTTOOL) /outputresource:"$@;#2" /manifest $@.manifest; \
+	)
+
+export:: $(lib)
+	@$(ExportLibrary)
+
+
+endif
+
+
+#
+# Obsolete rules for non-autoconf builds
+#
+
 
 #############################################################################
 #   Make rules for Linux                                                    #
@@ -224,44 +262,6 @@ export:: $(lib)
           $(RM) $(libname); \
           ln -s $(soname) $(libname); \
          )
-
-endif
-
-
-#############################################################################
-#   Make rules for Windows                                                  #
-#############################################################################
-
-ifdef Win32Platform
-
-PYPREFIX1 := "$(shell $(PYTHON) -c 'import sys,string; sys.stdout.write(string.lower(sys.prefix))')"
-PYPREFIX  := $(subst program files,progra~1,$(subst \,/,$(PYPREFIX1)))
-PYVERSION := $(shell $(PYTHON) -c 'import sys; sys.stdout.write(sys.version[:3])')
-PYINCDIR  := $(PYPREFIX)/include
-PYLIBDIR  := $(PYPREFIX)/libs
-PYLIB     := python$(subst .,,$(PYVERSION)).lib
-
-DIR_CPPFLAGS += -I$(PYINCDIR) -I$(PYINCDIR)/python$(PYVERSION) \
-                -DPYTHON_INCLUDE="<Python.h>" -DPYTHON_THREAD_INC="<pythread.h>"
-
-PYLIBPATH = $(patsubst %,-libpath:%,$(PYLIBDIR))
-
-implib = _omnipy.lib
-lib = $(patsubst %.lib,%.pyd,$(implib))
-
-all:: $(lib)
-
-$(lib): $(OBJS)
-	(set -x; \
-	 $(RM) $@; \
-	 libs="$(OMNIORB_LIB_NODYN) $(PYLIB)"; \
-	 $(CXXLINK) -out:$@ -DLL $(CXXLINKOPTIONS) $(IMPORT_LIBRARY_FLAGS) $(PYLIBPATH) $(OBJS) $$libs; \
-         $(MANIFESTTOOL) /outputresource:"$@;#2" /manifest $@.manifest; \
-	)
-
-export:: $(lib)
-	@$(ExportLibrary)
-
 
 endif
 

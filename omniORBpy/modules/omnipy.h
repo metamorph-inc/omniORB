@@ -3,7 +3,7 @@
 // omnipy.h                   Created on: 2000/02/24
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2002-2013 Apasphere Ltd
+//    Copyright (C) 2002-2014 Apasphere Ltd
 //    Copyright (C) 2000 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -30,6 +30,8 @@
 
 #ifndef _omnipy_h_
 #define _omnipy_h_
+
+#define PY_SSIZE_T_CLEAN
 
 #if defined(__VMS)
 #include <Python.h>
@@ -142,11 +144,29 @@ public:
     if (omniORB::traceExceptions) {
       PyObject* info_repr = PyObject_Repr(info);
       omniORB::logger log;
-      log << "BAD_PARAM info: " << PyString_AsString(info_repr) << "\n";
+      log << "BAD_PARAM info: " << String_AsString(info_repr) << "\n";
       Py_DECREF(info_repr);
     }
     Py_DECREF(info);
     throw CORBA::BAD_PARAM(minor(), completed());
+  }
+
+  // Log the stack of messages and release them.
+  inline void logInfoAndDrop(const char* msg=0)
+  {
+    PyObject* info = getInfo();
+
+    if (omniORB::traceExceptions) {
+      PyObject* info_repr = PyObject_Repr(info);
+      omniORB::logger log;
+
+      if (msg)
+        log << msg << ": ";
+
+      log << "BAD_PARAM info: " << String_AsString(info_repr) << "\n";
+      Py_DECREF(info_repr);
+    }
+    Py_DECREF(info);
   }
 
 
@@ -190,6 +210,7 @@ public:
 
   static PyInterpreterState* pyInterpreter;
 
+
   ////////////////////////////////////////////////////////////////////////////
   // Global pointers to Python objects                                      //
   ////////////////////////////////////////////////////////////////////////////
@@ -221,8 +242,8 @@ public:
   static PyObject* pyServantClass;     	//  Servant class
   static PyObject* pyCreateTypeCode;   	// Function to create a TypeCode object
   static PyObject* pyWorkerThreadClass;	// Worker thread class
-  static PyObject* pyWorkerThreadDel;  	// Method to delete worker thread
   static PyObject* pyEmptyTuple;       	// Zero element tuple
+
 
   ////////////////////////////////////////////////////////////////////////////
   // 'Static' strings                                                       //
@@ -231,6 +252,7 @@ public:
   static PyObject* pyservantAttr;
   static PyObject* pyobjAttr;
   static PyObject* pyNP_RepositoryId;
+
 
   ////////////////////////////////////////////////////////////////////////////
   // Constant strings to facilitate comparison by pointer                   //
@@ -248,6 +270,13 @@ public:
   ////////////////////////////////////////////////////////////////////////////
 
   static CORBA::ORB_ptr orb;
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  // Code sets                                                              //
+  ////////////////////////////////////////////////////////////////////////////
+
+  static omniCodeSet::NCS_C* ncs_c_utf_8;
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -272,6 +301,7 @@ public:
   static void initCallDescriptor (PyObject* d);
   static void initServant        (PyObject* d);
   static void initTypeCode       (PyObject* d);
+
 
   ////////////////////////////////////////////////////////////////////////////
   // PyRefHolder holds a references to a Python object                      //
@@ -322,19 +352,32 @@ public:
 
     // Cast operators for various concrete Python types, to allow
     // PyObjectHolder to be passed in Python API functions.
-    inline operator PyObject*()       { return obj_; }
-    inline operator PyIntObject*()    { return (PyIntObject*)obj_; }
-    inline operator PyVarObject*()    { return (PyVarObject*)obj_; }
-    inline operator PyListObject*()   { return (PyListObject*)obj_; }
-    inline operator PyTupleObject*()  { return (PyTupleObject*)obj_; }
-    inline operator PyStringObject*() { return (PyStringObject*)obj_; }
+    inline operator PyObject*()        { return obj_; }
+    inline operator PyVarObject*()     { return (PyVarObject*)obj_; }
+    inline operator PyLongObject*()    { return (PyLongObject*)obj_; }
+    inline operator PyListObject*()    { return (PyListObject*)obj_; }
+    inline operator PyTupleObject*()   { return (PyTupleObject*)obj_; }
+
+#if (PY_VERSION_HEX < 0x03000000)
+    inline operator PyIntObject*()     { return (PyIntObject*)obj_; }
+    inline operator PyStringObject*()  { return (PyStringObject*)obj_; }
+#else
+    inline operator PyBytesObject*()   { return (PyBytesObject*)obj_; }
+#endif
+    inline operator PyUnicodeObject*() { return (PyUnicodeObject*)obj_; }
+
+#if (PY_VERSION_HEX >= 0x03030000)
+    inline operator PyASCIIObject*()   { return (PyASCIIObject*)obj_; }
+    inline operator PyCompactUnicodeObject*()
+                                       { return (PyCompactUnicodeObject*)obj_; }
+#endif
 
     // Operators for our own types
-    inline operator PyObjRefObject*() { return (PyObjRefObject*)obj_; }
-    inline operator PyPOAObject*()    { return (PyPOAObject*)obj_; }
+    inline operator PyObjRefObject*()  { return (PyObjRefObject*)obj_; }
+    inline operator PyPOAObject*()     { return (PyPOAObject*)obj_; }
 
     // Pointer operator used in some Python macros like PyInt_Check.
-    inline PyObject* operator->()     { return obj_; }
+    inline PyObject* operator->()      { return obj_; }
 
   private:
     PyObject* obj_;
@@ -412,6 +455,61 @@ public:
   // String formatting function. Equivalent to Python fmt % (args)
   static
   PyObject* formatString(const char* fmt, const char* pyfmt, ...);
+
+  // Get ULong from integer
+  static inline
+  CORBA::ULong
+  getULongVal(PyObject* obj,
+              CORBA::CompletionStatus completion = CORBA::COMPLETED_NO)
+  {
+#if (PY_VERSION_HEX < 0x03000000)
+
+    if (PyInt_Check(obj)) {
+      long v = PyInt_AS_LONG(obj);
+
+      if (v < 0
+#if SIZEOF_LONG > 4
+          || v > 0xffffffff
+#endif
+          ) {
+        THROW_PY_BAD_PARAM(BAD_PARAM_WrongPythonType, completion,
+                           formatString("Value %s out of range for ULong",
+                                        "O", obj))
+      }
+      return (CORBA::ULong)v;
+    }
+#endif
+    if (!PyLong_Check(obj))
+      THROW_PY_BAD_PARAM(BAD_PARAM_WrongPythonType, completion,
+                         formatString("Expecting int, got %r", "O",
+                                      obj->ob_type));
+
+    unsigned long v = PyLong_AsUnsignedLong(obj);
+
+    if (PyErr_Occurred() 
+#if SIZEOF_LONG > 4
+        || v > 0xffffffff
+#endif
+        ) {
+      PyErr_Clear();
+      THROW_PY_BAD_PARAM(BAD_PARAM_WrongPythonType, completion,
+                         formatString("Value %s out of range for ULong",
+                                      "O", obj));
+    }
+    return v;
+  }
+
+  // Get value from an enum
+  static inline
+  CORBA::ULong getEnumVal(PyObject* pyenum)
+  {
+    PyRefHolder ev(PyObject_GetAttrString(pyenum, (char*)"_v"));
+    if (!ev.valid())
+      THROW_PY_BAD_PARAM(BAD_PARAM_WrongPythonType, CORBA::COMPLETED_NO,
+                         omniPy::formatString("Expecting enum item, got %r",
+                                              "O", pyenum->ob_type));
+    return getULongVal(ev);
+  }
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -559,10 +657,17 @@ public:
   static inline
   CORBA::ULong descriptorToTK(PyObject* d_o)
   {
+#if (PY_VERSION_HEX < 0x03000000)
     if (PyInt_Check(d_o))
       return PyInt_AS_LONG(d_o);
     else
       return PyInt_AS_LONG(PyTuple_GET_ITEM(d_o, 0));
+#else
+    if (PyLong_Check(d_o))
+      return PyLong_AsLong(d_o);
+    else
+      return PyLong_AsLong(PyTuple_GET_ITEM(d_o, 0));
+#endif
   }
 
   // Validate that the argument has the type specified by the
@@ -681,25 +786,50 @@ public:
   static inline
   void marshalRawPyString(cdrStream& stream, PyObject* pystring)
   {
-    CORBA::ULong slen = PyString_GET_SIZE(pystring) + 1;
+    CORBA::ULong slen;
+    const char*  str = String_AS_STRING_AND_SIZE(pystring, slen);
+
+    ++slen;
     slen >>= stream;
-    char* str = PyString_AS_STRING(pystring);
-    stream.put_octet_array((const CORBA::Octet*)((const char*)str), slen);
+
+    stream.put_small_octet_array((const CORBA::Octet*)str, slen);
+  }
+
+
+  static inline PyObject*
+  unmarshalRawPyString(cdrStream& stream, CORBA::ULong len)
+  {
+    if (!stream.checkInputOverrun(1, len))
+      OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+		    (CORBA::CompletionStatus)stream.completion());
+
+    PyObject* pystring;
+
+#if (PY_VERSION_HEX < 0x03000000)
+    pystring = PyString_FromStringAndSize(0, len - 1);
+    stream.get_octet_array((_CORBA_Octet*)PyString_AS_STRING(pystring), len);
+
+#else
+    const char* data = (const char*)stream.inData(len);
+    if (data) {
+      // Read data directly from stream's buffer
+      pystring = PyUnicode_FromStringAndSize((const char*)data, len-1);
+    }
+    else {
+      char* buf = new char[len];
+      stream.get_octet_array((_CORBA_Octet*)buf, len);
+      pystring = PyUnicode_FromStringAndSize((const char*)buf, len-1);
+      delete [] buf;
+    }
+#endif
+    return pystring;
   }
 
   static inline PyObject*
   unmarshalRawPyString(cdrStream& stream)
   {
     CORBA::ULong len; len <<= stream;
-
-    if (!stream.checkInputOverrun(1, len))
-      OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
-		    (CORBA::CompletionStatus)stream.completion());
-
-    PyObject* pystring = PyString_FromStringAndSize(0, len - 1);
-
-    stream.get_octet_array((_CORBA_Octet*)PyString_AS_STRING(pystring), len);
-    return pystring;
+    return unmarshalRawPyString(stream, len);
   }
 
 
@@ -824,12 +954,14 @@ public:
 
       inline InvokeArgs(CORBA::Object_ptr cxxobjref, PyObject* pyargs)
       {
-        PyObject* op_str;
-        PyObject* desc;
+        PyObject*    op_str;
+        PyObject*    desc;
+        CORBA::ULong len;
 
         op_str = PyTuple_GET_ITEM(pyargs, 0);
-        op     = PyString_AS_STRING(op_str);
-        op_len = PyString_GET_SIZE(op_str) + 1;
+        op     = String_AS_STRING_AND_SIZE(op_str, len);
+
+        op_len = len + 1;
 
         desc   = PyTuple_GET_ITEM(pyargs, 1);
         in_d   = PyTuple_GET_ITEM(desc, 0);

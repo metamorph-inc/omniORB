@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, time, string
+import sys, time
 from omniORB import CORBA, PortableServer
 import PerfTest
 
@@ -20,7 +20,7 @@ def doTests(orb, poa, io):
     a = time.time()
     print a-b
 
-    s = string.join(map(chr, l), "")
+    s = "".join(map(chr, l))
 
     print "octet sequence: ",
     sys.stdout.flush()

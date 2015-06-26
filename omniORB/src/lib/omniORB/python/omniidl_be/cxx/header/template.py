@@ -802,12 +802,15 @@ public:
     return *this;
   }
   inline @name@_var& operator = (const @name@_var& _s) {
-    if (_s._pd_seq) {
-      if (!_pd_seq)  _pd_seq = new @name@;
-      *_pd_seq = *_s._pd_seq;
-    } else if (_pd_seq) {
-      delete _pd_seq;
-      _pd_seq = 0;
+    if (&_s != this) {
+      if (_s._pd_seq) {
+        if (!_pd_seq)  _pd_seq = new @name@;
+        *_pd_seq = *_s._pd_seq;
+      }
+      else if (_pd_seq) {
+        delete _pd_seq;
+        _pd_seq = 0;
+      }
     }
     return *this;
   }
@@ -1024,8 +1027,10 @@ public:
   }
   
   @unionname@(const @unionname@& _value) : _pd__initialised(0) {
-    @copy_constructor@
-    _pd__initialised = _value._pd__initialised;
+    if (_value._pd__initialised) {
+      @copy_constructor@
+      _pd__initialised = _value._pd__initialised;
+    }
   }
 
   ~@unionname@() {
@@ -1033,8 +1038,15 @@ public:
   }
 
   @unionname@& operator=(const @unionname@& _value) {
-    @copy_constructor@
-    _pd__initialised = _value._pd__initialised;
+    if (&_value != this) {
+      if (_value._pd__initialised) {
+        @copy_constructor@
+        _pd__initialised = _value._pd__initialised;
+      }
+      else {
+        _release_member();
+      }
+    }
     return *this;
   }
 

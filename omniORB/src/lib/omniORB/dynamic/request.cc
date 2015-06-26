@@ -161,6 +161,9 @@ void
 DIICallDescriptor::
 completeCallback()
 {
+  if (exceptionOccurred() && !orbParameters::diiThrowsSysExceptions)
+    pd_environment->exception(getException());
+
   omniAMI::DIIPollableImpl::_PD_instance._replyReady();
   pd_req->decrRefCount();
 }

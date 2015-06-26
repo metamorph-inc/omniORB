@@ -168,6 +168,33 @@ static sslCAFileHandler sslCAFileHandler_;
 
 
 /////////////////////////////////////////////////////////////////////////////
+class sslCAPathHandler : public orbOptions::Handler {
+public:
+
+  sslCAPathHandler() : 
+    orbOptions::Handler("sslCAPath",
+			"sslCAPath = <certificate authority path>",
+			1,
+			"-ORBsslCAPath <certificate authority path>") {}
+
+  void visit(const char* value,orbOptions::Source) throw (orbOptions::BadParam)
+  {    
+    sslContext::certificate_authority_path = CORBA::string_dup(value);
+  }
+
+  void dump(orbOptions::sequenceString& result)
+  {
+    orbOptions::addKVString(key(),
+			    sslContext::certificate_authority_path ?
+			    sslContext::certificate_authority_path : "<unset>",
+			    result);
+  }
+};
+
+static sslCAPathHandler sslCAPathHandler_;
+
+
+/////////////////////////////////////////////////////////////////////////////
 class sslKeyFileHandler : public orbOptions::Handler {
 public:
 
@@ -327,11 +354,18 @@ static sslAcceptTimeOutHandler sslAcceptTimeOutHandler_;
 /////////////////////////////////////////////////////////////////////////
 static sslTransportImpl* _the_sslTransportImpl = 0;
 
+static inline CORBA::Boolean validPath(const char* path)
+{
+  struct stat sb;
+  return (path && stat(path, &sb) == 0);
+}
+
 class omni_sslTransport_initialiser : public omniInitialiser {
 public:
 
   omni_sslTransport_initialiser() {
     orbOptions::singleton().registerHandler(sslCAFileHandler_);
+    orbOptions::singleton().registerHandler(sslCAPathHandler_);
     orbOptions::singleton().registerHandler(sslKeyFileHandler_);
     orbOptions::singleton().registerHandler(sslKeyPasswordHandler_);
     orbOptions::singleton().registerHandler(sslVerifyModeHandler_);
@@ -346,16 +380,15 @@ public:
 
       if (omniORB::trace(5)) {
 	omniORB::logger log;
-	log << "No SSL context object supplied, attempt to create one "
-	    << "with the default ctor.\n";
+	log << "No SSL context object supplied. Attempt to create one "
+	    << "with the default constructor.\n";
       }
-      struct stat sb;
+      if (!(validPath(sslContext::certificate_authority_file) ||
+            validPath(sslContext::certificate_authority_path))) {
 
-      if (!sslContext::certificate_authority_file || 
-	  stat(sslContext::certificate_authority_file,&sb) < 0) {
 	if (omniORB::trace(1)) {
 	  omniORB::logger log;
-	  log << "Warning: SSL CA certificate file is not set "
+	  log << "Warning: SSL CA certificate location is not set "
 	      << "or cannot be found. SSL transport disabled.\n";
 	}
 	return;

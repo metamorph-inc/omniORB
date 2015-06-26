@@ -154,6 +154,25 @@ void omniInterceptors::invokeLocalCall_T::remove(
 
 
 //
+// Convenience methods to access operation name
+
+#define OPERATION_ACCESSOR(interceptor, g) \
+\
+const char* \
+omniInterceptors::interceptor##_T::info_T::operation() \
+{ \
+  return g.operation(); \
+}
+
+OPERATION_ACCESSOR(clientOpenConnection, giop_c)
+OPERATION_ACCESSOR(clientSendRequest,    giop_c)
+OPERATION_ACCESSOR(clientReceiveReply,   giop_c)
+OPERATION_ACCESSOR(serverReceiveRequest, giop_s)
+OPERATION_ACCESSOR(serverSendReply,      giop_s)
+OPERATION_ACCESSOR(serverSendException,  giop_s)
+
+
+//
 // Convenience methods to access connection details
 
 #define CONNECTION_ACCESSORS(interceptor,strand) \

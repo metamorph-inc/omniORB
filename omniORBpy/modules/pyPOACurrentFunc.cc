@@ -3,7 +3,7 @@
 // pyPOACurrentFunc.cc        Created on: 2001/06/11
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2005-2013 Apasphere Ltd
+//    Copyright (C) 2005-2014 Apasphere Ltd
 //    Copyright (C) 2001 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -41,7 +41,7 @@ extern "C" {
       CORBA::release(self->pc);
       CORBA::release(self->base.obj);
     }
-    self->base.ob_type->tp_free((PyObject*)self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
   }
 
   static PyObject*
@@ -71,8 +71,8 @@ extern "C" {
       return omniPy::raiseScopedException(omniPy::pyPortableServerModule,
                                           "Current", "NoContext");
     }
-    return PyString_FromStringAndSize((const char*)oid->NP_data(),
-                                      oid->length());
+    return RawString_FromStringAndSize((const char*)oid->NP_data(),
+                                       oid->length());
   }
 
   static PyObject*
@@ -149,8 +149,7 @@ extern "C" {
   };
 
   static PyTypeObject PyPOACurrentType = {
-    PyObject_HEAD_INIT(0)
-    0,                                   /* ob_size */
+    PyVarObject_HEAD_INIT(0,0)
     (char*)"_omnipy.PyPOACurrentObject", /* tp_name */
     sizeof(PyPOACurrentObject),          /* tp_basicsize */
     0,                                   /* tp_itemsize */

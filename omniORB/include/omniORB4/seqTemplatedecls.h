@@ -171,12 +171,14 @@ protected:
 
   inline T_seq &operator= (const T_seq &s)
   {
-    // Prevent copybuffer from copying any of the current sequence members
-    pd_len = 0;
+    if (&s != this) {
+      // Prevent copybuffer from copying any of the current sequence members
+      pd_len = 0;
 
-    length(s.pd_len);
-    for (unsigned long i=0; i < pd_len; i++) {
-      pd_buf[i] = s.pd_buf[i];
+      length(s.pd_len);
+      for (unsigned long i=0; i < pd_len; i++) {
+        pd_buf[i] = s.pd_buf[i];
+      }
     }
     return *this;
   }
@@ -1170,13 +1172,15 @@ protected:
 
   inline T_seq& operator= (const T_seq& s)
   {
-    // Prevent copybuffer from copying any of the current sequence members 
-    pd_len = 0;
+    if (&s != this) {
+      // Prevent copybuffer from copying any of the current sequence members 
+      pd_len = 0;
 
-    length(s.pd_len);
-    for (unsigned long i=0; i < pd_len; i++) {
-      for (_CORBA_ULong j=0; j < dimension; j++) {
-	*((T_elm*)(pd_buf[i]) + j) = *((T_elm*)(s.pd_buf[i]) + j);
+      length(s.pd_len);
+      for (unsigned long i=0; i < pd_len; i++) {
+        for (_CORBA_ULong j=0; j < dimension; j++) {
+          *((T_elm*)(pd_buf[i]) + j) = *((T_elm*)(s.pd_buf[i]) + j);
+        }
       }
     }
     return *this;
@@ -1989,26 +1993,28 @@ protected:
   }
 
   inline T_seq& operator= (const T_seq& s) {
-    _CORBA_ULong i;
+    if (&s != this) {
+      _CORBA_ULong i;
 
-    if (pd_rel) {
-      T* nil_ = T_Helper::_nil();
-      for (i=0; i < pd_len; i++) {
-	T_Helper::release(pd_buf[i]);
-	pd_buf[i] = nil_;
+      if (pd_rel) {
+        T* nil_ = T_Helper::_nil();
+        for (i=0; i < pd_len; i++) {
+          T_Helper::release(pd_buf[i]);
+          pd_buf[i] = nil_;
+        }
+        pd_len = 0;
+        length(s.pd_len);
+        for (i = 0; i < pd_len; i++) {
+          pd_buf[i] = s.pd_buf[i];
+          T_Helper::duplicate(pd_buf[i]);
+        }
       }
-      pd_len = 0;
-      length(s.pd_len);
-      for (i = 0; i < pd_len; i++) {
-	pd_buf[i] = s.pd_buf[i];
-	T_Helper::duplicate(pd_buf[i]);
-      }
-    }
-    else {
-      pd_len = 0;
-      length(s.pd_len);
-      for (i = 0; i < pd_len; i++) {
-	pd_buf[i] = s.pd_buf[i];
+      else {
+        pd_len = 0;
+        length(s.pd_len);
+        for (i = 0; i < pd_len; i++) {
+          pd_buf[i] = s.pd_buf[i];
+        }
       }
     }
     return *this;

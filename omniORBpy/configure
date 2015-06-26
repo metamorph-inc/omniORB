@@ -4167,6 +4167,7 @@ os_v="0"
 
 case "$host" in
   *-*-linux-*)   plat_name="Linux";    plat_def="__linux__";    os_v="2";;
+  *-*-uclinux-*) plat_name="Linux";    plat_def="__linux__";    os_v="2";;
   *-*-cygwin*)   plat_name="Cygwin";   plat_def="__cygwin__";   os_v="1";;
   *-*-solaris*)  plat_name="SunOS";    plat_def="__sunos__";    os_v="5";;
   *-*-osf3*)     plat_name="OSF1";     plat_def="__osf1__";     os_v="3";;
@@ -4227,7 +4228,7 @@ PROCESSOR_DEFINE=$proc_def
 ac_config_files="$ac_config_files mk/beforeauto.mk mk/afterauto.mk"
 
 
-ac_config_files="$ac_config_files GNUmakefile examples/embed/GNUmakefile modules/GNUmakefile modules/codesets/GNUmakefile modules/sslTP/GNUmakefile modules/connections/GNUmakefile modules/ziop/GNUmakefile omniidl_be/GNUmakefile python/GNUmakefile python/COS/GNUmakefile python/omniORB/GNUmakefile include/GNUmakefile"
+ac_config_files="$ac_config_files GNUmakefile examples/embed/GNUmakefile modules/GNUmakefile modules/codesets/GNUmakefile modules/sslTP/GNUmakefile modules/connections/GNUmakefile modules/ziop/GNUmakefile python/GNUmakefile python/omniidl_be/GNUmakefile python/COS/GNUmakefile python/omniORB/GNUmakefile python3/GNUmakefile python3/omniidl_be/GNUmakefile python3/COS/GNUmakefile python3/omniORB/GNUmakefile include/GNUmakefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4945,10 +4946,14 @@ do
     "modules/sslTP/GNUmakefile") CONFIG_FILES="$CONFIG_FILES modules/sslTP/GNUmakefile" ;;
     "modules/connections/GNUmakefile") CONFIG_FILES="$CONFIG_FILES modules/connections/GNUmakefile" ;;
     "modules/ziop/GNUmakefile") CONFIG_FILES="$CONFIG_FILES modules/ziop/GNUmakefile" ;;
-    "omniidl_be/GNUmakefile") CONFIG_FILES="$CONFIG_FILES omniidl_be/GNUmakefile" ;;
     "python/GNUmakefile") CONFIG_FILES="$CONFIG_FILES python/GNUmakefile" ;;
+    "python/omniidl_be/GNUmakefile") CONFIG_FILES="$CONFIG_FILES python/omniidl_be/GNUmakefile" ;;
     "python/COS/GNUmakefile") CONFIG_FILES="$CONFIG_FILES python/COS/GNUmakefile" ;;
     "python/omniORB/GNUmakefile") CONFIG_FILES="$CONFIG_FILES python/omniORB/GNUmakefile" ;;
+    "python3/GNUmakefile") CONFIG_FILES="$CONFIG_FILES python3/GNUmakefile" ;;
+    "python3/omniidl_be/GNUmakefile") CONFIG_FILES="$CONFIG_FILES python3/omniidl_be/GNUmakefile" ;;
+    "python3/COS/GNUmakefile") CONFIG_FILES="$CONFIG_FILES python3/COS/GNUmakefile" ;;
+    "python3/omniORB/GNUmakefile") CONFIG_FILES="$CONFIG_FILES python3/omniORB/GNUmakefile" ;;
     "include/GNUmakefile") CONFIG_FILES="$CONFIG_FILES include/GNUmakefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

@@ -3,7 +3,7 @@
 // omnipy_sysdep.h            Created on: 2000/03/07
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2002-2012 Apasphere Ltd
+//    Copyright (C) 2002-2014 Apasphere Ltd
 //    Copyright (C) 2000 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -35,11 +35,99 @@
 //
 // Python version dependencies
 
-// Boolean type support
-#if (PY_VERSION_HEX < 0x02030000)
-#  define PyBool_FromLong(x) PyInt_FromLong(x ? 1 : 0)
-#  define PyBool_Check(x) 0
+#if (PY_VERSION_HEX < 0x03000000) // Python 2
+
+#  define String_Check(o)                  PyString_Check(o)
+#  define String_AsString(o)               PyString_AsString(o)
+#  define String_FromString(s)             PyString_FromString(s)
+#  define String_FromStringAndSize(s,l)    PyString_FromStringAndSize(s,l)
+#  define String_Format(f,a)               PyString_Format(f,a)
+#  define String_GET_SIZE(o)               PyString_GET_SIZE(o)
+#  define String_AS_STRING(o)              PyString_AS_STRING(o)
+
+#  define Unicode_GET_SIZE(o)              PyUnicode_GET_SIZE(o)
+
+static inline const char*
+String_AS_STRING_AND_SIZE(PyObject* obj, CORBA::ULong& size)
+{
+  size = PyString_GET_SIZE(obj);
+  return PyString_AS_STRING(obj);
+}
+
+#  define RawString_Check(o)               PyString_Check(o)
+#  define RawString_GET_SIZE(o)            PyString_GET_SIZE(o)
+#  define RawString_AS_STRING(o)           PyString_AS_STRING(o)
+#  define RawString_FromStringAndSize(o,s) PyString_FromStringAndSize(o,s)
+#  define RawString_FromString(s)          PyString_FromString(s)
+
+#  define Int_Check(o)                     PyInt_Check(o)
+#  define Int_FromLong(l)                  PyInt_FromLong(l)
+#  define Int_AS_LONG(o)                   PyInt_AS_LONG(o)
+
+#else // Python 3
+
+#  if (PY_VERSION_HEX >= 0x03030000) // Python 3.3
+
+#    define String_AsString(o)               PyUnicode_AsUTF8(o)
+#    define String_GET_SIZE(o)               PyUnicode_GET_LENGTH(o)
+#    define String_AS_STRING(o)              PyUnicode_AsUTF8(o)
+
+#    define Unicode_GET_SIZE(o)              PyUnicode_GET_LENGTH(o)
+
+static inline const char*
+String_AS_STRING_AND_SIZE(PyObject* obj, CORBA::ULong& size)
+{
+  Py_ssize_t ss;
+  const char* str = PyUnicode_AsUTF8AndSize(obj, &ss);
+  size = ss;
+  return str;
+}
+
+#  else // Python 3.0, 3.1, 3.2
+
+static inline char* String_AsString(PyObject* obj)
+{
+  char* str;
+  PyArg_Parse(obj, (char*)"s", &str);
+  return str;
+}
+
+static inline const char*
+String_AS_STRING_AND_SIZE(PyObject* obj, CORBA::ULong& size)
+{
+  char*      str;
+  Py_ssize_t ss;
+
+  PyArg_Parse(obj, (char*)"s#", &str, &ss);
+
+  size = ss;
+  return str;
+}
+
+#    define String_AS_STRING(o)            String_AsString(o)
+#    define String_GET_SIZE(o)             PyUnicode_GetSize(o)
+
+#    define Unicode_GET_SIZE(o)            PyUnicode_GET_SIZE(o)
+
+#  endif
+
+#  define String_Check(o)                  PyUnicode_Check(o)
+#  define String_FromString(s)             PyUnicode_FromString(s)
+#  define String_FromStringAndSize(s,l)    PyUnicode_FromStringAndSize(s,l)
+#  define String_Format(f,a)               PyUnicode_Format(f,a)
+
+#  define RawString_Check(o)               PyBytes_Check(o)
+#  define RawString_GET_SIZE(o)            PyBytes_GET_SIZE(o)
+#  define RawString_AS_STRING(o)           PyBytes_AS_STRING(o)
+#  define RawString_FromStringAndSize(o,s) PyBytes_FromStringAndSize(o,s)
+#  define RawString_FromString(s)          PyBytes_FromString(s)
+
+#  define Int_Check(o)                     PyLong_Check(o)
+#  define Int_FromLong(l)                  PyLong_FromLong(l)
+#  define Int_AS_LONG(o)                   PyLong_AsLong(o)
+
 #endif
+
 
 
 //

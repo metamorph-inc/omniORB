@@ -118,6 +118,7 @@ public:
         giop_c(c), reject(0), why(0) {}
 
       // Accessors for connection details
+      const char* operation();
       const char* myaddress();
       const char* peeraddress();
       const char* peeridentity();
@@ -148,7 +149,8 @@ public:
       info_T(GIOP_C& c) :
         giop_c(c), service_contexts(5) {}
 
-      // Accessors for connection details
+      // Accessors for operation / connection details
+      const char* operation();
       const char* myaddress();
       const char* peeraddress();
       const char* peeridentity();
@@ -179,7 +181,8 @@ public:
       info_T(GIOP_C& c, IOP::ServiceContextList& sc) :
 	giop_c(c), service_contexts(sc) {}
 
-      // Accessors for connection details
+      // Accessors for operation / connection details
+      const char* operation();
       const char* myaddress();
       const char* peeraddress();
       const char* peeridentity();
@@ -241,7 +244,8 @@ public:
       info_T(GIOP_S& s) : 
 	giop_s(s) {}
 
-      // Accessors for connection details
+      // Accessors for operation / connection details
+      const char* operation();
       const char* myaddress();
       const char* peeraddress();
       const char* peeridentity();
@@ -271,7 +275,8 @@ public:
       info_T(GIOP_S& s) :
 	giop_s(s) {}
 
-      // Accessors for connection details
+      // Accessors for operation / connection details
+      const char* operation();
       const char* myaddress();
       const char* peeraddress();
       const char* peeridentity();
@@ -302,7 +307,8 @@ public:
       info_T(GIOP_S& s, const CORBA::Exception* e) :
 	giop_s(s), exception(e) {}
 
-      // Accessors for connection details
+      // Accessors for operation / connection details
+      const char* operation();
       const char* myaddress();
       const char* peeraddress();
       const char* peeridentity();

@@ -1,5 +1,5 @@
-TOP=..
-CURRENT=omniidl_be
+TOP=../..
+CURRENT=python3/COS
 BASE_OMNI_TREE=@top_srcdir@
 VPATH=@srcdir@
 INSTALL=@INSTALL@

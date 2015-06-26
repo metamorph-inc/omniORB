@@ -18,8 +18,8 @@ ifndef EmbeddedSystem
 ifdef Win32Platform
 ifndef MinGW32Build
 export::
-	(cd $(EXPORT_TREE)/$(BINDIR); rebase.exe -b 0x68000000 -d *_rt.dll; )
-	(cd $(EXPORT_TREE)/$(BINDIR); rebase.exe -b 0x68000000 -d *_rtd.dll; )
+	(cd $(EXPORT_TREE)/$(BINDIR); editbin /REBASE:BASE=0x68000000,DOWN *_rt.dll; )
+	(cd $(EXPORT_TREE)/$(BINDIR); editbin /REBASE:BASE=0x68000000,DOWN *_rtd.dll; )
 endif
 endif
 endif

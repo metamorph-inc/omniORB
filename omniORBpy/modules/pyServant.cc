@@ -3,7 +3,7 @@
 // pyServant.cc               Created on: 1999/07/29
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2003-2013 Apasphere Ltd
+//    Copyright (C) 2003-2014 Apasphere Ltd
 //    Copyright (C) 1999 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -55,8 +55,7 @@ extern "C" {
   };
 
   static PyTypeObject pyServantType = {
-    PyObject_HEAD_INIT(0)
-    0,                                 /* ob_size */
+    PyVarObject_HEAD_INIT(0,0)
     (char*)"_omnipy.pyServantObj",     /* tp_name */
     sizeof(pyServantObj),              /* tp_basicsize */
     0,                                 /* tp_itemsize */
@@ -414,9 +413,10 @@ omniPy::
 Py_omniServant::_non_existent()
 {
   omnipyThreadCache::lock _t;
-  PyObject* result = PyObject_CallMethod(pyservant_,
-					 (char*)"_non_existent", 0);
-  if (!result) {
+
+  omniPy::PyRefHolder result(PyObject_CallMethod(pyservant_,
+                                                 (char*)"_non_existent", 0));
+  if (!result.valid()) {
     if (omniORB::trace(1)) {
       {
 	omniORB::logger l;
@@ -430,12 +430,7 @@ Py_omniServant::_non_existent()
     OMNIORB_THROW(UNKNOWN, UNKNOWN_PythonException, CORBA::COMPLETED_NO);
   }
 
-  if (!PyInt_Check(result))
-    OMNIORB_THROW(BAD_PARAM, BAD_PARAM_WrongPythonType, CORBA::COMPLETED_NO);
-
-  long i = PyInt_AS_LONG(result);
-  Py_DECREF(result);
-  return i ? 1 : 0;
+  return PyObject_IsTrue(result);
 }
 
 
@@ -466,10 +461,12 @@ Py_omniServant::_is_a(const char* logical_type_id)
     return 1;
   else {
     omnipyThreadCache::lock _t;
-    PyObject* pyisa = PyObject_CallMethod(omniPy::pyomniORBmodule,
-					  (char*)"static_is_a", (char*)"Os",
-					  pyskeleton_, logical_type_id);
-    if (!pyisa) {
+    omniPy::PyRefHolder pyisa(PyObject_CallMethod(omniPy::pyomniORBmodule,
+                                                  (char*)"static_is_a",
+                                                  (char*)"Os",
+                                                  pyskeleton_,
+                                                  logical_type_id));
+    if (!pyisa.valid()) {
       if (omniORB::trace(1))
         PyErr_Print();
       else
@@ -478,10 +475,7 @@ Py_omniServant::_is_a(const char* logical_type_id)
       OMNIORB_THROW(UNKNOWN, UNKNOWN_PythonException, CORBA::COMPLETED_NO);
     }
 
-    OMNIORB_ASSERT(PyInt_Check(pyisa));
-
-    CORBA::Boolean isa = PyInt_AS_LONG(pyisa);
-    Py_DECREF(pyisa);
+    CORBA::Boolean isa = PyObject_IsTrue(pyisa);
 
     if (isa)
       return 1;
@@ -492,14 +486,10 @@ Py_omniServant::_is_a(const char* logical_type_id)
       pyisa = PyObject_CallMethod(pyservant_, (char*)"_is_a",
 				  (char*)"s", logical_type_id);
 
-      if (pyisa && PyInt_Check(pyisa)) {
-	CORBA::Boolean isa = PyInt_AS_LONG(pyisa);
-	Py_DECREF(pyisa);
-	return isa;
-      }
-      if (!pyisa) {
+      if (pyisa.valid())
+        return PyObject_IsTrue(pyisa);
+      else
 	omniPy::handlePythonException();
-      }
     }
   }
   return 0;
@@ -600,7 +590,7 @@ Py_omniServant::remote_dispatch(Py_omniCallDescriptor* pycd)
 
     if (op[0] == '_') {
       if (op[1] == 'g' && op[2] == 'e' && op[3] == 't' && op[4] == '_') {
-	propget = holder.change(PyString_FromString(op + 5));
+	propget = holder.change(String_FromString(op + 5));
 	PyObject* word = PyDict_GetItem(omniPy::pyomniORBwordMap, propget);
 	if (word) {
 	  Py_INCREF(word);
@@ -608,7 +598,7 @@ Py_omniServant::remote_dispatch(Py_omniCallDescriptor* pycd)
 	}
       }
       else if (op[1] == 's' && op[2] == 'e' && op[3] == 't' && op[4] == '_') {
-	propset = holder.change(PyString_FromString(op + 5));
+	propset = holder.change(String_FromString(op + 5));
 	PyObject* word = PyDict_GetItem(omniPy::pyomniORBwordMap, propset);
 	if (word) {
 	  Py_INCREF(word);
@@ -689,7 +679,7 @@ Py_omniServant::remote_dispatch(Py_omniCallDescriptor* pycd)
     if (evalue)
       erepoId = PyObject_GetAttrString(evalue, (char*)"_NP_RepositoryId");
 
-    if (!(erepoId && PyString_Check(erepoId))) {
+    if (!(erepoId && String_Check(erepoId))) {
       PyErr_Clear();
       Py_XDECREF(erepoId);
       if (omniORB::trace(1)) {
@@ -722,8 +712,7 @@ Py_omniServant::remote_dispatch(Py_omniCallDescriptor* pycd)
     }
 
     // Is it a LOCATION_FORWARD?
-    if (omni::strMatch(PyString_AS_STRING(erepoId),
-		       "omniORB.LOCATION_FORWARD")) {
+    if (omni::strMatch(String_AS_STRING(erepoId), "omniORB.LOCATION_FORWARD")) {
       Py_DECREF(erepoId); Py_DECREF(etype); Py_XDECREF(etraceback);
       omniPy::handleLocationForward(evalue);
     }
@@ -750,7 +739,7 @@ Py_omniServant::local_dispatch(Py_omniCallDescriptor* pycd)
 
     if (op[0] == '_') {
       if (op[1] == 'g' && op[2] == 'e' && op[3] == 't' && op[4] == '_') {
-	propget = holder.change(PyString_FromString(op + 5));
+	propget = holder.change(String_FromString(op + 5));
 	PyObject* word = PyDict_GetItem(omniPy::pyomniORBwordMap, propget);
 	if (word) {
 	  Py_INCREF(word);
@@ -758,7 +747,7 @@ Py_omniServant::local_dispatch(Py_omniCallDescriptor* pycd)
 	}
       }
       else if (op[1] == 's' && op[2] == 'e' && op[3] == 't' && op[4] == '_') {
-	propset = holder.change(PyString_FromString(op + 5));
+	propset = holder.change(String_FromString(op + 5));
 	PyObject* word = PyDict_GetItem(omniPy::pyomniORBwordMap, propset);
 	if (word) {
 	  Py_INCREF(word);
@@ -930,7 +919,7 @@ Py_omniServant::local_dispatch(Py_omniCallDescriptor* pycd)
     if (evalue)
       erepoId = PyObject_GetAttrString(evalue, (char*)"_NP_RepositoryId");
 
-    if (!(erepoId && PyString_Check(erepoId))) {
+    if (!(erepoId && String_Check(erepoId))) {
       PyErr_Clear();
       Py_XDECREF(erepoId);
       if (omniORB::trace(1)) {
@@ -961,8 +950,7 @@ Py_omniServant::local_dispatch(Py_omniCallDescriptor* pycd)
     }
 
     // Is it a LOCATION_FORWARD?
-    if (omni::strMatch(PyString_AS_STRING(erepoId),
-		       "omniORB.LOCATION_FORWARD")) {
+    if (omni::strMatch(String_AS_STRING(erepoId), "omniORB.LOCATION_FORWARD")) {
       Py_DECREF(erepoId); Py_DECREF(etype); Py_XDECREF(etraceback);
       omniPy::handleLocationForward(evalue);
     }
@@ -1065,17 +1053,17 @@ omniPy::getServantForPyObject(PyObject* pyservant)
 
   PyObject* pyrepoId = PyObject_GetAttr(pyservant, pyNP_RepositoryId);
 
-  if (!(pyrepoId && PyString_Check(pyrepoId))) {
+  if (!(pyrepoId && String_Check(pyrepoId))) {
     Py_DECREF(opdict);
     return 0;
   }
   if (PyObject_HasAttrString(pyservant, (char*)"_omni_special")) {
 
-    pyos = newSpecialServant(pyservant, opdict, PyString_AS_STRING(pyrepoId));
+    pyos = newSpecialServant(pyservant, opdict, String_AS_STRING(pyrepoId));
   }
   else {
     pyos = new omniPy::Py_omniServant(pyservant, opdict,
-				      PyString_AS_STRING(pyrepoId));
+				      String_AS_STRING(pyrepoId));
   }
   Py_DECREF(opdict);
   Py_DECREF(pyrepoId);

@@ -3,7 +3,7 @@
 # any.py                     Created on: 2002/09/16
 #                            Author    : Duncan Grisby (dgrisby)
 #
-#    Copyright (C) 2002-2008 Apasphere Ltd
+#    Copyright (C) 2002-2014 Apasphere Ltd
 #
 #    This file is part of the omniORBpy library
 #
@@ -39,7 +39,6 @@ from_any(any, keep_structs=0) -- return any's contents as plain Python
                                  to dictionaries.
 """
 
-from types import *
 import omniORB
 import CORBA, tcInternal
 import random
@@ -60,30 +59,27 @@ INVALID_MEMBER_KINDS = [ tcInternal.tv_null,
                          tcInternal.tv_void,
                          tcInternal.tv_except ]
 
-
-# Fudge things for Pythons without unicode / bool
-try:
-    UnicodeType
-except NameError:
-    class UnicodeType:
-        pass
-
-try:
-    BooleanType
-except NameError:
-    class BooleanType:
-        pass
-
-try:
-    bool(1)
-except:
-    def bool(x): return x
-
-
+#
 # Fixed type
+
 _f = CORBA.fixed(0)
 FixedType = type(_f)
 
+
+#
+# Python 2 / 3 differences
+
+try:
+    if bytes is str:
+        # Python 2.7
+        raise NameError()
+
+except NameError:
+    class bytes(object): pass
+
+
+#
+# to_any
 
 def to_any(data):
     """to_any(data) -- try to return data as a CORBA.Any"""
@@ -97,16 +93,19 @@ def _to_tc_value(data):
     if data is None:
         return CORBA.TC_null, None
 
-    elif isinstance(data, StringType):
+    elif isinstance(data, str):
         return CORBA.TC_string, data
 
-    elif isinstance(data, UnicodeType):
+    elif isinstance(data, unicode):
         return CORBA.TC_wstring, data
 
-    elif isinstance(data, BooleanType):
+    elif isinstance(data, bytes):
+        return CORBA._tc_OctetSeq, data
+
+    elif isinstance(data, bool):
         return CORBA.TC_boolean, data
 
-    elif isinstance(data, IntType) or isinstance(data, LongType):
+    elif isinstance(data, (int,long)):
         if -2147483648L <= data <= 2147483647L:
             return CORBA.TC_long, int(data)
         elif 0 <= data <= 4294967295L:
@@ -119,10 +118,10 @@ def _to_tc_value(data):
             raise CORBA.BAD_PARAM(omniORB.BAD_PARAM_PythonValueOutOfRange,
                                   CORBA.COMPLETED_NO)
 
-    elif isinstance(data, FloatType):
+    elif isinstance(data, float):
         return CORBA.TC_double, data
 
-    elif isinstance(data, ListType):
+    elif isinstance(data, list):
         if data == []:
             tc = tcInternal.createTypeCode((tcInternal.tv_sequence,
                                             tcInternal.tv_any, 0))
@@ -130,9 +129,9 @@ def _to_tc_value(data):
 
         d0 = data[0]
 
-        if isinstance(d0, StringType):
+        if isinstance(d0, str):
             for d in data:
-                if not isinstance(d, StringType):
+                if not isinstance(d, str):
                     break
             else:
                 # List of strings
@@ -140,9 +139,9 @@ def _to_tc_value(data):
                                                 CORBA.TC_string._d, 0))
                 return tc, data
 
-        elif isinstance(d0, UnicodeType):
+        elif isinstance(d0, unicode):
             for d in data:
-                if not isinstance(d, UnicodeType):
+                if not isinstance(d, unicode):
                     break
             else:
                 # List of wstrings
@@ -150,21 +149,30 @@ def _to_tc_value(data):
                                                 CORBA.TC_wstring._d, 0))
                 return tc, data
 
-        elif isinstance(d0, BooleanType):
+        elif isinstance(d0, bytes):
             for d in data:
-                if not isinstance(d, BooleanType):
+                if not isinstance(d, bytes):
+                    break
+            else:
+                # List of bytes
+                tc = tcInternal.createTypeCode((tcInternal.tv_sequence,
+                                                CORBA._tc_OctetSeq, 0))
+                return tc, data
+
+        elif isinstance(d0, bool):
+            for d in data:
+                if not isinstance(d, bool):
                     break
             else:
                 tc = tcInternal.createTypeCode((tcInternal.tv_sequence,
                                                 tcInternal.tv_boolean, 0))
                 return tc, data
 
-        elif isinstance(d0, IntType) or isinstance(d0, LongType):
+        elif isinstance(d0, (int,long)):
             # Numeric. Try to find a numeric type suitable for the whole list
             min_v = max_v = 0
             for d in data:
-                if (not (isinstance(d, IntType) or isinstance(d, LongType)) or
-                    isinstance(d, BooleanType)):
+                if (not (isinstance(d, (int,long)) or isinstance(d, bool))):
                     break
                 if d < min_v: min_v = d
                 if d > max_v: max_v = d
@@ -191,9 +199,9 @@ def _to_tc_value(data):
                         omniORB.BAD_PARAM_PythonValueOutOfRange,
                         CORBA.COMPLETED_NO)
 
-        elif isinstance(d0, FloatType):
+        elif isinstance(d0, float):
             for d in data:
-                if not isinstance(d, FloatType):
+                if not isinstance(d, float):
                     break
             else:
                 # List of doubles
@@ -230,10 +238,10 @@ def _to_tc_value(data):
             
         return tc, any_list
 
-    elif isinstance(data, TupleType):
+    elif isinstance(data, tuple):
         return _to_tc_value(list(data))
 
-    elif isinstance(data, DictType):
+    elif isinstance(data, dict):
         # Represent dictionaries as structs
         global _idcount
 
@@ -249,7 +257,7 @@ def _to_tc_value(data):
         svals = []
         items = data.items()
         for (k,v) in items:
-            if not isinstance(k, StringType):
+            if not isinstance(k, str):
                 raise CORBA.BAD_PARAM(omniORB.BAD_PARAM_WrongPythonType,
                                       CORBA.COMPLETED_NO)
             t, v = _to_tc_value(v)
@@ -265,7 +273,7 @@ def _to_tc_value(data):
         cls   = omniORB.createUnknownStruct(id, ms)
         dl[1] = cls
         tc    = tcInternal.createTypeCode(tuple(dl))
-        value = apply(cls, svals)
+        value = cls(*svals)
         return tc, value
 
     elif isinstance(data, FixedType):
@@ -289,6 +297,9 @@ def _to_tc_value(data):
                           CORBA.COMPLETED_NO)
 
 
+#
+# from_any
+
 def from_any(any, keep_structs=0):
     """from_any(any, keep_structs=0) -- extract the data from an Any.
 
@@ -301,10 +312,11 @@ def from_any(any, keep_structs=0):
                               CORBA.COMPLETED_NO)
     return _from_desc_value(any._t._d, any._v, keep_structs)
 
+
 def _from_desc_value(desc, value, keep_structs=0):
     """_from_desc_value(desc,val,keep_structs) -- de-Any value"""
 
-    if type(desc) is IntType:
+    if type(desc) is int:
         if desc == tcInternal.tv_boolean:
             return bool(value)
         
@@ -318,7 +330,7 @@ def _from_desc_value(desc, value, keep_structs=0):
 
     while k == tcInternal.tv_alias:
         desc = desc[3]
-        if type(desc) is IntType:
+        if type(desc) is int:
             if desc == tcInternal.tv_boolean:
                 return bool(value)
 
@@ -344,7 +356,7 @@ def _from_desc_value(desc, value, keep_structs=0):
 
     elif k in [tcInternal.tv_sequence, tcInternal.tv_array]:
         sd = desc[1]
-        if type(sd) is IntType and sd != tcInternal.tv_any:
+        if type(sd) is int and sd != tcInternal.tv_any:
             return value
         else:
             rl = []

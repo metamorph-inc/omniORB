@@ -61,19 +61,21 @@ public:
   }
 
   inline Any_var& operator= (const Any_var& p) {
-    if (p.pd_data) {
-      if (!pd_data) {
-	pd_data = new Any;
-	if (!pd_data) {
-	  _CORBA_new_operator_return_null();
-	  // never reach here
-	}
+    if (&p != this) {
+      if (p.pd_data) {
+        if (!pd_data) {
+          pd_data = new Any;
+          if (!pd_data) {
+            _CORBA_new_operator_return_null();
+            // never reach here
+          }
+        }
+        *pd_data = *p.pd_data;
       }
-      *pd_data = *p.pd_data;
-    }
-    else {
-      if (pd_data) delete pd_data;
-      pd_data = 0;
+      else {
+        if (pd_data) delete pd_data;
+        pd_data = 0;
+      }
     }
     return *this;
   }

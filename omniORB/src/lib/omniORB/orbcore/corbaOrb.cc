@@ -944,13 +944,13 @@ public:
     orbOptions::Handler("id",
 			"id = " ORB_ID_STRING,
 			1,
-			"-ORBid "ORB_ID_STRING" (standard option)") {}
+			"-ORBid " ORB_ID_STRING" (standard option)") {}
 
 
   void visit(const char* value,orbOptions::Source) throw (orbOptions::BadParam) {
 
     if (!isValidId(value)) {
-      throw orbOptions::BadParam(key(),value,"id is not "ORB_ID_STRING);
+      throw orbOptions::BadParam(key(),value,"id is not " ORB_ID_STRING);
     }
     if( strcmp(value, myOrbId()) ) {
       if( omniORB::trace(1) ) {

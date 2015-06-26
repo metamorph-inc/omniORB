@@ -3,7 +3,7 @@
 // pyAbstractIntf.cc          Created on: 2003/05/21
 //                            Author    : Duncan Grisby (dgrisby)
 //
-//    Copyright (C) 2003-2010 Apasphere Ltd.
+//    Copyright (C) 2003-2014 Apasphere Ltd.
 //
 //    This file is part of the omniORBpy library
 //
@@ -141,7 +141,7 @@ unmarshalPyObjectAbstractInterface(cdrStream& stream, PyObject* d_o)
 
   if (is_objref) {
     PyObject* pyrepoId = PyTuple_GET_ITEM(d_o, 1);
-    const char* repoId = PyString_AS_STRING(pyrepoId);
+    const char* repoId = String_AS_STRING(pyrepoId);
 
     CORBA::Object_ptr obj = omniPy::UnMarshalObjRef(repoId, stream);
     return omniPy::createPyCorbaObjRef(repoId, obj);

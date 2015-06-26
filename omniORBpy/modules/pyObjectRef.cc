@@ -3,7 +3,7 @@
 // pyObjectRef.cc             Created on: 1999/07/29
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2002-2013 Apasphere Ltd
+//    Copyright (C) 2002-2014 Apasphere Ltd
 //    Copyright (C) 1999 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -166,7 +166,7 @@ omniPy::createPyCorbaObjRef(const char*             targetRepoId,
   }
 
   if (fullTypeUnknown) {
-    PyObject* idstr = PyString_FromString(actualRepoId);
+    PyObject* idstr = String_FromString(actualRepoId);
     PyObject_SetAttrString(pyobjref, (char*)"_NP_RepositoryId", idstr);
     Py_DECREF(idstr);
   }
@@ -204,12 +204,23 @@ omniPy::createPyPseudoObjRef(const CORBA::Object_ptr objref)
     int len = PySequence_Length(omniPy::py_pseudoFns);
     for (int i=0; i < len; i++) {
       PyObject* pyf = PySequence_GetItem(omniPy::py_pseudoFns, i);
+
+#if (PY_VERSION_HEX <= 0x03000000)
+
       if (!PyCObject_Check(pyf)) {
 	omniORB::logs(1, "WARNING: Entry in _omnipy.pseudoFns "
 		      "is not a PyCObject.");
 	continue;
       }
       omniORBpyPseudoFn f = (omniORBpyPseudoFn)PyCObject_AsVoidPtr(pyf);
+#else
+      if (!PyCapsule_CheckExact(pyf)) {
+	omniORB::logs(1, "WARNING: Entry in _omnipy.pseudoFns "
+		      "is not a PyCObject.");
+	continue;
+      }
+      omniORBpyPseudoFn f = (omniORBpyPseudoFn)PyCapsule_GetPointer(pyf, 0);
+#endif
       PyObject* ret = f(objref);
       if (ret)
 	return ret;
@@ -478,7 +489,7 @@ omniPy::copyObjRefArgument(PyObject* pytargetRepoId, PyObject* pyobjref,
   }
   // Create new C++ and Python objrefs with the right target type
   omniObjRef* ooref        = objref->_PR_getobj();
-  const char* targetRepoId = PyString_AS_STRING(pytargetRepoId);
+  const char* targetRepoId = String_AS_STRING(pytargetRepoId);
 
   if (targetRepoId[0] == '\0') targetRepoId = CORBA::Object::_PD_repoId;
 
@@ -595,7 +606,7 @@ extern "C" {
       omniPy::InterpreterUnlocker _u;
       CORBA::release(self->obj);
     }
-    self->ob_type->tp_free((PyObject*)self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
   }
 
   static PyObject*
@@ -740,7 +751,7 @@ extern "C" {
       return 0;
 
     CORBA::ULong h = self->obj->_hash(max);
-    return PyInt_FromLong(h);
+    return Int_FromLong(h);
   }
 
 
@@ -792,6 +803,19 @@ extern "C" {
     }
   }
 
+  static PyObject*
+  pyObjRef_disconnect(PyObjRefObject* self, PyObject* args)
+  {
+    try {
+      omniObjRef* oo = self->obj->_PR_getobj();
+      if (oo)
+        oo->_NP_disconnect();
+    }
+    OMNIPY_CATCH_AND_HANDLE_SYSTEM_EXCEPTIONS
+
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
 
   static PyMethodDef pyObjRef_methods[] = {
     {(char*)"invoke",
@@ -812,7 +836,7 @@ extern "C" {
 
     {(char*)"nonExistent",
      (PyCFunction)pyObjRef_nonExistent,
-     METH_VARARGS},
+     METH_NOARGS},
 
     {(char*)"isEquivalent",
      (PyCFunction)pyObjRef_isEquivalent,
@@ -826,12 +850,15 @@ extern "C" {
      (PyCFunction)pyObjRef_narrow,
      METH_VARARGS},
 
+    {(char*)"disconnect",
+     (PyCFunction)pyObjRef_disconnect,
+     METH_NOARGS},
+
     {NULL,NULL}
   };
 
   static PyTypeObject pyObjRefType = {
-    PyObject_HEAD_INIT(0)
-    0,                                 /* ob_size */
+    PyVarObject_HEAD_INIT(0,0)
     (char*)"_omnipy.PyObjRefObject",   /* tp_name */
     sizeof(PyObjRefObject),            /* tp_basicsize */
     0,                                 /* tp_itemsize */

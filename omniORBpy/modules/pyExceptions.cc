@@ -3,7 +3,7 @@
 // pyExceptions.cc            Created on: 1999/07/29
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2003-2010 Apasphere Ltd
+//    Copyright (C) 2003-2014 Apasphere Ltd
 //    Copyright (C) 1999 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -96,7 +96,7 @@ omniPy::handleSystemException(const CORBA::SystemException& ex, PyObject* info)
     if (omniORB::traceExceptions) {
       PyObject* info_repr = PyObject_Repr(info);
       omniORB::logger log;
-      log << "BAD_PARAM info: " << PyString_AsString(info_repr) << "\n";
+      log << "BAD_PARAM info: " << String_AsString(info_repr) << "\n";
       Py_DECREF(info_repr);
     }
   }
@@ -138,34 +138,24 @@ omniPy::produceSystemException(PyObject* eobj, PyObject* erepoId,
   CORBA::ULong            minor  = 0;
   CORBA::CompletionStatus status = CORBA::COMPLETED_MAYBE;
 
-  PyObject *m = 0, *c = 0, *v = 0;
+  PyRefHolder m(PyObject_GetAttrString(eobj, (char*)"minor"));
+  PyRefHolder c(PyObject_GetAttrString(eobj, (char*)"completed"));
 
-  m = PyObject_GetAttrString(eobj, (char*)"minor");
+  try {
+    if (m.valid())
+      minor = getULongVal(m);
 
-  if (m) {
-    if (PyInt_Check(m)) {
-      minor = PyInt_AS_LONG(m);
-    }
-    else if (PyLong_Check(m)) {
-      minor = PyLong_AsUnsignedLong(m);
-      if (minor == (CORBA::ULong)-1 && PyErr_Occurred())
-	PyErr_Clear();
-    }
-    c = PyObject_GetAttrString(eobj, (char*)"completed");
-
-    if (c) {
-      v = PyObject_GetAttrString(c, (char*)"_v");
-
-      if (v && PyInt_Check(v))
-	status = (CORBA::CompletionStatus)PyInt_AS_LONG(v);
-    }
+    if (c.valid())
+      status = (CORBA::CompletionStatus)getEnumVal(c);
   }
-  Py_XDECREF(m); Py_XDECREF(c); Py_XDECREF(v);
+  catch (Py_BAD_PARAM& bp) {
+    bp.logInfoAndDrop("Invalid data inside system exception");
+  }
 
   // Clear any errors raised by the GetAttrs
   if (PyErr_Occurred()) PyErr_Clear();
 
-  char* repoId = PyString_AS_STRING(erepoId);
+  char* repoId = String_AS_STRING(erepoId);
 
 #define THROW_SYSTEM_EXCEPTION_IF_MATCH(ex) \
   if (omni::strMatch(repoId, "IDL:omg.org/CORBA/" #ex ":1.0")) { \
@@ -174,7 +164,7 @@ omniPy::produceSystemException(PyObject* eobj, PyObject* erepoId,
 	PyObject* erepr = PyObject_Repr(eobj); \
         omniORB::logger l; \
         l << "Caught a CORBA system exception during up-call: " \
-          << PyString_AS_STRING(erepr) << "\n"; \
+          << String_AsString(erepr) << "\n";                    \
         Py_DECREF(erepr); \
       } \
       PyErr_Restore(etype, eobj, etraceback); \
@@ -196,7 +186,7 @@ omniPy::produceSystemException(PyObject* eobj, PyObject* erepoId,
       PyObject* erepr = PyObject_Repr(eobj);
       omniORB::logger l;
       l << "Caught an unexpected CORBA exception during up-call: "
-        << PyString_AS_STRING(erepr) << "\n";
+        << String_AsString(erepr) << "\n";
       Py_DECREF(erepr);
     }
     PyErr_Restore(etype, eobj, etraceback);
@@ -206,7 +196,8 @@ omniPy::produceSystemException(PyObject* eobj, PyObject* erepoId,
     Py_XDECREF(eobj); Py_DECREF(etype); Py_XDECREF(etraceback);
   }
   Py_DECREF(erepoId);
-  if (m && c && v)
+
+  if (m.valid() && c.valid())
     OMNIORB_THROW(UNKNOWN, UNKNOWN_SystemException, CORBA::COMPLETED_MAYBE);
   else
     OMNIORB_THROW(UNKNOWN, UNKNOWN_UserException, CORBA::COMPLETED_MAYBE);
@@ -227,7 +218,7 @@ omniPy::handlePythonException()
   if (evalue)
     erepoId = PyObject_GetAttrString(evalue, (char*)"_NP_RepositoryId");
 
-  if (!(erepoId && PyString_Check(erepoId))) {
+  if (!(erepoId && String_Check(erepoId))) {
     PyErr_Clear();
     Py_XDECREF(erepoId);
     if (omniORB::trace(1)) {
@@ -243,8 +234,7 @@ omniPy::handlePythonException()
   }
 
   // Is it a LOCATION_FORWARD?
-  if (omni::strMatch(PyString_AS_STRING(erepoId),
-		     "omniORB.LOCATION_FORWARD")) {
+  if (omni::strMatch(String_AS_STRING(erepoId), "omniORB.LOCATION_FORWARD")) {
     Py_DECREF(erepoId); Py_DECREF(etype); Py_XDECREF(etraceback);
     omniPy::handleLocationForward(evalue);
   }
@@ -275,16 +265,19 @@ omniPy::handleLocationForward(PyObject* evalue)
   OMNIORB_ASSERT(pyfwd);
   OMNIORB_ASSERT(pyperm);
 
-  CORBA::Boolean perm;
+  CORBA::Boolean perm = PyObject_IsTrue(pyperm);
 
-  if (PyInt_Check(pyperm)) {
-    perm = PyInt_AS_LONG(pyperm) ? 1 : 0;
-  }
-  else {
-    omniORB::logs(1, "Bad 'permanent' field in LOCATION_FORWARD. "
-		  "Using FALSE.");
+  if (PyErr_Occurred()) {
     perm = 0;
+
+    if (omniORB::trace(1)) {
+      omniORB::logs(1, "Invalid 'permanent' attribute in LOCATION_FORWARD.");
+      PyErr_Print();
+    }
+    else
+      PyErr_Clear();
   }
+
   CORBA::Object_ptr fwd = omniPy::getObjRef(pyfwd);
 
   if (fwd)
@@ -293,6 +286,7 @@ omniPy::handleLocationForward(PyObject* evalue)
   Py_DECREF(pyfwd);
   Py_DECREF(pyperm);
   Py_DECREF(evalue);
+
   if (fwd) {
     OMNIORB_ASSERT(CORBA::Object::_PR_is_valid(fwd));
     throw omniORB::LOCATION_FORWARD(fwd, perm);
@@ -320,7 +314,7 @@ PyUserException::PyUserException(PyObject* desc)
 
   if (omniORB::trace(25)) {
     omniORB::logger l;
-    const char* repoId = PyString_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
+    const char* repoId = String_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
     l << "Prepare to unmarshal Python user exception " << repoId << "\n";
   }
 }
@@ -335,7 +329,7 @@ PyUserException::PyUserException(PyObject* desc, PyObject* exc,
 
   if (omniORB::trace(25)) {
     omniORB::logger l;
-    const char* repoId = PyString_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
+    const char* repoId = String_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
     l << "Construct Python user exception " << repoId << "\n";
   }
 
@@ -369,7 +363,7 @@ PyUserException::~PyUserException()
   if (decref_on_del_) {
     if (omniORB::trace(25)) {
       omniORB::logger l;
-      const char* repoId = PyString_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
+      const char* repoId = String_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
       l << "Python user exception state " << repoId << " dropped unused\n";
     }
     omnipyThreadCache::lock _t;
@@ -389,7 +383,7 @@ PyUserException::setPyExceptionState()
   
   if (omniORB::trace(25)) {
     omniORB::logger l;
-    const char* repoId = PyString_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
+    const char* repoId = String_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
     l << "Set Python user exception state " << repoId << "\n";
   }
   PyErr_SetObject(excclass, exc_);
@@ -418,7 +412,7 @@ PyUserException::operator>>=(cdrStream& stream) const
 
   if (omniORB::trace(25)) {
     omniORB::logger l;
-    const char* repoId = PyString_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
+    const char* repoId = String_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
     l << "Marshal Python user exception " << repoId << "\n";
   }
 
@@ -444,7 +438,7 @@ PyUserException::operator<<=(cdrStream& stream)
 {
   if (omniORB::trace(25)) {
     omniORB::logger l;
-    const char* repoId = PyString_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
+    const char* repoId = String_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
     l << "Unmarshal Python user exception " << repoId << "\n";
   }
 
@@ -489,7 +483,7 @@ PyUserException::_raise() const
 
   if (omniORB::trace(25)) {
     omniORB::logger l;
-    const char* repoId = PyString_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
+    const char* repoId = String_AS_STRING(PyTuple_GET_ITEM(desc_, 2));
     l << "C++ throw of Python user exception " << repoId << "\n";
   }
   throw *this;
@@ -500,10 +494,13 @@ omniPy::
 PyUserException::_NP_repoId(int* size) const
 {
   PyObject* pyrepoId = PyTuple_GET_ITEM(desc_, 2);
-  OMNIORB_ASSERT(PyString_Check(pyrepoId));
+  OMNIORB_ASSERT(String_Check(pyrepoId));
 
-  *size = PyString_GET_SIZE(pyrepoId) + 1;
-  return PyString_AS_STRING(pyrepoId);
+  CORBA::ULong len;
+  const char*  repoId = String_AS_STRING_AND_SIZE(pyrepoId, len);
+
+  *size = len + 1;
+  return repoId;
 }
 
 void

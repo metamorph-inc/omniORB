@@ -140,8 +140,9 @@ omniORB::logger::logger(const char* prefix)
 omniORB::logger::~logger()
 {
   if( (size_t)(pd_p - pd_buf) != strlen(pd_prefix) ) {
-    if (logfunc())
-      logfunc()(pd_buf);
+    omniORB::logFunction f = logfunc();
+    if (f)
+      f(pd_buf);
     else {
       fputs(pd_buf, logfile ? logfile : stderr);
       if ((const char*)logfilename)
@@ -345,8 +346,9 @@ void
 omniORB::logger::flush()
 {
   if( (size_t)(pd_p - pd_buf) != strlen(pd_prefix) ) {
-    if (logfunc())
-      logfunc()(pd_buf);
+    omniORB::logFunction f = logfunc();
+    if (f)
+      f(pd_buf);
     else
       fprintf(logfile ? logfile : stderr, "%s", pd_buf);
   }
@@ -421,8 +423,9 @@ omniORB::do_logs(const char* mesg)
 
   sprintf(cbuf, "%s\n", mesg);
 
-  if (logfunc()) {
-    logfunc()(buf);
+  omniORB::logFunction f = logfunc();
+  if (f) {
+    f(buf);
   }
   else {
     fputs(buf, logfile ? logfile : stderr);

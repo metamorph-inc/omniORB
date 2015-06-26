@@ -3,7 +3,7 @@
 // pyPOAFunc.cc               Created on: 2000/02/04
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2003-2013 Apasphere Ltd
+//    Copyright (C) 2003-2014 Apasphere Ltd
 //    Copyright (C) 1999 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -47,27 +47,11 @@ raisePOAException(const char* ename, PyObject* args=0)
   return 0;
 }
 
-
-static CORBA::ULong
+static inline CORBA::ULong
 getEnumVal(PyObject* pyenum)
 {
   omniPy::PyRefHolder ev(PyObject_GetAttrString(pyenum, (char*)"_v"));
-
-  if (!(ev.valid() && PyInt_Check(ev)))
-    THROW_PY_BAD_PARAM(BAD_PARAM_WrongPythonType, CORBA::COMPLETED_NO,
-                       omniPy::formatString("Expecting enum item, got %r", "O",
-                                            pyenum->ob_type));
-  return PyInt_AS_LONG(ev);
-}
-
-static CORBA::ULong
-getULongVal(PyObject* pyval)
-{
-  if (!PyInt_Check(pyval))
-    THROW_PY_BAD_PARAM(BAD_PARAM_WrongPythonType, CORBA::COMPLETED_NO,
-                       omniPy::formatString("Expecting int, got %r", "O",
-                                            pyval->ob_type));
-  return PyInt_AS_LONG(pyval);
+  return omniPy::getULongVal(ev);
 }
 
 
@@ -87,7 +71,7 @@ createPolicyObject(PortableServer::POA_ptr poa, PyObject* pypolicy)
 
   if (pyptype.valid() && pyvalue.valid()) {
 
-    switch (getULongVal(pyptype)) {
+    switch (omniPy::getULongVal(pyptype)) {
 
     case 16: // ThreadPolicy
       policy = poa->
@@ -139,7 +123,7 @@ createPolicyObject(PortableServer::POA_ptr poa, PyObject* pypolicy)
       break;
 
     case 37: // BidirectionalPolicy
-      policy = new BiDirPolicy::BidirectionalPolicy(getULongVal(pyvalue));
+      policy = new BiDirPolicy::BidirectionalPolicy(omniPy::getULongVal(pyvalue));
       break;
 
     case 0x41545402: // EndPointPublishPolicy
@@ -158,14 +142,14 @@ createPolicyObject(PortableServer::POA_ptr poa, PyObject* pypolicy)
         for (CORBA::ULong idx=0; idx != len; ++idx) {
           PyObject* item = PyList_GET_ITEM(pyvalue, idx);
 
-          if (!PyString_Check(item))
+          if (!String_Check(item))
             THROW_PY_BAD_PARAM(BAD_PARAM_WrongPythonType, CORBA::COMPLETED_NO,
                                omniPy::formatString("EndPointPublishPolicy "
                                                     "value should be a list of "
                                                     "strings, not list of %r",
                                                     "O", item->ob_type));
 
-          seq[idx] = CORBA::string_dup(PyString_AS_STRING(item));
+          seq[idx] = CORBA::string_dup(String_AsString(item));
         }
         try {
           policy = new omniPolicy::EndPointPublishPolicy(seq);
@@ -186,6 +170,8 @@ createPolicyObject(PortableServer::POA_ptr poa, PyObject* pypolicy)
         PyObject* pyf = PyDict_GetItem(omniPy::py_policyFns, pyptype);
         
         if (pyf) {
+
+#if (PY_VERSION_HEX <= 0x03000000)
           if (PyCObject_Check(pyf)) {
             omniORBpyPolicyFn f = (omniORBpyPolicyFn)PyCObject_AsVoidPtr(pyf);
             policy = f(pyvalue);
@@ -194,6 +180,17 @@ createPolicyObject(PortableServer::POA_ptr poa, PyObject* pypolicy)
             omniORB::logs(1, "WARNING: Entry in _omnipy.policyFns is not a "
                           "PyCObject.");
           }
+#else
+          if (PyCapsule_CheckExact(pyf)) {
+            omniORBpyPolicyFn f = (omniORBpyPolicyFn)PyCapsule_GetPointer(pyf,
+                                                                          0);
+            policy = f(pyvalue);
+          }
+          else {
+            omniORB::logs(1, "WARNING: Entry in _omnipy.policyFns is not a "
+                          "PyCapsule.");
+          }
+#endif
         }
       }
     }
@@ -219,7 +216,7 @@ extern "C" {
       CORBA::release(self->poa);
       CORBA::release(self->base.obj);
     }
-    self->base.ob_type->tp_free((PyObject*)self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
   }
 
   static PyObject*
@@ -325,7 +322,7 @@ extern "C" {
   {
     try {
       char*     name   = self->poa->the_name();
-      PyObject* pyname = PyString_FromString(name);
+      PyObject* pyname = String_FromString(name);
       CORBA::string_free(name);
       return pyname;
     }
@@ -626,8 +623,8 @@ extern "C" {
 	omniPy::InterpreterUnlocker _u;
 	oid = self->poa->activate_object(pyos);
       }
-      return PyString_FromStringAndSize((const char*)oid->NP_data(),
-					oid->length());
+      return RawString_FromStringAndSize((const char*)oid->NP_data(),
+                                         oid->length());
     }
     catch (PortableServer::POA::ServantAlreadyActive& ex) {
       return raisePOAException("ServantAlreadyActive");
@@ -636,14 +633,15 @@ extern "C" {
       return raisePOAException("WrongPolicy");
     }
     OMNIPY_CATCH_AND_HANDLE_SYSTEM_EXCEPTIONS
+    return 0;
   }
 
   static PyObject*
   pyPOA_activate_object_with_id(PyPOAObject* self, PyObject* args)
   {
-    PyObject* pyServant;
-    char*     oidstr;
-    int       oidlen;
+    PyObject*  pyServant;
+    char*      oidstr;
+    Py_ssize_t oidlen;
 
     if (!PyArg_ParseTuple(args, (char*)"s#O",
 			  &oidstr, &oidlen, &pyServant))
@@ -678,8 +676,8 @@ extern "C" {
   static PyObject*
   pyPOA_deactivate_object(PyPOAObject* self, PyObject* args)
   {
-    char* oidstr;
-    int   oidlen;
+    char*      oidstr;
+    Py_ssize_t oidlen;
 
     if (!PyArg_ParseTuple(args, (char*)"s#", &oidstr, &oidlen))
       return 0;
@@ -731,9 +729,9 @@ extern "C" {
   static PyObject*
   pyPOA_create_reference_with_id(PyPOAObject* self, PyObject* args)
   {
-    char* oidstr;
-    int   oidlen;
-    char* repoId;
+    char*      oidstr;
+    Py_ssize_t oidlen;
+    char*      repoId;
 
     if (!PyArg_ParseTuple(args, (char*)"s#s",
 			  &oidstr, &oidlen, &repoId))
@@ -776,8 +774,8 @@ extern "C" {
 	omniPy::InterpreterUnlocker _u;
 	oid = self->poa->servant_to_id(pyos);
       }
-      return PyString_FromStringAndSize((const char*)oid->NP_data(),
-					oid->length());
+      return RawString_FromStringAndSize((const char*)oid->NP_data(),
+                                         oid->length());
     }
     catch (PortableServer::POA::ServantNotActive& ex) {
       return raisePOAException("ServantNotActive");
@@ -786,6 +784,7 @@ extern "C" {
       return raisePOAException("WrongPolicy");
     }
     OMNIPY_CATCH_AND_HANDLE_SYSTEM_EXCEPTIONS
+    return 0;
   }
 
   static PyObject*
@@ -887,8 +886,8 @@ extern "C" {
 	omniPy::InterpreterUnlocker _u;
 	oid = self->poa->reference_to_id(objref);
       }
-      return PyString_FromStringAndSize((const char*)oid->NP_data(),
-					oid->length());
+      return RawString_FromStringAndSize((const char*)oid->NP_data(),
+                                         oid->length());
     }
     catch (PortableServer::POA::WrongAdapter& ex) {
       return raisePOAException("WrongAdapter");
@@ -897,13 +896,14 @@ extern "C" {
       return raisePOAException("WrongPolicy");
     }
     OMNIPY_CATCH_AND_HANDLE_SYSTEM_EXCEPTIONS
+    return 0;
   }
 
   static PyObject*
   pyPOA_id_to_servant(PyPOAObject* self, PyObject* args)
   {
-    char* oidstr;
-    int   oidlen;
+    char*      oidstr;
+    Py_ssize_t oidlen;
 
     if (!PyArg_ParseTuple(args, (char*)"s#", &oidstr, &oidlen))
       return 0;
@@ -947,8 +947,8 @@ extern "C" {
   static PyObject*
   pyPOA_id_to_reference(PyPOAObject* self, PyObject* args)
   {
-    char* oidstr;
-    int   oidlen;
+    char*      oidstr;
+    Py_ssize_t oidlen;
 
     if (!PyArg_ParseTuple(args, (char*)"s#", &oidstr, &oidlen))
       return 0;
@@ -1084,8 +1084,7 @@ extern "C" {
   };
 
   static PyTypeObject PyPOAType = {
-    PyObject_HEAD_INIT(0)
-    0,                                 /* ob_size */
+    PyVarObject_HEAD_INIT(0,0)
     (char*)"_omnipy.PyPOAObject",      /* tp_name */
     sizeof(PyPOAObject),               /* tp_basicsize */
     0,                                 /* tp_itemsize */

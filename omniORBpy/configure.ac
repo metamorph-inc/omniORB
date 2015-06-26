@@ -84,6 +84,7 @@ os_v="0"
 
 case "$host" in
   *-*-linux-*)   plat_name="Linux";    plat_def="__linux__";    os_v="2";;
+  *-*-uclinux-*) plat_name="Linux";    plat_def="__linux__";    os_v="2";;
   *-*-cygwin*)   plat_name="Cygwin";   plat_def="__cygwin__";   os_v="1";;
   *-*-solaris*)  plat_name="SunOS";    plat_def="__sunos__";    os_v="5";;
   *-*-osf3*)     plat_name="OSF1";     plat_def="__osf1__";     os_v="3";;
@@ -148,10 +149,14 @@ AC_CONFIG_FILES(
                 modules/sslTP/GNUmakefile
                 modules/connections/GNUmakefile
                 modules/ziop/GNUmakefile
-                omniidl_be/GNUmakefile
                 python/GNUmakefile
+                python/omniidl_be/GNUmakefile
                 python/COS/GNUmakefile
                 python/omniORB/GNUmakefile
+                python3/GNUmakefile
+                python3/omniidl_be/GNUmakefile
+                python3/COS/GNUmakefile
+                python3/omniORB/GNUmakefile
 		include/GNUmakefile
                )
 

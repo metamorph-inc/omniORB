@@ -60,9 +60,10 @@ class sslContext {
 
   SSL_CTX* get_SSL_CTX() const { return pd_ctx; }
   
-  // These three parameters must be set or else the default way to
+  // These parameters must be set or else the default way to
   // initialise a sslContext singleton will not be used.
   static _core_attr const char* certificate_authority_file; // In PEM format
+  static _core_attr const char* certificate_authority_path; // Path
   static _core_attr const char* key_file;                   // In PEM format
   static _core_attr const char* key_file_password;
 
@@ -74,6 +75,28 @@ class sslContext {
 
   static _core_attr void      (*info_callback)(const SSL *s,
 					       int where, int ret);
+
+  // If this parameter is false (the default), interceptor
+  // peerdetails() calls treturn an X509*. If set true, the calls
+  // return a pointer to an sslContext::PeerDetails object.
+  static _core_attr CORBA::Boolean full_peerdetails;
+
+  class PeerDetails {
+  public:
+    inline PeerDetails(SSL* s, X509* c, CORBA::Boolean v)
+      : pd_ssl(s), pd_cert(c), pd_verified(v) {}
+
+    ~PeerDetails();
+
+    inline SSL*           ssl()      { return pd_ssl; }
+    inline X509*          cert()     { return pd_cert; }
+    inline CORBA::Boolean verified() { return pd_verified; }
+
+  private:
+    SSL*           pd_ssl;
+    X509*          pd_cert;
+    CORBA::Boolean pd_verified;
+  };
 
   // sslContext singleton object.
   static _core_attr sslContext* singleton;

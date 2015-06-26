@@ -794,21 +794,28 @@ public:
 
   inline _CORBA_ConstrType_Fix_Var()  {}
   inline _CORBA_ConstrType_Fix_Var(T* p) { pd_data = *p; delete p; }
+  inline _CORBA_ConstrType_Fix_Var(const T& d) { pd_data = d; }
   inline _CORBA_ConstrType_Fix_Var(const T_var& p) {
     pd_data = p.pd_data;
   }
   inline ~_CORBA_ConstrType_Fix_Var()  {}
-  inline T_var&operator= (T* p) {
-    pd_data = *p;
-    delete p;
+  inline T_var& operator= (T* p) {
+    if (p != &pd_data) {
+      pd_data = *p;
+      delete p;
+    }
     return *this;
   }
   inline T_var& operator= (const T_var& p) {
-    pd_data = p.pd_data;
+    if (&p != this)
+      pd_data = p.pd_data;
+
     return *this;
   }
-  inline T_var& operator= (T p) {
-    pd_data = p;
+  inline T_var& operator= (const T& p) {
+    if (&p != &pd_data)
+      pd_data = p;
+
     return *this;
   }
   inline T* operator->() const { return (T*) &pd_data; }

@@ -103,6 +103,7 @@ public:
       pd_task(0),
       pd_next_idle(0), pd_prev_idle(0)
   {
+    pd_total_at_start = pd_invoker->workerStartLocked();
     start();
   }
 
@@ -118,12 +119,10 @@ public:
   }
 
   void run(void*) {
-    unsigned int total = pd_invoker->workerStart();
-
     if (omniORB::trace(10)) {
       omniORB::logger log;
       log << "AsyncInvoker: thread id " << pd_id
-          << " has started. Total threads = " << total << ".\n";
+          << " has started. Total threads = " << pd_total_at_start << ".\n";
     }
     omniAsyncWorkerInfo info(this);
     info.run();
@@ -165,6 +164,7 @@ private:
   omni_tracedmutex&    pd_lock;
   omni_tracedcondition pd_cond;
   int                  pd_id;
+  unsigned int         pd_total_at_start;
 
   omniAsyncPool*       pd_pool;
   omniTask*            pd_task;
@@ -192,7 +192,7 @@ public:
       pd_idle_threads(0)
   {}
 
-  virtual ~omniAsyncPool() {}
+  virtual ~omniAsyncPool() { }
 
   inline const char* purpose() { return pd_purpose; }
 

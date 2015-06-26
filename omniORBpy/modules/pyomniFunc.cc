@@ -42,8 +42,12 @@ static PyObject* commFailureEHtuple = 0;
 static PyObject* systemEHtuple      = 0;
 
 
-static CORBA::Boolean transientEH(void* cookie, CORBA::ULong retries,
-				  const CORBA::TRANSIENT& ex)
+static inline CORBA::Boolean
+exceptionHandler(void*                         cookie,
+                 PyObject*                     def_eh,
+                 CORBA::ULong                  retries,
+                 const CORBA::SystemException& ex,
+                 const char*                   kind)
 {
   PyObject* tuple;
 
@@ -52,175 +56,83 @@ static CORBA::Boolean transientEH(void* cookie, CORBA::ULong retries,
   else
     tuple = transientEHtuple;
 
-  OMNIORB_ASSERT(PyTuple_Check(tuple));
-
-  PyObject* pyfn     = PyTuple_GET_ITEM(tuple, 0);
-  PyObject* pycookie = PyTuple_GET_ITEM(tuple, 1);
-  PyObject* r;
-  CORBA::Boolean ret;
-
   {
     omnipyThreadCache::lock _t;
-    PyObject* pyex = omniPy::createPySystemException(ex);
-    r = PyObject_CallFunction(pyfn, (char*)"OiN", pycookie, retries, pyex);
+
+    OMNIORB_ASSERT(PyTuple_Check(tuple));
+
+    PyObject* pyfn     = PyTuple_GET_ITEM(tuple, 0);
+    PyObject* pycookie = PyTuple_GET_ITEM(tuple, 1);
+    PyObject* pyex     = omniPy::createPySystemException(ex);
+
+    omniPy::PyRefHolder r(PyObject_CallFunction(pyfn, (char*)"OiN",
+                                                pycookie, retries, pyex));
     
-    if (!r) {
+    if (!r.valid()) {
       if (omniORB::trace(1)) {
-	omniORB::logs(1, "Python TRANSIENT exception handler failed. "
-		      "Traceback follows:");
+        {
+          omniORB::logger log;
+          log << "Python " << kind
+              << "  exception handler failed. Traceback follows:\n";
+        }
 	PyErr_Print();
       }
       else
 	PyErr_Clear();
+
       return 0;
     }
-    if (!PyInt_Check(r)) {
-      omniORB::logs(1, "Python TRANSIENT exception handler returned an "
-		    "invalid object.");
-      Py_DECREF(r);
+    int ret = PyObject_IsTrue(r);
+
+    if (ret == -1) {
+      if (omniORB::trace(1)) {
+        {
+          omniORB::logger log;
+          log << "Python " << kind
+              << "  exception handler returned an invalid object.\n";
+        }
+      }
+      else
+	PyErr_Clear();
+
       return 0;
     }
-    ret = PyInt_AS_LONG(r);
-    Py_DECREF(r);
+    return ret;
   }
-  return ret;
 }
 
+
+static CORBA::Boolean transientEH(void* cookie, CORBA::ULong retries,
+				  const CORBA::TRANSIENT& ex)
+{
+  return exceptionHandler(cookie, transientEHtuple, retries, ex, "TRANSIENT");
+}
 
 static CORBA::Boolean timeoutEH(void* cookie, CORBA::ULong retries,
 				const CORBA::TIMEOUT& ex)
 {
-  PyObject* tuple;
-
-  if (cookie)
-    tuple = (PyObject*)cookie;
-  else
-    tuple = timeoutEHtuple;
-
-  OMNIORB_ASSERT(PyTuple_Check(tuple));
-
-  PyObject* pyfn     = PyTuple_GET_ITEM(tuple, 0);
-  PyObject* pycookie = PyTuple_GET_ITEM(tuple, 1);
-  PyObject* r;
-  CORBA::Boolean ret;
-
-  {
-    omnipyThreadCache::lock _t;
-    PyObject* pyex = omniPy::createPySystemException(ex);
-    r = PyObject_CallFunction(pyfn, (char*)"OiN", pycookie, retries, pyex);
-    
-    if (!r) {
-      if (omniORB::trace(1)) {
-	omniORB::logs(1, "Python TIMEOUT exception handler failed. "
-		      "Traceback follows:");
-	PyErr_Print();
-      }
-      else
-	PyErr_Clear();
-      return 0;
-    }
-    if (!PyInt_Check(r)) {
-      omniORB::logs(1, "Python TIMEOUT exception handler returned an "
-		    "invalid object.");
-      Py_DECREF(r);
-      return 0;
-    }
-    ret = PyInt_AS_LONG(r);
-    Py_DECREF(r);
-  }
-  return ret;
+  return exceptionHandler(cookie, timeoutEHtuple, retries, ex, "TIMEOUT");
 }
-
 
 static CORBA::Boolean commFailureEH(void* cookie, CORBA::ULong retries,
 				    const CORBA::COMM_FAILURE& ex)
 {
-  PyObject* tuple;
-
-  if (cookie)
-    tuple = (PyObject*)cookie;
-  else
-    tuple = commFailureEHtuple;
-
-  OMNIORB_ASSERT(PyTuple_Check(tuple));
-
-  PyObject* pyfn     = PyTuple_GET_ITEM(tuple, 0);
-  PyObject* pycookie = PyTuple_GET_ITEM(tuple, 1);
-  PyObject* r;
-  CORBA::Boolean ret;
-
-  {
-    omnipyThreadCache::lock _t;
-    PyObject* pyex = omniPy::createPySystemException(ex);
-    r = PyObject_CallFunction(pyfn, (char*)"OiN", pycookie, retries, pyex);
-    
-    if (!r) {
-      if (omniORB::trace(1)) {
-	omniORB::logs(1, "Python COMM_FAILURE exception handler failed. "
-		      "Traceback follows:");
-	PyErr_Print();
-      }
-      else
-	PyErr_Clear();
-      return 0;
-    }
-    if (!PyInt_Check(r)) {
-      omniORB::logs(1, "Python COMM_FAILURE exception handler returned an "
-		    "invalid object.");
-      Py_DECREF(r);
-      return 0;
-    }
-    ret = PyInt_AS_LONG(r);
-    Py_DECREF(r);
-  }
-  return ret;
+  return exceptionHandler(cookie, commFailureEHtuple, retries,
+                          ex, "COMM_FAILURE");
 }
 
 static CORBA::Boolean systemEH(void* cookie, CORBA::ULong retries,
 			       const CORBA::SystemException& ex)
 {
-  PyObject* tuple;
-
-  if (cookie)
-    tuple = (PyObject*)cookie;
-  else
-    tuple = systemEHtuple;
-
-  OMNIORB_ASSERT(PyTuple_Check(tuple));
-
-  PyObject* pyfn     = PyTuple_GET_ITEM(tuple, 0);
-  PyObject* pycookie = PyTuple_GET_ITEM(tuple, 1);
-  PyObject* r;
-  CORBA::Boolean ret;
-
-  {
-    omnipyThreadCache::lock _t;
-    PyObject* pyex = omniPy::createPySystemException(ex);
-    r = PyObject_CallFunction(pyfn, (char*)"OiN", pycookie, retries, pyex);
-    
-    if (!r) {
-      if (omniORB::trace(1)) {
-	omniORB::logs(1, "Python SystemException handler failed. "
-		      "Traceback follows:");
-	PyErr_Print();
-      }
-      else
-	PyErr_Clear();
-      return 0;
-    }
-    if (!PyInt_Check(r)) {
-      omniORB::logs(1, "Python SystemException handler returned an "
-		    "invalid object.");
-      Py_DECREF(r);
-      return 0;
-    }
-    ret = PyInt_AS_LONG(r);
-    Py_DECREF(r);
-  }
-  return ret;
+  return exceptionHandler(cookie, systemEHtuple, retries,
+                          ex, "SystemException");
 }
 
+
 extern "C" {
+
+#if (PY_VERSION_HEX < 0x03000000)
+
   static void removeDummyOmniThread(void* vself) {
     if ((omni_thread*)vself == omni_thread::self()) {
       omniORB::logs(10, "Remove dummy omni thread.");
@@ -230,6 +142,21 @@ extern "C" {
     else
       omniORB::logs(5, "Unable to release dummy omni_thread.");
   }
+
+#else
+
+  static void removeDummyOmniThread(PyObject* cap) {
+    void* vself = PyCapsule_GetPointer(cap, 0);
+
+    if ((omni_thread*)vself == omni_thread::self()) {
+      omniORB::logs(10, "Remove dummy omni thread.");
+      omniPy::InterpreterUnlocker _u;
+      omni_thread::release_dummy();
+    }
+    else
+      omniORB::logs(5, "Unable to release dummy omni_thread.");
+  }
+#endif
 }
 
 
@@ -264,7 +191,12 @@ omniPy::ensureOmniThread()
 
   // Create a CObject with a suitable destructor function and set it
   // as an attribute of the current thread.
+#if (PY_VERSION_HEX < 0x03000000)
   PyObject* cobj = PyCObject_FromVoidPtr(self, removeDummyOmniThread);
+#else
+  PyObject* cobj = PyCapsule_New(self, 0, removeDummyOmniThread);
+#endif
+
   PyObject_SetAttrString(current, (char*)"__omni_thread", cobj);
 
   // Use an evil hack to make sure the __omni_thread member is
@@ -284,7 +216,6 @@ omniPy::ensureOmniThread()
 
   return self;
 }
-
 
 
 extern "C" {
@@ -481,13 +412,13 @@ extern "C" {
   static PyObject* pyomni_traceLevel(PyObject* self, PyObject* args)
   {
     if (PyTuple_GET_SIZE(args) == 0) {
-      return PyInt_FromLong(omniORB::traceLevel);
+      return Int_FromLong(omniORB::traceLevel);
     }
     else if (PyTuple_GET_SIZE(args) == 1) {
       PyObject* pytl = PyTuple_GET_ITEM(args, 0);
 
-      if (PyInt_Check(pytl)) {
-	omniORB::traceLevel = PyInt_AS_LONG(pytl);
+      if (Int_Check(pytl)) {
+	omniORB::traceLevel = Int_AS_LONG(pytl);
 	Py_INCREF(Py_None);
 	return Py_None;
       }
@@ -506,13 +437,13 @@ extern "C" {
   static PyObject* pyomni_traceExceptions(PyObject* self, PyObject* args)
   {
     if (PyTuple_GET_SIZE(args) == 0) {
-      return PyInt_FromLong(omniORB::traceExceptions);
+      return Int_FromLong(omniORB::traceExceptions);
     }
     else if (PyTuple_GET_SIZE(args) == 1) {
       PyObject* pytl = PyTuple_GET_ITEM(args, 0);
 
-      if (PyInt_Check(pytl)) {
-	omniORB::traceExceptions = PyInt_AS_LONG(pytl);
+      if (Int_Check(pytl)) {
+	omniORB::traceExceptions = Int_AS_LONG(pytl);
 	Py_INCREF(Py_None);
 	return Py_None;
       }
@@ -531,13 +462,13 @@ extern "C" {
   static PyObject* pyomni_traceInvocations(PyObject* self, PyObject* args)
   {
     if (PyTuple_GET_SIZE(args) == 0) {
-      return PyInt_FromLong(omniORB::traceInvocations);
+      return Int_FromLong(omniORB::traceInvocations);
     }
     else if (PyTuple_GET_SIZE(args) == 1) {
       PyObject* pytl = PyTuple_GET_ITEM(args, 0);
 
-      if (PyInt_Check(pytl)) {
-	omniORB::traceInvocations = PyInt_AS_LONG(pytl);
+      if (Int_Check(pytl)) {
+	omniORB::traceInvocations = Int_AS_LONG(pytl);
 	Py_INCREF(Py_None);
 	return Py_None;
       }
@@ -556,13 +487,13 @@ extern "C" {
   static PyObject* pyomni_traceInvocationReturns(PyObject* self, PyObject* args)
   {
     if (PyTuple_GET_SIZE(args) == 0) {
-      return PyInt_FromLong(omniORB::traceInvocationReturns);
+      return Int_FromLong(omniORB::traceInvocationReturns);
     }
     else if (PyTuple_GET_SIZE(args) == 1) {
       PyObject* pytl = PyTuple_GET_ITEM(args, 0);
 
-      if (PyInt_Check(pytl)) {
-	omniORB::traceInvocationReturns = PyInt_AS_LONG(pytl);
+      if (Int_Check(pytl)) {
+	omniORB::traceInvocationReturns = Int_AS_LONG(pytl);
 	Py_INCREF(Py_None);
 	return Py_None;
       }
@@ -581,13 +512,13 @@ extern "C" {
   static PyObject* pyomni_traceThreadId(PyObject* self, PyObject* args)
   {
     if (PyTuple_GET_SIZE(args) == 0) {
-      return PyInt_FromLong(omniORB::traceThreadId);
+      return Int_FromLong(omniORB::traceThreadId);
     }
     else if (PyTuple_GET_SIZE(args) == 1) {
       PyObject* pytl = PyTuple_GET_ITEM(args, 0);
 
-      if (PyInt_Check(pytl)) {
-	omniORB::traceThreadId = PyInt_AS_LONG(pytl);
+      if (Int_Check(pytl)) {
+	omniORB::traceThreadId = Int_AS_LONG(pytl);
 	Py_INCREF(Py_None);
 	return Py_None;
       }
@@ -606,13 +537,13 @@ extern "C" {
   static PyObject* pyomni_traceTime(PyObject* self, PyObject* args)
   {
     if (PyTuple_GET_SIZE(args) == 0) {
-      return PyInt_FromLong(omniORB::traceTime);
+      return Int_FromLong(omniORB::traceTime);
     }
     else if (PyTuple_GET_SIZE(args) == 1) {
       PyObject* pytl = PyTuple_GET_ITEM(args, 0);
 
-      if (PyInt_Check(pytl)) {
-	omniORB::traceTime = PyInt_AS_LONG(pytl);
+      if (Int_Check(pytl)) {
+	omniORB::traceTime = Int_AS_LONG(pytl);
 	Py_INCREF(Py_None);
 	return Py_None;
       }
@@ -657,7 +588,7 @@ extern "C" {
 
       if (ncs_c) {
 	const char* ncs = ncs_c->name();
-	return PyString_FromString((char*)ncs);
+	return String_FromString((char*)ncs);
       }
       else {
 	Py_INCREF(Py_None);
@@ -667,10 +598,15 @@ extern "C" {
     else if (PyTuple_GET_SIZE(args) == 1) {
       PyObject* pyncs = PyTuple_GET_ITEM(args, 0);
 
-      if (PyString_Check(pyncs)) {
+      if (String_Check(pyncs)) {
 	try {
 	  omniCodeSet::NCS_C* ncs_c;
-	  ncs_c = omniCodeSet::getNCS_C(PyString_AS_STRING(pyncs));
+	  ncs_c = omniCodeSet::getNCS_C(String_AS_STRING(pyncs));
+
+          if (!ncs_c)
+            OMNIORB_THROW(NO_RESOURCES, NO_RESOURCES_CodeSetNotSupported,
+                          CORBA::COMPLETED_NO);
+
 	  orbParameters::nativeCharCodeSet = ncs_c;
 	}
 	OMNIPY_CATCH_AND_HANDLE_SYSTEM_EXCEPTIONS
@@ -734,17 +670,20 @@ extern "C" {
     if (!pyminor)
       PyErr_Clear();
 
-    if (!(pyrepoId && PyString_Check(pyrepoId) &&
-	  pyminor  && (PyInt_Check(pyminor) || PyLong_Check(pyminor)))) {
+    if (!(pyrepoId && String_Check(pyrepoId) &&
+	  pyminor  && (Int_Check(pyminor) || PyLong_Check(pyminor)))) {
       Py_INCREF(Py_None);
       return Py_None;
     }
-    const char* repoId = PyString_AS_STRING(pyrepoId);
+    const char* repoId = String_AS_STRING(pyrepoId);
 
     CORBA::ULong minor;
+#if (PY_VERSION_HEX < 0x03000000)
     if (PyInt_Check(pyminor))
       minor = PyInt_AS_LONG(pyminor);
-    else {
+    else
+#endif
+      {
       minor = PyLong_AsUnsignedLong(pyminor);
       if (minor == (CORBA::ULong)-1 && PyErr_Occurred())
 	PyErr_Clear();
@@ -764,7 +703,7 @@ extern "C" {
 #undef ToStringIfMatch
 
     if (str)
-      return PyString_FromString(str);
+      return String_FromString(str);
     else {
       Py_INCREF(Py_None);
       return Py_None;
@@ -888,7 +827,7 @@ extern "C" {
     int j;
 
     for (i = ifaddrs->begin(), j=0; i != ifaddrs->end(); i++, j++) {
-      PyList_SetItem(pyaddrs, j, PyString_FromString(*i));
+      PyList_SetItem(pyaddrs, j, String_FromString(*i));
     }
 
     return pyaddrs;
@@ -904,8 +843,8 @@ extern "C" {
   static PyObject* pyomni_setPersistentServerIdentifier(PyObject* self,
 							PyObject* args)
   {
-    char* idstr;
-    int   idlen;
+    char*      idstr;
+    Py_ssize_t idlen;
 
     if (!PyArg_ParseTuple(args, (char*)"s#", &idstr, &idlen))
       return 0;
@@ -1035,9 +974,37 @@ extern "C" {
   };
 }
 
+#if (PY_VERSION_HEX < 0x03000000)
+
 void
 omniPy::initomniFunc(PyObject* d)
 {
   PyObject* m = Py_InitModule((char*)"_omnipy.omni_func", pyomni_methods);
   PyDict_SetItemString(d, (char*)"omni_func", m);
 }
+
+#else
+
+ static struct PyModuleDef omni_func_module = {
+   PyModuleDef_HEAD_INIT,
+   "_omnipy.omni_func",
+   "omniORB API",
+   -1,
+   pyomni_methods,
+   NULL,
+   NULL,
+   NULL,
+   NULL
+ };
+
+void
+omniPy::initomniFunc(PyObject* d)
+{
+  PyObject* m = PyModule_Create(&omni_func_module);
+  if (!m)
+    return;
+
+  PyDict_SetItemString(d, (char*)"omni_func", m);
+}
+
+#endif

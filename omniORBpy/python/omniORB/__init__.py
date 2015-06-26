@@ -3,7 +3,7 @@
 # __init__.py                Created on: 1999/07/19
 #                            Author    : Duncan Grisby (dpg1)
 #
-#    Copyright (C) 2002-2012 Apasphere Ltd
+#    Copyright (C) 2002-2014 Apasphere Ltd
 #    Copyright (C) 1999 AT&T Laboratories Cambridge
 #
 #    This file is part of the omniORBpy library
@@ -32,15 +32,15 @@
 omniORB module -- omniORB specific features
 """
 
-import sys, types, imp, os, os.path, tempfile, exceptions
+import sys, types, imp, os, os.path, tempfile
 
 try:
     import threading
 except ImportError:
-    print """
+    sys.stderr.write("""
 Error: your Python executable was not built with thread support.
        omniORBpy requires threads. Sorry.
-"""
+""")
     raise ImportError("Python executable has no thread support")
 
 import _omnipy
@@ -56,7 +56,7 @@ reinit = 0
 for k, v in _omnipy.__dict__.items():
     if k[-5:] == "_func" and isinstance(v, types.ModuleType):
         sub = "_omnipy." + k
-        if not sys.modules.has_key(sub):
+        if sub not in sys.modules:
             reinit = 1
             sys.modules[sub] = v
         del sub
@@ -95,11 +95,11 @@ e.g. omniidlArguments(["-I/my/include", "-DMY_DEFINE"])"""
 
     global _omniidl_args
 
-    if type(args) is not types.ListType:
+    if not isinstance(args, list):
         raise TypeError("argument must be a list of strings")
 
     for arg in args:
-        if type(arg) is not types.StringType:
+        if not isinstance(arg, str):
             raise TypeError("argument must be a list of strings")
 
     _omniidl_args = args
@@ -160,8 +160,8 @@ sys.modules."""
 
         for mod in mods:
             for m in (mod, skeletonModuleName(mod)):
-                if _partialModules.has_key(m):
-                    if sys.modules.has_key(m):
+                if m in _partialModules:
+                    if m in sys.modules:
                         sys.modules[m].__dict__.update(
                             _partialModules[m].__dict__)
                     else:
@@ -363,15 +363,15 @@ def openModule(mname, fname=None):
     if mname == "CORBA":
         mod = sys.modules["omniORB.CORBA"]
 
-    elif sys.modules.has_key(mname):
+    elif mname in sys.modules:
         mod = sys.modules[mname]
 
-        if _partialModules.has_key(mname):
+        if mname in _partialModules:
             pmod = _partialModules[mname]
             mod.__dict__.update(pmod.__dict__)
             del _partialModules[mname]
             
-    elif _partialModules.has_key(mname):
+    elif mname in _partialModules:
         mod = _partialModules[mname]
 
     else:
@@ -396,10 +396,10 @@ def newModule(mname):
     for name in mlist:
         current = current + name
 
-        if sys.modules.has_key(current):
+        if current in sys.modules:
             mod = sys.modules[current]
 
-        elif _partialModules.has_key(current):
+        elif current in _partialModules:
             mod = _partialModules[current]
 
         else:
@@ -415,7 +415,7 @@ def updateModule(mname):
     updateModule(mname) -- update a module with a partial module
     stored in the partial module map.
     """
-    if _partialModules.has_key(mname):
+    if mname in _partialModules:
         pmod = _partialModules[mname]
         mod  = sys.modules[mname]
         mod.__dict__.update(pmod.__dict__)
@@ -551,7 +551,7 @@ class Union(object):
             if mem == cmem:
                 return self._v
             else:
-                if mem == self._def_m or self._m_to_d.has_key(mem):
+                if mem == self._def_m or mem in self._m_to_d:
                     raise CORBA.BAD_PARAM(BAD_PARAM_WrongUnionMemberSelected,
                                           CORBA.COMPLETED_NO)
                 else:
@@ -560,7 +560,7 @@ class Union(object):
             if mem == self._def_m:
                 return self._v
             else:
-                if self._m_to_d.has_key(mem):
+                if mem in self._m_to_d:
                     raise CORBA.BAD_PARAM(BAD_PARAM_WrongUnionMemberSelected,
                                           CORBA.COMPLETED_NO)
                 else:
@@ -595,6 +595,7 @@ class Union(object):
 
 # Import sub-modules
 import CORBA, tcInternal, omniPolicy
+tcInternal.CORBA = CORBA
 
 def createUnknownStruct(repoId, members):
 
@@ -716,8 +717,7 @@ def coerceAny(v, fd, td):
     if not tcInternal.equivalentDescriptors(fd, td):
         return None
 
-    if type(fd) is not types.TupleType or \
-       type(td) is not types.TupleType:
+    if not (isinstance(fd, tuple) and isinstance(td, tuple)):
         return None
 
     while fd[0] == tcInternal.tv_alias:
@@ -740,7 +740,7 @@ def coerceAny(v, fd, td):
             for i in range(len(l)):
                 l[i] = coerceAny(l[i], fd[i*2 + 5], td[i*2 + 5])
             
-            return apply(td[1], l)
+            return td[1](*l)
 
         elif fd[0] == tcInternal.tv_union:
             return td[1](v._d, coerceAny(v._v, fd[6][v._d], td[6][v._d]))
@@ -767,7 +767,7 @@ def coerceAny(v, fd, td):
             for i in range(len(l)):
                 l[i] = coerceAny(l[i], fd[i*2 + 5], td[i*2 + 5])
             
-            return apply(td[1], l)
+            return td[1](*l)
 
         elif fd[0] == tcInternal.tv__indirect:
             return coerceAny(v, fd[1][0], td[1][0])
@@ -817,10 +817,17 @@ class fixedConstructor(object):
 # *** Depends on threading module internals ***
 
 _thr_init = threading.Thread.__init__
-_thr_id   = threading._get_ident
+
+try:
+    _thr_id = threading._get_ident
+except AttributeError:
+    _thr_id = threading.get_ident
+
 _thr_act  = threading._active
 _thr_acq  = threading._active_limbo_lock.acquire
 _thr_rel  = threading._active_limbo_lock.release
+
+def_id = id
 
 class WorkerThread(threading.Thread):
 
@@ -829,17 +836,23 @@ class WorkerThread(threading.Thread):
     def __init__(self):
         id = _thr_id()
         _thr_init(self, name="omniORB-%d" % id)
-        if hasattr(self._Thread__started, 'set'):
+
+        if hasattr(self, "_started"):
+            self._started.set()
+        elif hasattr(self._Thread__started, 'set'):
             self._Thread__started.set()
         else:
             self._Thread__started = 1
+
         self.id = id
         _thr_acq()
-        if _thr_act.has_key(id):
+
+        if id in _thr_act:
             self.add = 0
         else:
             self.add = 1
             _thr_act[id] = self
+
         _thr_rel()
         if self.add:
             for hook in self.hooks:
@@ -857,7 +870,7 @@ class WorkerThread(threading.Thread):
 
     def _set_daemon(self): return 1
     def join(self):        assert 0, "cannot join an omniORB WorkerThread"
-    
+
 
 # omniThreadHook is used to release a dummy omni_thread C++ object
 # associated with a threading.Thread object when the thread stops.
@@ -865,13 +878,22 @@ class WorkerThread(threading.Thread):
 class omniThreadHook(object):
     def __init__(self, target):
         self.target            = target
-        self.target_stop       = target._Thread__stop
-        target._Thread__stop   = self.omni_thread_stop
+
+        try:
+            self.target_stop       = target._Thread__stop
+            target._Thread__stop   = self.omni_thread_stop
+
+        except AttributeError:
+            self.target_stop = target._stop
+            target._stop     = self.omni_thread_stop
 
     def omni_thread_stop(self):
         try:
             delattr(self.target, "__omni_thread")
-            del self.target._Thread__stop
+            try:
+                del self.target._Thread__stop
+            except AttributeError:
+                del self.target._stop
         except AttributeError:
             pass
         self.target_stop()
@@ -916,7 +938,7 @@ from omniORB.minorCodes import *
 # More public things, which depend on the CORBA module
 
 # LOCATION_FORWARD exception
-class LOCATION_FORWARD (exceptions.Exception):
+class LOCATION_FORWARD (Exception):
     """LOCATION_FORWARD(objref, permanent=0)
 
 This exception may be thrown inside any operation implementation. It
@@ -952,18 +974,20 @@ import omniORB, omniORB.PortableServer
 _omnipy.registerPyObjects(omniORB)
 
 # Import CORBA module stubs
-import corbaidl_idl
-import boxes_idl
-import pollable_idl
-import messaging_idl
-
+from omniORB import corbaidl_idl
 sys.modules["corbaidl_idl"]  = corbaidl_idl
+
+from omniORB import boxes_idl
 sys.modules["boxes_idl"]     = boxes_idl
+
+from omniORB import pollable_idl
 sys.modules["pollable_idl"]  = pollable_idl
+
+from omniORB import messaging_idl
 sys.modules["messaging_idl"] = messaging_idl
 
 # Import the Interface Repository stubs if necessary
-if os.environ.has_key("OMNIORBPY_IMPORT_IR_STUBS"):
+if "OMNIORBPY_IMPORT_IR_STUBS" in os.environ:
     importIRStubs()
 
 promotePartialModule("CORBA__POA")

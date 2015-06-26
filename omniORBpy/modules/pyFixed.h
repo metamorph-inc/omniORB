@@ -3,7 +3,7 @@
 // pyFixed.h                  Created on: 2001/03/30
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2005 Apasphere Ltd
+//    Copyright (C) 2005-2014 Apasphere Ltd
 //    Copyright (C) 2001 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -44,9 +44,9 @@ extern "C" {
     CORBA::Fixed* ob_fixed;
   };
 
-  extern DL_IMPORT(PyTypeObject) omnipyFixed_Type;
+  extern PyTypeObject omnipyFixed_Type;
 
-#define omnipyFixed_Check(op) ((op)->ob_type == &omnipyFixed_Type)
+#define omnipyFixed_Check(op) PyObject_TypeCheck(op, &omnipyFixed_Type)
 
 }
 

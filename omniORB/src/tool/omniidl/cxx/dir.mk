@@ -1,3 +1,5 @@
+include $(BASE_OMNI_TREE)/mk/python.mk
+
 IDLMODULE_MAJOR   = $(OMNIORB_MAJOR_VERSION)
 IDLMODULE_MINOR   = $(OMNIORB_MINOR_VERSION)
 IDLMODULE_VERSION = 0x2630# => CORBA 2.6, front-end 3.0
@@ -73,20 +75,11 @@ idlc = $(patsubst %,$(BinPattern),idlc)
 
 ifdef UnixPlatform
 #CXXDEBUGFLAGS = -g
-PYPREFIX  := $(shell $(PYTHON) -c 'import sys; sys.stdout.write(sys.exec_prefix)')
-PYVERSION := $(shell $(PYTHON) -c 'import sys; sys.stdout.write(sys.version[:3])')
-PYINCDIR  := $(PYPREFIX)/include
-PYINCFILE := "<python$(PYVERSION)/Python.h>"
-DIR_CPPFLAGS += -I$(PYINCDIR)/python$(PYVERSION) \
-		-I$(PYINCDIR)/python$(PYVERSION)mu \
-		-I$(PYINCDIR) \
-		-DPYTHON_INCLUDE="<Python.h>"
 endif
-
 
 ifeq ($(platform),autoconf)
 
-namespec := _omniidlmodule _ $(IDLMODULE_MAJOR) $(IDLMODULE_MINOR)
+namespec := _omniidl$(PY_MODULE_SUFFIX) _ $(IDLMODULE_MAJOR) $(IDLMODULE_MINOR)
 
 ifdef PythonSHAREDLIB_SUFFIX
 SHAREDLIB_SUFFIX = $(PythonSHAREDLIB_SUFFIX)
@@ -144,6 +137,7 @@ endif
 
 else
 #### ugly AIX section end, normal build command
+
 $(shlib): $(OBJS) $(PYOBJS)
 	@(namespec="$(namespec)"; extralibs="$(extralibs)"; $(MakeCXXSharedLibrary))
 endif
@@ -178,6 +172,46 @@ extralibs += -L$(PYPREFIX)/lib/python$(PYVERSION)/config \
 endif
 
 else
+
+#############################################################################
+#   Make rules for Windows                                                  #
+#############################################################################
+
+ifdef Win32Platform
+
+DIR_CPPFLAGS += -DMSDOS -DOMNIIDL_EXECUTABLE
+
+PYLIBDIR := $(PYPREFIX)/libs $(PYPREFIX)/lib/x86_win32
+
+ifdef MinGW32Build
+PYLIB     := -lpython$(subst .,,$(PYVERSION))
+CXXLINKOPTIONS += $(patsubst %,-L%,$(PYLIBDIR))
+else
+PYLIB     := python$(subst .,,$(PYVERSION)).lib
+CXXLINKOPTIONS += $(patsubst %,-libpath:%,$(PYLIBDIR))
+endif
+
+omniidl = $(patsubst %,$(BinPattern),omniidl)
+
+all:: $(omniidl)
+
+export:: $(omniidl)
+	@$(ExportExecutable)
+
+clean::
+	$(RM) $(omniidl)
+
+$(omniidl): $(OBJS) $(PYOBJS)
+	@(libs="$(PYLIB)"; $(CXXExecutable))
+
+endif
+
+
+
+#
+# Obsolete rules for non-autoconf builds
+#
+
 
 #############################################################################
 #   Make rules for Linux                                                    #
@@ -271,52 +305,6 @@ export:: $(lib)
           $(RM) $(libname); \
           ln -s $(soname) $(libname); \
          )
-endif
-
-
-
-#############################################################################
-#   Make rules for Windows                                                  #
-#############################################################################
-
-ifdef Win32Platform
-
-DIR_CPPFLAGS += -DMSDOS -DOMNIIDL_EXECUTABLE
-
-# A Python Windows source tree has PC/pyconfig.h and PCbuild/*.lib
-# We specify all directories for both a source and binary tree -
-# the others just wont be used.
-PYPREFIX1 := "$(shell $(PYTHON) -c 'import sys,string; sys.stdout.write(string.lower(sys.prefix))')"
-PYPREFIX  := $(subst program files,progra~1,$(subst \,/,$(PYPREFIX1)))
-PYVERSION := $(shell $(PYTHON) -c 'import sys; sys.stdout.write(sys.version[:3])')
-PYINCDIR  := $(PYPREFIX)/include
-PYLIBDIR  := $(PYPREFIX)/libs $(PYPREFIX)/lib/x86_win32 $(PYPREFIX)/PCbuild
-
-DIR_CPPFLAGS += -I$(PYINCDIR) -I$(PYPREFIX)/PC \
-                -I$(PYINCDIR)/python$(PYVERSION) \
-                -DPYTHON_INCLUDE="<Python.h>"
-
-ifdef MinGW32Build
-PYLIB     := -lpython$(subst .,,$(PYVERSION))
-CXXLINKOPTIONS += $(patsubst %,-L%,$(PYLIBDIR))
-else
-PYLIB     := python$(subst .,,$(PYVERSION)).lib
-CXXLINKOPTIONS += $(patsubst %,-libpath:%,$(PYLIBDIR))
-endif
-
-omniidl = $(patsubst %,$(BinPattern),omniidl)
-
-all:: $(omniidl)
-
-export:: $(omniidl)
-	@$(ExportExecutable)
-
-clean::
-	$(RM) $(omniidl)
-
-$(omniidl): $(OBJS) $(PYOBJS)
-	@(libs="$(PYLIB)"; $(CXXExecutable))
-
 endif
 
 

@@ -291,7 +291,16 @@ sslConnection::peeridentity() {
 /////////////////////////////////////////////////////////////////////////
 void*
 sslConnection::peerdetails() {
-  return (void*)pd_peercert;
+
+  if (sslContext::full_peerdetails) {
+    return (void*)pd_peerdetails;
+  }
+  else if (pd_peerdetails && pd_peerdetails->verified()) {
+    return (void*)pd_peerdetails->cert();
+  }
+  else {
+    return 0;
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -332,6 +341,7 @@ sslConnection::gatekeeperCheckSpecific(giopStrand* strand)
     case SSL_ERROR_NONE:
       tcpSocket::setBlocking(pd_socket);
       pd_handshake_ok = 1;
+      setPeerDetails();
       return 1;
 
     case SSL_ERROR_WANT_READ:
@@ -380,7 +390,7 @@ sslConnection::gatekeeperCheckSpecific(giopStrand* strand)
 /////////////////////////////////////////////////////////////////////////
 sslConnection::sslConnection(SocketHandle_t sock,::SSL* ssl, 
 			     SocketCollection* belong_to) : 
-  SocketHolder(sock), pd_ssl(ssl), pd_handshake_ok(0), pd_peercert(0)
+  SocketHolder(sock), pd_ssl(ssl), pd_handshake_ok(0), pd_peerdetails(0)
 {
   OMNI_SOCKADDR_STORAGE addr;
   SOCKNAME_SIZE_T l;
@@ -405,25 +415,56 @@ sslConnection::sslConnection(SocketHandle_t sock,::SSL* ssl,
   tcpSocket::setCloseOnExec(sock);
 
   belong_to->addSocket(this);
+  setPeerDetails();
+}
+
+/////////////////////////////////////////////////////////////////////////
+sslConnection::~sslConnection() {
+
+  clearSelectable();
+  pd_belong_to->removeSocket(this);
+
+  if (pd_peerdetails) {
+    delete pd_peerdetails;
+    pd_peerdetails = 0;
+  }
+
+  if (pd_ssl != 0) {
+    if (SSL_get_shutdown(pd_ssl) == 0) {
+      SSL_set_shutdown(pd_ssl, SSL_SENT_SHUTDOWN | SSL_RECEIVED_SHUTDOWN);
+      SSL_shutdown(pd_ssl);
+    }
+    SSL_free(pd_ssl);
+    pd_ssl = 0;
+  }
+
+  CLOSESOCKET(pd_socket);
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+void
+sslConnection::setPeerDetails() {
 
   // Determine our peer identity, if there is one
-  X509 *peer_cert = SSL_get_peer_certificate(pd_ssl);
+
+  if (pd_peerdetails)
+    return;
+
+  X509           *peer_cert = SSL_get_peer_certificate(pd_ssl);
+  CORBA::Boolean  verified  = 0;
 
   if (peer_cert) {
-    if (SSL_get_verify_result(pd_ssl) != X509_V_OK) {
-      X509_free(peer_cert);
-      return;
-    }
+    verified       = SSL_get_verify_result(pd_ssl) == X509_V_OK;
+    pd_peerdetails = new sslContext::PeerDetails(pd_ssl, peer_cert, verified);
 
     int lastpos = -1;
 
     X509_NAME* name = X509_get_subject_name(peer_cert);
     lastpos = X509_NAME_get_index_by_NID(name, NID_commonName, lastpos);
 
-    if (lastpos == -1) {
-      X509_free(peer_cert);
+    if (lastpos == -1)
       return;
-    }
 
     X509_NAME_ENTRY* ne       = X509_NAME_get_entry(name, lastpos);
     ASN1_STRING*     asn1_str = X509_NAME_ENTRY_get_data(ne);
@@ -436,10 +477,9 @@ sslConnection::sslConnection(SocketHandle_t sock,::SSL* ssl,
     if (ASN1_STRING_type(asn1_str) != V_ASN1_UTF8STRING) {
       unsigned char* s = 0;
       int len = ASN1_STRING_to_UTF8(&s, asn1_str);
-      if (len == -1) {
-	X509_free(peer_cert);
+      if (len == -1)
         return;
-      }
+
       CORBA::ULong(len+1) >>= stream;
       stream.put_octet_array(s, len);
       stream.marshalOctet(0);
@@ -451,8 +491,6 @@ sslConnection::sslConnection(SocketHandle_t sock,::SSL* ssl,
       stream.put_octet_array(ASN1_STRING_data(asn1_str), len);
       stream.marshalOctet(0);
     }
-
-    pd_peercert = peer_cert;
 
     try {
       pd_peeridentity = stream.unmarshalString();
@@ -467,28 +505,6 @@ sslConnection::sslConnection(SocketHandle_t sock,::SSL* ssl,
   }
 }
 
-/////////////////////////////////////////////////////////////////////////
-sslConnection::~sslConnection() {
-
-  clearSelectable();
-  pd_belong_to->removeSocket(this);
-
-  if (pd_peercert) {
-    X509_free(pd_peercert);
-    pd_peercert = 0;
-  }
-
-  if (pd_ssl != 0) {
-    if (SSL_get_shutdown(pd_ssl) == 0) {
-      SSL_set_shutdown(pd_ssl, SSL_SENT_SHUTDOWN | SSL_RECEIVED_SHUTDOWN);
-      SSL_shutdown(pd_ssl);
-    }
-    SSL_free(pd_ssl);
-    pd_ssl = 0;
-  }
-
-  CLOSESOCKET(pd_socket);
-}
 
 /////////////////////////////////////////////////////////////////////////
 void

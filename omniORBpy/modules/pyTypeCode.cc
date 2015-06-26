@@ -3,7 +3,7 @@
 // pyTypeCode.cc              Created on: 1999/07/19
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2003-2013 Apasphere Ltd
+//    Copyright (C) 2003-2014 Apasphere Ltd
 //    Copyright (C) 1999 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -46,15 +46,39 @@ extern "C" {
     PyObject_Del((PyObject*)self);
   }
 
+#if (PY_VERSION_HEX < 0x03000000)
   static int
   PyPointerObj_cmp(PyPointerObj* t1, PyPointerObj* t2)
   {
-    // Can't use simple t1->ptr - t2->ptr in case int is
-    // smaller than a pointer
     if      (t1->ptr == t2->ptr) return 0;
     else if (t1->ptr >  t2->ptr) return 1;
     else                         return -1;
   }
+
+#else
+
+  static PyObject*
+  PyPointerObj_rcmp(PyPointerObj* t1, PyPointerObj* t2, int op)
+  {
+    CORBA::Boolean r = 0;
+
+    PyObject* p1 = t1->ptr;
+    PyObject* p2 = t2->ptr;
+
+    switch (op) {
+    case Py_LT: r = p1 <  p2; break;
+    case Py_LE: r = p1 <= p2; break;
+    case Py_EQ: r = p1 == p2; break;
+    case Py_NE: r = p1 != p2; break;
+    case Py_GT: r = p1 >  p2; break;
+    case Py_GE: r = p1 >= p2; break;
+    };
+    
+    PyObject* r_o = r ? Py_True : Py_False;
+    Py_INCREF(r_o);
+    return r_o;
+  }
+#endif
 
   static long
   PyPointerObj_hash(PyPointerObj* self)
@@ -63,8 +87,7 @@ extern "C" {
   }
 
   static PyTypeObject PyPointerType = {
-    PyObject_HEAD_INIT(0)
-    0,                                 /* ob_size */
+    PyVarObject_HEAD_INIT(0,0)
     (char*)"_omnipy.PyPointerObj",     /* tp_name */
     sizeof(PyPointerObj),              /* tp_basicsize */
     0,                                 /* tp_itemsize */
@@ -72,7 +95,11 @@ extern "C" {
     0,                                 /* tp_print */
     0,                                 /* tp_getattr */
     0,                                 /* tp_setattr */
+#if (PY_VERSION_HEX < 0x03000000)
     (cmpfunc)PyPointerObj_cmp,         /* tp_compare */
+#else
+    0,                                 /* tp_reserved */
+#endif
     0,                                 /* tp_repr */
     0,                                 /* tp_as_number */
     0,                                 /* tp_as_sequence */
@@ -85,6 +112,13 @@ extern "C" {
     0,                                 /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT,                /* tp_flags */
     (char*)"PyPointerObj",             /* tp_doc */
+    0,                                 /* tp_traverse */
+    0,                                 /* tp_clear */
+#if (PY_VERSION_HEX < 0x03000000)
+    0,                                 /* tp_richcompare */
+#else
+    (richcmpfunc)PyPointerObj_rcmp,    /* tp_richcompare */
+#endif
   };
 }
 
@@ -119,7 +153,7 @@ public:
 
   inline void add(PyObject* desc, CORBA::Long offset) {
     PyObject* desc_o = (PyObject*)PyPointerObj_alloc(desc);
-    PyObject* oo     = PyInt_FromLong(offset + base_);
+    PyObject* oo     = Int_FromLong(offset + base_);
     PyDict_SetItem(dict_, desc_o, oo);
     Py_DECREF(desc_o);
     Py_DECREF(oo);
@@ -130,7 +164,7 @@ public:
     PyObject* oo     = PyDict_GetItem(dict_, desc_o);
     Py_DECREF(desc_o);
     if (oo) {
-      offset = PyInt_AS_LONG(oo) - base_;
+      offset = Int_AS_LONG(oo) - base_;
       return 1;
     }
     return 0;
@@ -165,13 +199,13 @@ public:
   }
 
   inline void add(PyObject* desc, CORBA::Long offset) {
-    PyObject* oo = PyInt_FromLong(offset + base_);
+    PyObject* oo = Int_FromLong(offset + base_);
     PyDict_SetItem(dict_, oo, desc);
     Py_DECREF(oo);
   }
 
   inline CORBA::Boolean lookup(PyObject*& desc, CORBA::Long offset) {
-    PyObject* oo = PyInt_FromLong(offset + base_);
+    PyObject* oo = Int_FromLong(offset + base_);
     desc = PyDict_GetItem(dict_, oo);
     Py_DECREF(oo);
     if (desc) {
@@ -216,12 +250,12 @@ r_marshalTypeCode(cdrStream&           stream,
     PyObject*      t_o;
 
     if (PyTuple_Check(d_o)) {
-      t_o = PyTuple_GET_ITEM(d_o, 0); OMNIORB_ASSERT(PyInt_Check(t_o));
-      tk  = PyInt_AS_LONG(t_o);
+      t_o = PyTuple_GET_ITEM(d_o, 0); OMNIORB_ASSERT(Int_Check(t_o));
+      tk  = Int_AS_LONG(t_o);
     }
     else {
-      OMNIORB_ASSERT(PyInt_Check(d_o));
-      tk  = PyInt_AS_LONG(d_o);
+      OMNIORB_ASSERT(Int_Check(d_o));
+      tk  = Int_AS_LONG(d_o);
     }
 
     // Marshal the kind
@@ -257,8 +291,8 @@ r_marshalTypeCode(cdrStream&           stream,
     case CORBA::tk_string:
       {
 	// Send max length
-	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(PyInt_Check(t_o));
-	CORBA::ULong len = PyInt_AS_LONG(t_o);
+	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(Int_Check(t_o));
+	CORBA::ULong len = Int_AS_LONG(t_o);
 	len >>= stream;
       }
       break;
@@ -266,8 +300,8 @@ r_marshalTypeCode(cdrStream&           stream,
     case CORBA::tk_wstring:
       {
 	// Send max length
-	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(PyInt_Check(t_o));
-	CORBA::ULong len = PyInt_AS_LONG(t_o);
+	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(Int_Check(t_o));
+	CORBA::ULong len = Int_AS_LONG(t_o);
 	len >>= stream;
       }
       break;
@@ -275,10 +309,10 @@ r_marshalTypeCode(cdrStream&           stream,
     case CORBA::tk_fixed:
       {
 	// Send digits followed by scale
-	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(PyInt_Check(t_o));
-	CORBA::UShort digits = PyInt_AS_LONG(t_o);
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyInt_Check(t_o));
-	CORBA::Short scale = PyInt_AS_LONG(t_o);
+	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(Int_Check(t_o));
+	CORBA::UShort digits = Int_AS_LONG(t_o);
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(Int_Check(t_o));
+	CORBA::Short scale = Int_AS_LONG(t_o);
 	digits >>= stream;
 	scale  >>= stream;
       }
@@ -293,10 +327,10 @@ r_marshalTypeCode(cdrStream&           stream,
 	cdrEncapsulationStream encap;
 
 	// RepoId and name
-	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
 	// Send encapsulation
@@ -313,10 +347,10 @@ r_marshalTypeCode(cdrStream&           stream,
 	DescriptorOffsetMap edom(dom, tc_offset + 8);
 
 	// RepoId and name
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
-	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
 	// Count
@@ -324,21 +358,19 @@ r_marshalTypeCode(cdrStream&           stream,
 	cnt >>= encap;
 
 	CORBA::ULong i, j, slen;
-	char* str;
+	const char*  str;
 
 	for (i=0, j=4; i < cnt; i++) {
 	  // member name
-	  t_o  = PyTuple_GET_ITEM(d_o, j++);
-	  OMNIORB_ASSERT(PyString_Check(t_o));
-	  str  = PyString_AS_STRING(t_o);
-	  slen = PyString_GET_SIZE(t_o) + 1;
+	  t_o  = PyTuple_GET_ITEM(d_o, j++); OMNIORB_ASSERT(String_Check(t_o));
+          str  = String_AS_STRING_AND_SIZE(t_o, slen);
 
+          ++slen;
 	  if (str[0] == '_') { --slen; ++str; }
+
 	  slen >>= encap;
-	  if (slen > 1) {
-	    encap.put_octet_array((const CORBA::Octet*)((const char*)str),
-				  slen);
-	  }
+          encap.put_small_octet_array((const CORBA::Octet*)str, slen);
+
 	  // member type
 	  r_marshalTypeCode(encap, PyTuple_GET_ITEM(d_o, j++), edom);
 	}
@@ -356,10 +388,10 @@ r_marshalTypeCode(cdrStream&           stream,
 	DescriptorOffsetMap edom(dom, tc_offset + 8);
 
 	// RepoId and name
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
-	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
 	// Discriminant type
@@ -368,8 +400,8 @@ r_marshalTypeCode(cdrStream&           stream,
 
 	// Default used
 	t_o              = PyTuple_GET_ITEM(d_o, 5);
-	OMNIORB_ASSERT(PyInt_Check(t_o));
-	CORBA::Long defu = PyInt_AS_LONG(t_o);
+	OMNIORB_ASSERT(Int_Check(t_o));
+	CORBA::Long defu = Int_AS_LONG(t_o);
 	defu >>= encap;
 
 	PyObject* mems;
@@ -381,7 +413,7 @@ r_marshalTypeCode(cdrStream&           stream,
 	cnt >>= encap;
 
 	CORBA::ULong slen;
-	char*        str;
+	const char*  str;
 
 	for (CORBA::ULong i=0; i < cnt; i++) {
 	  mem = PyTuple_GET_ITEM(mems, i); OMNIORB_ASSERT(PyTuple_Check(mem));
@@ -391,16 +423,15 @@ r_marshalTypeCode(cdrStream&           stream,
 				  PyTuple_GET_ITEM(mem, 0));
 
 	  // Member name
-	  t_o  = PyTuple_GET_ITEM(mem, 1); OMNIORB_ASSERT(PyString_Check(t_o));
-	  str  = PyString_AS_STRING(t_o);
-	  slen = PyString_GET_SIZE(t_o) + 1;
+	  t_o  = PyTuple_GET_ITEM(mem, 1); OMNIORB_ASSERT(String_Check(t_o));
+          str  = String_AS_STRING_AND_SIZE(t_o, slen);
 
+          ++slen;
 	  if (str[0] == '_') { --slen; ++str; }
+
 	  slen >>= encap;
-	  if (slen > 1) {
-	    encap.put_octet_array((const CORBA::Octet*)((const char*)str),
-				  slen);
-	  }
+          encap.put_small_octet_array((const CORBA::Octet*)str, slen);
+
 	  // Member typecode
 	  r_marshalTypeCode(encap, PyTuple_GET_ITEM(mem, 2), edom);
 	}
@@ -417,10 +448,10 @@ r_marshalTypeCode(cdrStream&           stream,
 	cdrEncapsulationStream encap;
 
 	// RepoId and name
-	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
 	PyObject* mems;
@@ -456,8 +487,8 @@ r_marshalTypeCode(cdrStream&           stream,
 	r_marshalTypeCode(encap, PyTuple_GET_ITEM(d_o, 1), edom);
 
 	// Max length
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyInt_Check(t_o));
-	CORBA::ULong max_len = PyInt_AS_LONG(t_o);
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(Int_Check(t_o));
+	CORBA::ULong max_len = Int_AS_LONG(t_o);
 	max_len >>= encap;
 
 	// Send encapsulation
@@ -477,8 +508,8 @@ r_marshalTypeCode(cdrStream&           stream,
 	r_marshalTypeCode(encap, PyTuple_GET_ITEM(d_o, 1), edom);
 
 	// Length
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyInt_Check(t_o));
-	CORBA::ULong arr_len = PyInt_AS_LONG(t_o);
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(Int_Check(t_o));
+	CORBA::ULong arr_len = Int_AS_LONG(t_o);
 	arr_len >>= encap;
 
 	// Send encapsulation
@@ -495,10 +526,10 @@ r_marshalTypeCode(cdrStream&           stream,
 	DescriptorOffsetMap edom(dom, tc_offset + 8);
 
 	// RepoId and name
-	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
 	// TypeCode
@@ -518,10 +549,10 @@ r_marshalTypeCode(cdrStream&           stream,
 	DescriptorOffsetMap edom(dom, tc_offset + 8);
 
 	// RepoId and name
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
-	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
 	// Count
@@ -529,22 +560,19 @@ r_marshalTypeCode(cdrStream&           stream,
 	cnt >>= encap;
 
 	CORBA::ULong i, j, slen;
-	char* str;
+	const char*  str;
 
 	for (i=0, j=4; i < cnt; i++) {
 	  // member name
-	  t_o = PyTuple_GET_ITEM(d_o, j++);
-	  OMNIORB_ASSERT(PyString_Check(t_o));
+	  t_o = PyTuple_GET_ITEM(d_o, j++); OMNIORB_ASSERT(String_Check(t_o));
+          str = String_AS_STRING_AND_SIZE(t_o, slen);
 
-	  str  = PyString_AS_STRING(t_o);
-	  slen = PyString_GET_SIZE(t_o) + 1;
-
+          ++slen;
 	  if (str[0] == '_') { --slen; ++str; }
+
 	  slen >>= encap;
-	  if (slen > 1) {
-	    encap.put_octet_array((const CORBA::Octet*)((const char*)str),
-				  slen);
-	  }
+          encap.put_small_octet_array((const CORBA::Octet*)str, slen);
+
 	  // member type
 	  r_marshalTypeCode(encap, PyTuple_GET_ITEM(d_o, j++), edom);
 	}
@@ -562,15 +590,15 @@ r_marshalTypeCode(cdrStream&           stream,
 	DescriptorOffsetMap edom(dom, tc_offset + 8);
 
 	// RepoId and name
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
-	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
 	// ValueModifier
-	t_o = PyTuple_GET_ITEM(d_o, 4);	OMNIORB_ASSERT(PyInt_Check(t_o));
-	CORBA::ValueModifier mod = PyInt_AS_LONG(t_o);
+	t_o = PyTuple_GET_ITEM(d_o, 4);	OMNIORB_ASSERT(Int_Check(t_o));
+	CORBA::ValueModifier mod = Int_AS_LONG(t_o);
 	mod >>= encap;
 
 	// Concrete base
@@ -589,29 +617,25 @@ r_marshalTypeCode(cdrStream&           stream,
 	cnt >>= encap;
 
 	CORBA::ULong i, j, slen;
-	char* str;
+	const char*  str;
 
 	for (i=0, j=7; i < cnt; i++) {
 	  // member name
-	  t_o = PyTuple_GET_ITEM(d_o, j++);
-	  OMNIORB_ASSERT(PyString_Check(t_o));
+	  t_o = PyTuple_GET_ITEM(d_o, j++); OMNIORB_ASSERT(String_Check(t_o));
+          str = String_AS_STRING_AND_SIZE(t_o, slen);
 
-	  str  = PyString_AS_STRING(t_o);
-	  slen = PyString_GET_SIZE(t_o) + 1;
-
+          ++slen;
 	  if (str[0] == '_') { --slen; ++str; }
+
 	  slen >>= encap;
-	  if (slen > 1) {
-	    encap.put_octet_array((const CORBA::Octet*)((const char*)str),
-				  slen);
-	  }
+          encap.put_small_octet_array((const CORBA::Octet*)str, slen);
+
 	  // member type
 	  r_marshalTypeCode(encap, PyTuple_GET_ITEM(d_o, j++), edom);
 
 	  // member visiblity
-	  t_o = PyTuple_GET_ITEM(d_o, j++);
-	  OMNIORB_ASSERT(PyInt_Check(t_o));
-	  CORBA::UShort vis = PyInt_AS_LONG(t_o);
+	  t_o = PyTuple_GET_ITEM(d_o, j++); OMNIORB_ASSERT(Int_Check(t_o));
+	  CORBA::UShort vis = Int_AS_LONG(t_o);
 	  vis >>= encap;
 	}
 	// Send encapsulation
@@ -628,10 +652,10 @@ r_marshalTypeCode(cdrStream&           stream,
 	DescriptorOffsetMap edom(dom, tc_offset + 8);
 
 	// RepoId and name
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
-	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 3); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
 	// Boxed type
@@ -652,10 +676,10 @@ r_marshalTypeCode(cdrStream&           stream,
 	DescriptorOffsetMap edom(dom, tc_offset + 8);
 
 	// RepoId and name
-	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
-	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(PyString_Check(t_o));
+	t_o = PyTuple_GET_ITEM(d_o, 2); OMNIORB_ASSERT(String_Check(t_o));
 	omniPy::marshalRawPyString(encap, t_o);
 
 	// Send encapsulation
@@ -666,11 +690,11 @@ r_marshalTypeCode(cdrStream&           stream,
 
     case 0xffffffff:
       {
-	PyObject* l = PyTuple_GET_ITEM(d_o, 1);
-	OMNIORB_ASSERT(PyList_Check(l));
-	t_o = PyList_GET_ITEM(l, 0); OMNIORB_ASSERT(t_o);
+	PyObject* l = PyTuple_GET_ITEM(d_o, 1); OMNIORB_ASSERT(PyList_Check(l));
 
-	if (PyString_Check(t_o)) {
+	t_o = PyList_GET_ITEM(l, 0); OMNIORB_ASSERT(t_o);
+        
+	if (String_Check(t_o)) {
 	  // Indirection to a repoId -- find the corresponding descriptor
 	  t_o = PyDict_GetItem(omniPy::pyomniORBtypeMap, t_o);
 	  if (!t_o)
@@ -749,42 +773,42 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 #endif
   case CORBA::tk_wchar:
     {
-      d_o = PyInt_FromLong(tk); odm.add(d_o, tc_offset);
+      d_o = Int_FromLong(tk); odm.add(d_o, tc_offset);
     }
     break;
 
   case CORBA::tk_string:
     {
       d_o = PyTuple_New(2); odm.add(d_o, tc_offset);
-      PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+      PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 
       CORBA::ULong len; len <<= stream;
 
-      PyTuple_SET_ITEM(d_o, 1, PyInt_FromLong(len));
+      PyTuple_SET_ITEM(d_o, 1, Int_FromLong(len));
     }
     break;
 
   case CORBA::tk_wstring:
     {
       d_o = PyTuple_New(2); odm.add(d_o, tc_offset);
-      PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+      PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 
       CORBA::ULong len; len <<= stream;
 
-      PyTuple_SET_ITEM(d_o, 1, PyInt_FromLong(len));
+      PyTuple_SET_ITEM(d_o, 1, Int_FromLong(len));
     }
     break;
 
   case CORBA::tk_fixed:
     {
       d_o = PyTuple_New(3); odm.add(d_o, tc_offset);
-      PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+      PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 
       CORBA::UShort digits; digits <<= stream;
       CORBA::Short  scale;  scale  <<= stream;
 
-      PyTuple_SET_ITEM(d_o, 1, PyInt_FromLong(digits));
-      PyTuple_SET_ITEM(d_o, 2, PyInt_FromLong(scale));
+      PyTuple_SET_ITEM(d_o, 1, Int_FromLong(digits));
+      PyTuple_SET_ITEM(d_o, 2, Int_FromLong(scale));
     }
     break;
 
@@ -794,7 +818,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
       cdrEncapsulationStream encap(stream, size);
 
       d_o = PyTuple_New(3); odm.add(d_o, tc_offset);
-      PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+      PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 
       // RepoId and name
       t_o = omniPy::unmarshalRawPyString(encap); PyTuple_SET_ITEM(d_o, 1, t_o);
@@ -841,7 +865,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 	CORBA::ULong cnt; cnt <<= encap;
 
 	d_o = PyTuple_New(cnt * 2 + 4);	odm.add(d_o, tc_offset);
-	PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+	PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 	PyTuple_SET_ITEM(d_o, 2, repoId);
 	PyTuple_SET_ITEM(d_o, 3, name);
 
@@ -931,7 +955,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 	OffsetDescriptorMap eodm(odm, tc_offset + 8);
 
 	d_o = PyTuple_New(9); odm.add(d_o, tc_offset);
-	PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+	PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 	PyTuple_SET_ITEM(d_o, 2, repoId);
 
 	// name
@@ -944,7 +968,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 
 	// default used
 	CORBA::Long def_used; def_used <<= encap;
-	PyTuple_SET_ITEM(d_o, 5, PyInt_FromLong(def_used));
+	PyTuple_SET_ITEM(d_o, 5, Int_FromLong(def_used));
 
 	if (def_used < 0) {
 	  Py_INCREF(Py_None);
@@ -1025,7 +1049,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
       else {
 	// Don't know this enum
 	d_o = PyTuple_New(4); odm.add(d_o, tc_offset);
-	PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+	PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 	PyTuple_SET_ITEM(d_o, 1, repoId);
 
 	// name
@@ -1048,7 +1072,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 	for (CORBA::ULong i=0; i<cnt; i++) {
 	  PyObject* mname = omniPy::unmarshalRawPyString(encap);
 
-	  if (PyString_GET_SIZE(mname) > 0)
+	  if (String_GET_SIZE(mname) > 0)
 	    t_o = PyObject_CallFunction(eclass, (char*)"Oi", mname, i);
 	  else
 	    t_o = PyObject_CallFunction(aclass, (char*)"i", i);
@@ -1071,7 +1095,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
       OffsetDescriptorMap eodm(odm, tc_offset + 8);
 
       d_o = PyTuple_New(3); odm.add(d_o, tc_offset);
-      PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+      PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 
       // Element type
       t_o = r_unmarshalTypeCode(encap, eodm);
@@ -1079,7 +1103,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 
       // Max length
       CORBA::ULong len; len <<= encap;
-      PyTuple_SET_ITEM(d_o, 2, PyInt_FromLong(len));
+      PyTuple_SET_ITEM(d_o, 2, Int_FromLong(len));
     }
     break;
 
@@ -1091,7 +1115,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
       OffsetDescriptorMap eodm(odm, tc_offset + 8);
 
       d_o = PyTuple_New(3); odm.add(d_o, tc_offset);
-      PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+      PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 
       // Element type
       t_o = r_unmarshalTypeCode(encap, eodm);
@@ -1099,7 +1123,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 
       // Length
       CORBA::ULong len; len <<= encap;
-      PyTuple_SET_ITEM(d_o, 2, PyInt_FromLong(len));
+      PyTuple_SET_ITEM(d_o, 2, Int_FromLong(len));
     }
     break;
 
@@ -1126,7 +1150,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 	OffsetDescriptorMap eodm(odm, tc_offset + 8);
 
 	d_o = PyTuple_New(4); odm.add(d_o, tc_offset);
-	PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+	PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 	PyTuple_SET_ITEM(d_o, 1, repoId);
 	
 	// name
@@ -1175,7 +1199,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 	CORBA::ULong cnt; cnt <<= encap;
 
 	d_o = PyTuple_New(cnt * 2 + 4); odm.add(d_o, tc_offset);
-	PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+	PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 	PyTuple_SET_ITEM(d_o, 2, repoId);
 	PyTuple_SET_ITEM(d_o, 3, name);
 
@@ -1268,10 +1292,10 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 	CORBA::ULong cnt; cnt <<= encap;
 
 	d_o = PyTuple_New(cnt * 3 + 7);	odm.add(d_o, tc_offset);
-	PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+	PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 	PyTuple_SET_ITEM(d_o, 2, repoId);
 	PyTuple_SET_ITEM(d_o, 3, name);
-	PyTuple_SET_ITEM(d_o, 4, PyInt_FromLong(mod));
+	PyTuple_SET_ITEM(d_o, 4, Int_FromLong(mod));
 	Py_INCREF(Py_None);
 	PyTuple_SET_ITEM(d_o, 5, Py_None); // Empty truncatable bases
 	PyTuple_SET_ITEM(d_o, 6, base);
@@ -1298,7 +1322,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 
 	  // member visibility
 	  CORBA::UShort vis; vis <<= encap;
-	  PyTuple_SET_ITEM(d_o, j++, PyInt_FromLong(vis));
+	  PyTuple_SET_ITEM(d_o, j++, Int_FromLong(vis));
 	}
 
 	// Create class object
@@ -1337,7 +1361,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 	OffsetDescriptorMap eodm(odm, tc_offset + 8);
 
 	d_o = PyTuple_New(5); odm.add(d_o, tc_offset);
-	PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+	PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 
 	// Member 1 is valuebox class in static stubs, but it's not used.
 	Py_INCREF(Py_None);
@@ -1362,7 +1386,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
       cdrEncapsulationStream encap(stream, size);
 
       d_o = PyTuple_New(3); odm.add(d_o, tc_offset);
-      PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+      PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 
       // RepoId and name
       t_o = omniPy::unmarshalRawPyString(encap); PyTuple_SET_ITEM(d_o, 1, t_o);
@@ -1388,7 +1412,7 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
       }
 
       d_o = PyTuple_New(2); odm.add(d_o, tc_offset);
-      PyTuple_SET_ITEM(d_o, 0, PyInt_FromLong(tk));
+      PyTuple_SET_ITEM(d_o, 0, Int_FromLong(tk));
 
       PyObject* olist = PyList_New(1);
       PyList_SET_ITEM(olist, 0, t_o);

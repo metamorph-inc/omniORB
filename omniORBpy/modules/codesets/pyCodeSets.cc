@@ -49,8 +49,33 @@ extern "C" {
   };
 
 
+#if (PY_VERSION_HEX < 0x03000000)
+
   void DLL_EXPORT init_omnicodesets()
   {
     PyObject* m = Py_InitModule((char*)"_omnicodesets", omnicodesets_methods);
   }
+
+#else
+
+  static struct PyModuleDef omnicodesetsmodule = {
+    PyModuleDef_HEAD_INIT,
+    "_omnicodesets",
+    "omniORBpy codesets",
+    -1,
+    omnicodesets_methods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+  };
+
+  PyMODINIT_FUNC
+  PyInit__omnicodesets(void)
+  {
+    return PyModule_Create(&omnicodesetsmodule);
+  }
+
+#endif
+
 };

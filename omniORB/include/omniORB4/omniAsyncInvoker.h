@@ -213,6 +213,12 @@ private:
     return ++pd_total_threads;
   }
 
+  inline unsigned int workerStartLocked()
+  {
+    ASSERT_OMNI_TRACEDMUTEX_HELD(pd_lock, 1);
+    return ++pd_total_threads;
+  }
+
   inline unsigned int workerStop()
   {
     omni_tracedmutex_lock l(pd_lock);

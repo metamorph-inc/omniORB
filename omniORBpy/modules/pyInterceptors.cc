@@ -51,27 +51,6 @@ static PyObject* assignUpcallThreadFns        = 0;
 static PyObject* assignAMIThreadFns           = 0;
 
 
-static inline
-CORBA::ULong
-pyNumberToULong(PyObject* obj, CORBA::CompletionStatus completion)
-{
-  if (PyInt_Check(obj)) {
-    long r = PyInt_AS_LONG(obj);
-    if (r >= 0)
-      return r;
-  }
-  if (PyLong_Check(obj)) {
-    CORBA::ULong r = PyLong_AsUnsignedLong(obj);
-    if (r == (CORBA::ULong)-1 && PyErr_Occurred())
-      PyErr_Clear();
-    else
-      return r;
-  }
-  OMNIORB_THROW(BAD_PARAM, BAD_PARAM_WrongPythonType, completion);
-  return 0;
-}
-
-
 static
 void
 callInterceptorsAndSetContexts(PyObject*                fnlist,
@@ -80,18 +59,14 @@ callInterceptorsAndSetContexts(PyObject*                fnlist,
 			       IOP::ServiceContextList& service_contexts,
 			       CORBA::CompletionStatus  completion)
 {
-  PyObject* argtuple;
-  if (exrepoid)
-    argtuple = PyTuple_New(3);
-  else
-    argtuple = PyTuple_New(2);
+  omniPy::PyRefHolder argtuple(PyTuple_New(exrepoid ? 3 : 2));
 
   PyObject* ctxtlist = PyList_New(0);
-  PyTuple_SetItem(argtuple, 0, PyString_FromString(opname));
+  PyTuple_SetItem(argtuple, 0, String_FromString(opname));
   PyTuple_SetItem(argtuple, 1, ctxtlist);
 
   if (exrepoid)
-    PyTuple_SetItem(argtuple, 2, PyString_FromString(exrepoid));
+    PyTuple_SetItem(argtuple, 2, String_FromString(exrepoid));
 
   CORBA::ULong sclen = service_contexts.length();
   CORBA::ULong sci   = sclen;
@@ -121,28 +96,27 @@ callInterceptorsAndSetContexts(PyObject*                fnlist,
 	    OMNIORB_THROW(BAD_PARAM, BAD_PARAM_WrongPythonType, completion);
 	  }
 	  service_contexts[sci].context_id =
-	    pyNumberToULong(PyTuple_GET_ITEM(sc, 0), completion);
+	    omniPy::getULongVal(PyTuple_GET_ITEM(sc, 0), completion);
 
 	  PyObject* data = PyTuple_GET_ITEM(sc, 1);
 
-	  if (!PyString_Check(data))
+	  if (!String_Check(data))
 	    OMNIORB_THROW(BAD_PARAM, BAD_PARAM_WrongPythonType, completion);
 
-	  service_contexts[sci].context_data.length(PyString_GET_SIZE(data));
+          CORBA::ULong size;
+          const char*  str = String_AS_STRING_AND_SIZE(data, size);
 
-	  memcpy(service_contexts[sci].context_data.NP_data(),
-		 PyString_AS_STRING(data),
-		 PyString_GET_SIZE(data));
+	  service_contexts[sci].context_data.length(size);
+
+	  memcpy(service_contexts[sci].context_data.NP_data(), str, size);
 	}
 	PyList_SetSlice(ctxtlist, 0, PyList_GET_SIZE(ctxtlist), 0);
       }
     }
   }
-  catch (...) {
-    Py_DECREF(argtuple);
-    throw;
+  catch (Py_BAD_PARAM& bp) {
+    bp.logInfoAndThrow();
   }
-  Py_DECREF(argtuple);
 }
 
 static
@@ -158,17 +132,17 @@ getContextsAndCallInterceptors(PyObject*                fnlist,
   int i;
   int sclen = service_contexts.length();
 
-  PyObject* argtuple = PyTuple_New(pass_peer_info ? 3 : 2);
-  PyObject* sctuple  = PyTuple_New(sclen);
+  omniPy::PyRefHolder argtuple(PyTuple_New(pass_peer_info ? 3 : 2));
 
-  PyTuple_SET_ITEM(argtuple, 0, PyString_FromString(opname));
+  PyObject* sctuple = PyTuple_New(sclen);
+  PyTuple_SET_ITEM(argtuple, 0, String_FromString(opname));
   PyTuple_SET_ITEM(argtuple, 1, sctuple);
 
   if (pass_peer_info) {
     PyObject* peer_info = PyDict_New();
     PyObject* value;
     if (peer_address) {
-      value = PyString_FromString(peer_address);
+      value = String_FromString(peer_address);
     }
     else {
       Py_INCREF(Py_None);
@@ -176,7 +150,7 @@ getContextsAndCallInterceptors(PyObject*                fnlist,
     }
     PyDict_SetItemString(peer_info, "address", value);
     if (peer_identity) {
-      value = PyString_FromString(peer_identity);
+      value = String_FromString(peer_identity);
     }
     else {
       Py_INCREF(Py_None);
@@ -194,7 +168,7 @@ getContextsAndCallInterceptors(PyObject*                fnlist,
     const char* data = (const char*)service_contexts[i].context_data.NP_data();
     int len = service_contexts[i].context_data.length();
     
-    PyTuple_SET_ITEM(sc, 1, PyString_FromStringAndSize(data, len));
+    PyTuple_SET_ITEM(sc, 1, String_FromStringAndSize(data, len));
     PyTuple_SET_ITEM(sctuple, i, sc);
   }
 
@@ -213,11 +187,9 @@ getContextsAndCallInterceptors(PyObject*                fnlist,
       Py_DECREF(result);
     }
   }
-  catch (...) {
-    Py_DECREF(argtuple);
-    throw;
+  catch (Py_BAD_PARAM& bp) {
+    bp.logInfoAndThrow();
   }
-  Py_DECREF(argtuple);
 }
 
 
@@ -352,8 +324,7 @@ assignThreadFn(infoT& info, PyObject* fns)
 
   omnipyThreadCache::lock _t;
 
-  PyObject*           post_list = PyList_New(0);
-  omniPy::PyRefHolder post_list_holder(post_list);
+  omniPy::PyRefHolder post_list(PyList_New(0));
 
   int i;
   for (i=0; i < PyList_GET_SIZE(fns); ++i) {
@@ -691,6 +662,8 @@ extern "C" {
   };
 }
 
+#if (PY_VERSION_HEX < 0x03000000)
+
 void
 omniPy::initInterceptorFunc(PyObject* d)
 {
@@ -698,3 +671,29 @@ omniPy::initInterceptorFunc(PyObject* d)
 			      pyInterceptor_methods);
   PyDict_SetItemString(d, (char*)"interceptor_func", m);
 }
+
+#else
+
+ static struct PyModuleDef interceptor_func_module = {
+   PyModuleDef_HEAD_INIT,
+   "_omnipy.interceptor_func",
+   "omniORB Interceptor API",
+   -1,
+   pyInterceptor_methods,
+   NULL,
+   NULL,
+   NULL,
+   NULL
+ };
+
+void
+omniPy::initInterceptorFunc(PyObject* d)
+{
+  PyObject* m = PyModule_Create(&interceptor_func_module);
+  if (!m)
+    return;
+
+  PyDict_SetItemString(d, (char*)"interceptor_func", m);
+}
+
+#endif

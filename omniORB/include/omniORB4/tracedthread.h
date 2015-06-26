@@ -48,14 +48,14 @@
 
 class omni_tracedmutex : public omni_mutex {
 public:
-  inline omni_tracedmutex(const char* name=0) : omni_mutex() {}
+  inline omni_tracedmutex(const char* /*name*/=0) : omni_mutex() {}
 };
 
 typedef omni_mutex_lock omni_tracedmutex_lock;
 
 class omni_tracedcondition : public omni_condition {
 public:
-  inline omni_tracedcondition(omni_tracedmutex* m, const char* name=0)
+  inline omni_tracedcondition(omni_tracedmutex* m, const char* /*name*/=0)
     : omni_condition(m) {}
 };
 

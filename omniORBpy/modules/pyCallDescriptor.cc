@@ -3,7 +3,7 @@
 // pyCallDescriptor.cc        Created on: 2000/02/02
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2003-2013 Apasphere Ltd
+//    Copyright (C) 2003-2014 Apasphere Ltd
 //    Copyright (C) 2000 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -95,7 +95,7 @@ extern "C" {
     omniPy::Py_omniCallDescriptor* cd = self->cd;
 
     const char*  op;
-    int          op_len;
+    Py_ssize_t   op_len;
     PyObject*    pytimeout;
     CORBA::ULong timeout;
 
@@ -198,7 +198,7 @@ extern "C" {
   static PyObject*
   PyCDObj_operation_name(PyCDObj* self, PyObject* args)
   {
-    return PyString_FromString(self->cd->op());
+    return String_FromString(self->cd->op());
   }
 
   static PyObject*
@@ -252,8 +252,7 @@ extern "C" {
   };
 
   static PyTypeObject PyCDType = {
-    PyObject_HEAD_INIT(0)
-    0,                                 /* ob_size */
+    PyVarObject_HEAD_INIT(0,0)
     (char*)"_omnipy.PyCDObj",          /* tp_name */
     sizeof(PyCDObj),                   /* tp_basicsize */
     0,                                 /* tp_itemsize */
@@ -425,10 +424,12 @@ extern "C" {
     if (!PyArg_ParseTuple(args, (char*)"O", &pytimeout))
       return 0;
 
-    if (PyLong_Check(pytimeout))
-      timeout = PyLong_AsUnsignedLong(pytimeout);
-    else
+#if (PY_VERSION_HEX <= 0x03000000)
+    if (PyInt_Check(pytimeout))
       timeout = PyInt_AsLong(pytimeout);
+    else
+#endif
+      timeout = PyLong_AsUnsignedLong(pytimeout);
     
     if (PyErr_Occurred())
       return 0;
@@ -529,7 +530,7 @@ extern "C" {
     if (len > 0xffff)
       len = 0xffff;
 
-    return PyInt_FromLong(len);
+    return Int_FromLong(len);
   }
 
   static PyMethodDef PyPSetObj_methods[] = {
@@ -545,8 +546,7 @@ extern "C" {
   };
 
   static PyTypeObject PyPSetType = {
-    PyObject_HEAD_INIT(0)
-    0,                                 /* ob_size */
+    PyVarObject_HEAD_INIT(0,0)
     (char*)"_omnipy.PyPSetObj",        /* tp_name */
     sizeof(PyPSetObj),                 /* tp_basicsize */
     0,                                 /* tp_itemsize */

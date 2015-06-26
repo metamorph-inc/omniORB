@@ -3,7 +3,7 @@
 // pyContext.cc               Created on: 2002/01/17
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2003-2010 Apasphere Ltd
+//    Copyright (C) 2003-2014 Apasphere Ltd
 //    Copyright (C) 2002 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -45,7 +45,7 @@ omniPy::marshalContext(cdrStream& stream, PyObject* p_o, PyObject* c_o)
   PyObject* values = PyObject_CallMethod(c_o, (char*)"_get_values",
 					 (char*)"O", p_o);
   if (values) {
-    PyObject* items = PyDict_Items(values);
+    PyObject*    items = PyDict_Items(values);
     CORBA::ULong count = PyList_GET_SIZE(items);
     CORBA::ULong mlen  = count * 2;
     mlen >>= stream;

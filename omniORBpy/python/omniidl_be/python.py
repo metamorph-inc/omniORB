@@ -3,7 +3,7 @@
 # python.py                 Created on: 1999/10/29
 #			    Author    : Duncan Grisby (dpg1)
 #
-#    Copyright (C) 2002-2013 Apasphere Ltd
+#    Copyright (C) 2002-2014 Apasphere Ltd
 #    Copyright (C) 1999 AT&T Laboratories Cambridge
 #
 #  This file is part of omniidl.
@@ -31,7 +31,6 @@
 
 from omniidl import idlast, idltype, idlutil, idlvisitor, output, main
 import sys, os.path, keyword
-import string  # for maketrans
 
 cpp_args = ["-D__OMNIIDL_PYTHON__"]
 usage_string = """\
@@ -716,8 +715,7 @@ def run(tree, args):
     tree.accept(dv)
     dv.output()
 
-    exports = exported_modules.keys()
-    exports.sort()
+    exports = sorted(exported_modules.keys())
     export_list = [ '"%s%s"' % (module_package, s) for s in exports ]
     if len(export_list) == 1:
         export_list.append("")
@@ -757,10 +755,10 @@ class PythonVisitor:
             return 0
         else:
             ifilename = outputFileName(node.file())
-            if not imported_files.has_key(ifilename):
+            if ifilename not in imported_files:
                 imported_files[ifilename] = 1
                 ibasename,ext = os.path.splitext(os.path.basename(node.file()))
-                if extern_stub_pkgs.has_key(ibasename):
+                if ibasename in extern_stub_pkgs:
                     ipackage = extern_stub_pkgs[ibasename]
                     if ipackage:
                         fn = ipackage + '.' + ifilename
@@ -815,7 +813,7 @@ class PythonVisitor:
             imodname = dotName(node.scopedName())
             ibasename,ext = os.path.splitext(os.path.basename(node.file()))
 
-            if extern_stub_pkgs.has_key(ibasename):
+            if ibasename in extern_stub_pkgs:
                 package = extern_stub_pkgs[ibasename]
                 if package is None:
                     package = ""
@@ -2340,11 +2338,11 @@ def typeToDescriptor(tspec, from_scope=[], is_typedef=0):
     if hasattr(tspec, "python_desc"):
         return tspec.python_desc
 
-    if ttdMap.has_key(tspec.kind()):
+    if tspec.kind() in ttdMap:
         tspec.python_desc = ttdMap[tspec.kind()]
         return tspec.python_desc
 
-    if unsupportedMap.has_key(tspec.kind()):
+    if tspec.kind() in unsupportedMap:
         error_exit("omniORBpy does not support the %s type." %
                    unsupportedMap[tspec.kind()])
 
@@ -2396,9 +2394,9 @@ module name. e.g. M1.M2.I -> M1__POA.M2.I"""
 
 def dotName(scopedName, our_scope=[]):
     if scopedName[:len(our_scope)] == our_scope:
-        l = map(mangle, scopedName[len(our_scope):])
+        l = [ mangle(s) for s in scopedName[len(our_scope):] ]
     else:
-        l = map(mangle, scopedName)
+        l = [ mangle(s) for s in scopedName ]
     return ".".join(l)
 
 def mangle(name):
@@ -2449,10 +2447,15 @@ def valueToString(val, kind, scope=[]):
     else:
         return str(val)
 
-__translate_table = string.maketrans(" -.,", "____")
+
+try:
+    __translate_table = str.maketrans(" -.,", "____")
+
+except AttributeError:
+    import string
+    __translate_table = string.maketrans(" -.,", "____")
 
 def outputFileName(idlname):
-    global __translate_table
     return os.path.basename(idlname).translate(__translate_table)
 
 def checkStubPackage(package):
@@ -2500,7 +2503,7 @@ def updateModules(modules, pymodule):
 
     checkStubPackage(module_package)
 
-    poamodules = map(skeletonModuleName, modules)
+    poamodules = [ skeletonModuleName(m) for m in modules ]
 
     real_updateModules(modules,    pymodule)
     real_updateModules(poamodules, pymodule)

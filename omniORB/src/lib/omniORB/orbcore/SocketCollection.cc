@@ -285,7 +285,7 @@ SocketCollection::Select() {
       if (revents) {
 	count--;
 
-	if (revents & POLLIN) {
+	if (revents & (POLLIN | POLLHUP)) {
 	  SocketHolder* s = pd_pollsockets[index];
 
 	  if (s) {

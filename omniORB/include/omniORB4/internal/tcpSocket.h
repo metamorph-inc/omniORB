@@ -381,7 +381,7 @@ public:
     omni_time_t now;
     omni_thread::get_time(now);
 
-    if (deadline < now) {
+    if (deadline <= now) {
       t.tv_sec = t.tv_usec = 0;
       return 1;
     }

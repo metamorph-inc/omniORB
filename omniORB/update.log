@@ -1,3 +1,197 @@
+Mon  8 Jun 12:41:56 BST 2015 dgrisby
+====================================
+
+- Use longer DH parameters; disable use of SSLv3.
+
+src/lib/omniORB/orbcore/ssl/sslContext.cc
+
+
+Mon  8 Jun 12:36:27 BST 2015 dgrisby
+====================================
+
+- Properly handle SystemExceptions thrown in deferred synchronous DII.
+
+src/lib/omniORB/dynamic/request.cc
+
+- Handle POLLHUP as if it was POLLIN.
+
+src/lib/omniORB/orbcore/SocketCollection.cc
+
+
+Wed  6 May 14:54:14 BST 2015 dgrisby
+====================================
+
+- Add uclinux to platform list.
+
+configure.ac
+configure
+
+
+Wed May  6 12:22:23 BST 2015 dgrisby
+====================================
+
+- Avoid C++ 11 warnings about missing spaces before macros.
+
+src/lib/omniORB/orbcore/corbaOrb.cc
+
+
+Wed May  6 12:18:00 BST 2015 dgrisby
+====================================
+
+- Avoid annoying Mac compiler warning about perfectly safe use of strcpy().
+
+include/omniORB4/stringtypes.h
+
+
+Wed May  6 12:07:16 BST 2015 dgrisby
+====================================
+
+- Avoid issues in use of uninitialised unions. Thanks Michael Teske.
+
+src/lib/omniORB/python/omniidl_be/cxx/header/template.py
+
+- Missing constructor in _var type for fixed length struct. Thanks
+  Daniel Krügler.
+
+include/omniORB4/templatedecls.h
+
+
+Fri Apr 10 17:42:58 BST 2015 dgrisby
+====================================
+
+- Locking bug in rope matching; misclassification of connection as
+  supporting ZIOP.
+
+src/lib/omniORB/orbcore/giopRope.cc
+
+
+Mon 23 Feb 11:37:55 GMT 2015 dgrisby
+====================================
+
+- Race condition if application code changes log function. Thanks Peter Klotz.
+
+src/lib/omniORB/orbcore/logIOstream.cc
+
+
+Tue Nov 25 12:42:40 GMT 2014 dgrisby
+====================================
+
+- Build patches from Peter Klotz.
+
+include/omniORB4/internal/GNUmakefile.in
+include/omniORB4/tracedthread.h
+src/lib/dir.mk
+
+
+Tue Nov 25 12:34:02 GMT 2014 dgrisby
+====================================
+
+- Self-assignment safety.
+
+include/omniORB4/CORBA_Any_vartypes.h
+include/omniORB4/seqTemplatedecls.h
+src/lib/omniORB/python/omniidl_be/cxx/header/template.py
+src/lib/omniORB/python/omniidl_be/cxx/skel/template.py
+src/lib/omniORB/python3/omniidl_be/cxx/header/template.py
+src/lib/omniORB/python3/omniidl_be/cxx/skel/template.py
+
+
+Tue Nov 25 11:21:17 GMT 2014 dgrisby
+====================================
+
+- Avoid zero timeout.
+
+include/omniORB4/internal/tcpSocket.h
+
+
+Thu Oct 23 09:45:43 BST 2014 dgrisby
+====================================
+
+- Windows Python 3 changes.
+
+mk/python.mk
+src/tool/omniidl/cxx/dir.mk
+src/tool/omniidl/cxx/idlpython.cc
+
+
+Wed Oct 22 23:49:04 BST 2014 dgrisby
+====================================
+
+- Immediately set strands dying in _NP_disconnect.
+
+src/lib/omniORB/orbcore/giopRope.cc
+
+
+Mon Sep 15 11:42:45 BST 2014 dgrisby
+====================================
+
+- Fix race between thread startup and orb destroy.
+
+include/omniORB4/omniAsyncInvoker.h
+src/lib/omniORB/orbcore/invoker.cc
+
+
+Wed Sep  3 17:20:06 BST 2014 dgrisby
+====================================
+
+- Keep peer details even if name is empty.
+
+src/lib/omniORB/orbcore/ssl/sslConnection.cc
+
+
+Wed Sep  3 10:32:46 BST 2014 dgrisby
+====================================
+
+- Add operation() to clientOpenConnection interceptor; ensure SSL peer
+  details are always set.
+
+include/omniORB4/omniInterceptors.h
+src/lib/omniORB/orbcore/interceptors.cc
+src/lib/omniORB/orbcore/ssl/sslConnection.cc
+src/lib/omniORB/orbcore/ssl/sslConnection.h
+
+
+Tue Sep  2 12:02:48 BST 2014 dgrisby
+====================================
+
+- Expand valuetracker hash table on demand.
+
+include/omniORB4/internal/valueTrackerImpl.h
+src/lib/omniORB/dynamic/valueTracker.cc
+
+- Optionally return more details about SSL peer.
+
+include/omniORB4/sslContext.h
+src/lib/omniORB/orbcore/ssl/sslConnection.cc
+src/lib/omniORB/orbcore/ssl/sslConnection.h
+src/lib/omniORB/orbcore/ssl/sslContext.cc
+
+- Operation accessor in interceptors.
+
+include/omniORB4/omniInterceptors.h
+src/lib/omniORB/orbcore/interceptors.cc
+
+
+Fri Aug  8 18:17:22 BST 2014 dgrisby
+====================================
+
+- Option to set SSL CA path.
+
+include/omniORB4/sslContext.h
+sample.cfg
+src/lib/omniORB/orbcore/ssl/sslContext.cc
+src/lib/omniORB/orbcore/ssl/sslTransportImpl.cc
+
+
+Wed Jul 23 10:07:17 BST 2014 dgrisby
+====================================
+
+- Improved Python 3 support.
+
+mk/python.mk
+src/tool/omniidl/cxx/dir.mk
+
+
 Mon Apr 28 17:48:32 BST 2014 dgrisby
 ====================================
 

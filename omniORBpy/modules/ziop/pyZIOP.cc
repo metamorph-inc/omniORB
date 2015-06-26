@@ -31,14 +31,14 @@
 #define DLL_EXPORT
 #endif
 
-#include <omniORB4/CORBA.h>
-#include <omniORB4/omniZIOP.h>
-
 #if defined(__VMS)
 #include <Python.h>
 #else
 #include PYTHON_INCLUDE
 #endif
+
+#include <omniORB4/CORBA.h>
+#include <omniORB4/omniZIOP.h>
 
 #include <omniORBpy.h>
 #include "../omnipy.h"
@@ -55,10 +55,13 @@ getUShort(PyObject* obj)
 {
   long l = 0;
 
+#if (PY_VERSION_HEX < 0x03000000)
   if (PyInt_Check(obj)) {
     l = PyInt_AS_LONG(obj);
   }
-  else if (PyLong_Check(obj)) {
+  else
+#endif
+  if (PyLong_Check(obj)) {
     l = PyLong_AsLong(obj);
   }
   else {
@@ -95,6 +98,7 @@ getULong(PyObject* obj)
 #endif
     return ul;
   }
+#if (PY_VERSION_HEX < 0x03000000)
   else if (PyInt_Check(obj)) {
     long l = PyInt_AS_LONG(obj);
 #if SIZEOF_LONG > 4
@@ -112,6 +116,7 @@ getULong(PyObject* obj)
 #endif
     return l;
   }
+#endif
   else {
     OMNIORB_THROW(BAD_PARAM, BAD_PARAM_WrongPythonType, CORBA::COMPLETED_NO);
   }
@@ -242,8 +247,13 @@ registerPolicyFn(PyObject*         policyFns,
                  CORBA::ULong      ptype,
                  omniORBpyPolicyFn fn)
 {
+#if (PY_VERSION_HEX < 0x03000000)
   omniPy::PyRefHolder pyptype(PyInt_FromLong(ptype));
   omniPy::PyRefHolder pyfn(PyCObject_FromVoidPtr((void*)fn, 0));
+#else
+  omniPy::PyRefHolder pyptype(PyLong_FromLong(ptype));
+  omniPy::PyRefHolder pyfn(PyCapsule_New((void*)fn, 0, 0));
+#endif
 
   PyDict_SetItem(policyFns, pyptype, pyfn);
 }
@@ -318,26 +328,8 @@ extern "C" {
   }
 
 
-  static PyMethodDef omniZIOP_methods[] = {
-    {(char*)"setGlobalPolicies",
-     pyZIOP_setGlobalPolicies, METH_VARARGS, setGlobalPolicies_doc},
-
-    {(char*)"setServerPolicies",
-     pyZIOP_setServerPolicies, METH_VARARGS, setServerPolicies_doc},
-
-    {0,0}
-  };
-
-  void DLL_EXPORT init_omniZIOP()
+  static inline void initModule(PyObject* m, PyObject* omnipy)
   {
-    PyObject* m = Py_InitModule((char*)"_omniZIOP", omniZIOP_methods);
-
-    // Get hold of the omniORBpy C++ API.
-    PyObject* omnipy = PyImport_ImportModule((char*)"_omnipy");
-    PyObject* pyapi  = PyObject_GetAttrString(omnipy, (char*)"API");
-    api              = (omniORBpyAPI*)PyCObject_AsVoidPtr(pyapi);
-    Py_DECREF(pyapi);
-
     // Register policy creation functions
     omniPy::PyRefHolder policyFns(PyObject_GetAttrString(omnipy,
                                                          (char*)"policyFns"));
@@ -360,4 +352,64 @@ extern "C" {
                      ZIOP::COMPRESSION_MIN_RATIO_POLICY_ID,
                      convertCompressionMinRatioPolicy);
   }
+
+
+  static PyMethodDef omniZIOP_methods[] = {
+    {(char*)"setGlobalPolicies",
+     pyZIOP_setGlobalPolicies, METH_VARARGS, setGlobalPolicies_doc},
+
+    {(char*)"setServerPolicies",
+     pyZIOP_setServerPolicies, METH_VARARGS, setServerPolicies_doc},
+
+    {0,0}
+  };
+
+#if (PY_VERSION_HEX < 0x03000000)
+
+  void DLL_EXPORT init_omniZIOP()
+  {
+    PyObject* m = Py_InitModule((char*)"_omniZIOP", omniZIOP_methods);
+
+    // Get hold of the omniORBpy C++ API.
+    PyObject* omnipy = PyImport_ImportModule((char*)"_omnipy");
+    PyObject* pyapi  = PyObject_GetAttrString(omnipy, (char*)"API");
+    api              = (omniORBpyAPI*)PyCObject_AsVoidPtr(pyapi);
+    Py_DECREF(pyapi);
+
+    initModule(m, omnipy);
+  }
+
+#else
+
+  static struct PyModuleDef omniZIOPmodule = {
+    PyModuleDef_HEAD_INIT,
+    "_omniZIOP",
+    "omniORBpy ZIOP support",
+    -1,
+    omniZIOP_methods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+  };
+
+  PyMODINIT_FUNC
+  PyInit__omniZIOP(void)
+  {
+    PyObject* m = PyModule_Create(&omniZIOPmodule);
+    if (!m)
+      return 0;
+
+    // Get hold of the omniORBpy C++ API.
+    PyObject* omnipy = PyImport_ImportModule((char*)"_omnipy");
+    PyObject* pyapi  = PyObject_GetAttrString(omnipy, (char*)"API");
+    api              = (omniORBpyAPI*)PyCapsule_GetPointer(pyapi,
+                                                           "_omnipy.API");
+    Py_DECREF(pyapi);
+
+    initModule(m, omnipy);
+    return m;
+  }
+
+#endif
 };

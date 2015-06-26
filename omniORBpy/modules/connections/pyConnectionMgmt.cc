@@ -31,14 +31,14 @@
 #define DLL_EXPORT
 #endif
 
-#include <omniORB4/CORBA.h>
-#include <omniORB4/omniConnectionMgmt.h>
-
 #if defined(__VMS)
 #include <Python.h>
 #else
 #include PYTHON_INCLUDE
 #endif
+
+#include <omniORB4/CORBA.h>
+#include <omniORB4/omniConnectionMgmt.h>
 
 #include <omniORBpy.h>
 #include "../omnipy.h"
@@ -128,6 +128,8 @@ extern "C" {
     {0,0}
   };
 
+#if (PY_VERSION_HEX < 0x03000000)
+
   void DLL_EXPORT init_omniConnMgmt()
   {
     PyObject* m = Py_InitModule((char*)"_omniConnMgmt",
@@ -139,5 +141,38 @@ extern "C" {
     omnipyApi        = (omniORBpyAPI*)PyCObject_AsVoidPtr(pyapi);
     Py_DECREF(pyapi);
   }
+
+#else
+
+  static struct PyModuleDef omniConnectionMgmtmodule = {
+    PyModuleDef_HEAD_INIT,
+    "_omniConnMgmt",
+    "omniORBpy connection management",
+    -1,
+    omniConnectionMgmt_methods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+  };
+
+  PyMODINIT_FUNC
+  PyInit__omniConnMgmt(void)
+  {
+    PyObject* m = PyModule_Create(&omniConnectionMgmtmodule);
+    if (!m)
+      return 0;
+
+    // Get hold of the omniORBpy C++ API.
+    PyObject* omnipy = PyImport_ImportModule((char*)"_omnipy");
+    PyObject* pyapi  = PyObject_GetAttrString(omnipy, (char*)"API");
+    omnipyApi        = (omniORBpyAPI*)PyCapsule_GetPointer(pyapi,
+                                                           "_omnipy.API");
+    Py_DECREF(pyapi);
+
+    return m;
+  }
+
+#endif
 };
 

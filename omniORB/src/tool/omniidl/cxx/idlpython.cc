@@ -1575,11 +1575,16 @@ extern "C" int PyVMS_init(int* pvi_argc, char*** pvi_argv);
 #endif
 #endif
 
+#if defined(__WIN32__) && defined(OMNIIDL_PY3)
+int
+wmain(int argc, wchar_t** argv)
+#else
 int
 main(int argc, char** argv)
+#endif
 {
   const char* omniidl_string =
-"import sys, os, os.path, string\n"
+"import sys, os, os.path\n"
 "\n"
 "pylibdir   = None\n"
 "binarchdir = os.path.abspath(os.path.dirname(sys.executable))\n"
@@ -1588,17 +1593,21 @@ main(int argc, char** argv)
 "    sys.path.insert(0, binarchdir)\n"
 "    bindir, archname = os.path.split(binarchdir)\n"
 "    treedir, bin     = os.path.split(bindir)\n"
-"    if string.lower(bin) == 'bin':\n"
+"    if bin.lower() == 'bin':\n"
 "        pylibdir = os.path.join(treedir, 'lib', 'python')\n"
 "\n"
 "        if os.path.isdir(pylibdir):\n"
 "            sys.path.insert(0, pylibdir)\n"
 "else:\n"
-"    print '''can't parse %s's path name!''' % sys.executable\n"
+"    sys.stderr.write('''can't parse %s's path name!''' % sys.executable)\n"
 "\n"
 "try:\n"
 "    import omniidl.main\n"
+#ifdef OMNIIDL_PY3
+"except ImportError as msg:\n"
+#else
 "except ImportError, msg:\n"
+#endif
 "    sys.stderr.write('\\n\\n')\n"
 "    sys.stderr.write('omniidl: ERROR!\\n\\n')\n"
 "    sys.stderr.write('omniidl: Could not open Python files for IDL compiler\\n')\n"
@@ -1619,10 +1628,17 @@ main(int argc, char** argv)
 #endif
   Py_SetProgramName(argv[0]);
 #endif
+
+#ifdef OMNIIDL_PY3
+  PyImport_AppendInittab("_omniidl", &PyInit__omniidl);
+#endif
+
   Py_Initialize();
   PySys_SetArgv(argc, argv);
 
+#ifndef OMNIIDL_PY3
   init_omniidl();
+#endif
 
   return PyRun_SimpleString((char*)omniidl_string);
 }

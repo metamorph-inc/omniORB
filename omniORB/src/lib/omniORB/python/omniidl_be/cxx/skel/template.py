@@ -967,8 +967,10 @@ exception = """\
 
 @scoped_name@& @scoped_name@::operator=(const @scoped_name@& _s)
 {
-  ((::CORBA::UserException*) this)->operator=(_s);
-  @assign_op_body@
+  if (&_s != this) {
+    ((::CORBA::UserException*) this)->operator=(_s);
+    @assign_op_body@
+  }
   return *this;
 }
 
@@ -1094,10 +1096,12 @@ void
 @fqname@&
 @fqname@::operator=(const ::@fqname@& _s)
 {
-  pd_len = 0;
-  length(_s.pd_len);
-  for (unsigned long _i=0; _i < pd_len; _i++) {
-    pd_buf[_i] = _s.pd_buf[_i];
+  if (&_s != this) {
+    pd_len = 0;
+    length(_s.pd_len);
+    for (unsigned long _i=0; _i < pd_len; _i++) {
+      pd_buf[_i] = _s.pd_buf[_i];
+    }
   }
   return *this;
 }

@@ -3,7 +3,7 @@
 // pyPOAManagerFunc.cc        Created on: 2000/02/04
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2008-2013 Apasphere Ltd
+//    Copyright (C) 2008-2014 Apasphere Ltd
 //    Copyright (C) 1999 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -41,7 +41,7 @@ extern "C" {
       CORBA::release(self->pm);
       CORBA::release(self->base.obj);
     }
-    self->base.ob_type->tp_free((PyObject*)self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
   }
 
   static PyObject*
@@ -116,7 +116,7 @@ extern "C" {
       omniPy::InterpreterUnlocker _u;
       s = self->pm->get_state();
     }
-    return PyInt_FromLong((int)s);
+    return Int_FromLong((int)s);
   }
 
   static PyMethodDef pyPM_methods[] = {
@@ -144,8 +144,7 @@ extern "C" {
   };
 
   static PyTypeObject PyPOAManagerType = {
-    PyObject_HEAD_INIT(0)
-    0,                                 /* ob_size */
+    PyVarObject_HEAD_INIT(0,0)
     (char*)"_omnipy.PyPOAManagerObject",  /* tp_name */
     sizeof(PyPOAManagerObject),           /* tp_basicsize */
     0,                                 /* tp_itemsize */

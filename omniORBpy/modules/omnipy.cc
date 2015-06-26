@@ -3,7 +3,7 @@
 // omnipy.cc                  Created on: 1999/06/01
 //                            Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2002-2013 Apasphere Ltd
+//    Copyright (C) 2002-2014 Apasphere Ltd
 //    Copyright (C) 1999 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -73,7 +73,6 @@ PyObject* omniPy::pyPOACurrentClass;    //  Current class
 PyObject* omniPy::pyServantClass;       //  Servant class
 PyObject* omniPy::pyCreateTypeCode;	// Function to create a TypeCode object
 PyObject* omniPy::pyWorkerThreadClass;  // Worker thread class
-PyObject* omniPy::pyWorkerThreadDel;    // Method to delete worker thread
 PyObject* omniPy::pyEmptyTuple;         // Zero element tuple.
 
 PyObject* omniPy::pyservantAttr;
@@ -86,6 +85,13 @@ PyObject* omniPy::pyNP_RepositoryId;
 ////////////////////////////////////////////////////////////////////////////
 
 CORBA::ORB_ptr omniPy::orb;
+
+
+////////////////////////////////////////////////////////////////////////////
+// Code sets                                                              //
+////////////////////////////////////////////////////////////////////////////
+
+omniCodeSet::NCS_C* omniPy::ncs_c_utf_8;
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -130,7 +136,7 @@ generateExceptionList()
   i = 0;
 
 # define ADD_EXCEPTION_NAME(exc) \
-  PyList_SetItem(excs, i++, PyString_FromString(#exc));
+  PyList_SetItem(excs, i++, String_FromString(#exc));
   OMNIORB_FOR_EACH_SYS_EXCEPTION(ADD_EXCEPTION_NAME)
 # undef ADD_EXCEPTION_NAME
 
@@ -145,14 +151,14 @@ generateExceptionList()
 PyObject*
 omniPy::formatString(const char* fmt, const char* pyfmt, ...)
 {
-  PyObject* fmt_string = PyString_FromString(fmt);
+  PyObject* fmt_string = String_FromString(fmt);
 
   va_list va;
   va_start(va, pyfmt);
   PyObject* args = Py_VaBuildValue(pyfmt, va);
   va_end(va);
 
-  PyObject* ret = PyString_Format(fmt_string, args);
+  PyObject* ret = String_Format(fmt_string, args);
 
   Py_DECREF(fmt_string);
   Py_DECREF(args);
@@ -274,9 +280,6 @@ extern "C" {
 
     omniPy::pyWorkerThreadClass = OMNIPY_ATTR("WorkerThread");
 
-    omniPy::pyWorkerThreadDel =
-      PyObject_GetAttrString(omniPy::pyWorkerThreadClass, (char*)"delete");
-
     omniPy::pyEmptyTuple = OMNIPY_ATTR("_emptyTuple");
 
     OMNIORB_ASSERT(omniPy::pyCORBAsysExcMap);
@@ -306,8 +309,6 @@ extern "C" {
     OMNIORB_ASSERT(omniPy::pyCreateTypeCode);
     OMNIORB_ASSERT(PyFunction_Check(omniPy::pyCreateTypeCode));
     OMNIORB_ASSERT(omniPy::pyWorkerThreadClass);
-    OMNIORB_ASSERT(omniPy::pyWorkerThreadDel);
-    OMNIORB_ASSERT(PyMethod_Check(omniPy::pyWorkerThreadDel));
     OMNIORB_ASSERT(omniPy::pyEmptyTuple);
     OMNIORB_ASSERT(PyTuple_Check(omniPy::pyEmptyTuple));
 
@@ -316,13 +317,13 @@ extern "C" {
     omniPy::pyNP_RepositoryId = OMNIPY_ATTR("_NP_RepositoryId");
 
     OMNIORB_ASSERT(omniPy::pyservantAttr);
-    OMNIORB_ASSERT(PyString_Check(omniPy::pyservantAttr));
+    OMNIORB_ASSERT(String_Check(omniPy::pyservantAttr));
 
     OMNIORB_ASSERT(omniPy::pyobjAttr);
-    OMNIORB_ASSERT(PyString_Check(omniPy::pyobjAttr));
+    OMNIORB_ASSERT(String_Check(omniPy::pyobjAttr));
 
     OMNIORB_ASSERT(omniPy::pyNP_RepositoryId);
-    OMNIORB_ASSERT(PyString_Check(omniPy::pyNP_RepositoryId));
+    OMNIORB_ASSERT(String_Check(omniPy::pyNP_RepositoryId));
 
     Py_INCREF(Py_None);
     return Py_None;
@@ -335,9 +336,9 @@ extern "C" {
       return 0;
 
     if (omniPy::orb)
-      return PyInt_FromLong(0);
+      Py_RETURN_FALSE;
     else
-      return PyInt_FromLong(1);
+      Py_RETURN_TRUE;
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -370,13 +371,13 @@ extern "C" {
     int i;
     for (i=0; i<argc; i++) {
       o = PyList_GET_ITEM(pyargv, i);
-      if (!PyString_Check(o)) {
+      if (!String_Check(o)) {
 	PyErr_SetString(PyExc_TypeError,
 			"argument 1: parameter must be a list of strings.");
 	delete[] argv;
 	return 0;
       }
-      argv[i] = PyString_AS_STRING(o);
+      argv[i] = String_AsString(o);
     }
 
     int orig_argc = argc;
@@ -403,7 +404,7 @@ extern "C" {
 
 	while (1) {
 	  o = PyList_GetItem(pyargv, i); OMNIORB_ASSERT(o != 0);
-	  t = PyString_AS_STRING(o);
+	  t = String_AsString(o);
 	  if (s == t) break;
 	  r = PySequence_DelItem(pyargv, i);
 	  OMNIORB_ASSERT(r != -1);
@@ -452,8 +453,8 @@ extern "C" {
 
 	omniPy::marshalPyObject(stream, desc, data);
 
-	return PyString_FromStringAndSize((char*)stream.bufPtr(),
-					  stream.bufSize());
+	return RawString_FromStringAndSize((char*)stream.bufPtr(),
+                                           stream.bufSize());
       }
       else {
 	// Marshal into a raw buffer
@@ -465,8 +466,8 @@ extern "C" {
 
 	omniPy::marshalPyObject(stream, desc, data);
 
-	return PyString_FromStringAndSize((char*)stream.bufPtr(),
-					  stream.bufSize());
+	return RawString_FromStringAndSize((char*)stream.bufPtr(),
+                                           stream.bufSize());
       }
     }
     OMNIPY_CATCH_AND_HANDLE_SYSTEM_EXCEPTIONS
@@ -486,14 +487,24 @@ extern "C" {
   static PyObject*
   omnipy_cdrUnmarshal(PyObject* self, PyObject* args)
   {
-    PyObject* desc;
-    char*     encap;
-    size_t    size;
-    int       endian = -1;
+    PyObject*  desc;
+    char*      encap;
+    Py_ssize_t size;
+    int        endian = -1;
     
+#if (PY_VERSION_HEX < 0x03000000)
+
     if (!PyArg_ParseTuple(args, (char*)"Os#|i",
 			  &desc, &encap, &size, &endian))
       return 0;
+
+#else
+
+    if (!PyArg_ParseTuple(args, (char*)"Oy#|i",
+			  &desc, &encap, &size, &endian))
+      return 0;
+
+#endif
 
     if (endian > 1 || endian < -1) {
       PyErr_SetString(PyExc_ValueError,
@@ -543,13 +554,15 @@ extern "C" {
   omnipy_ensureInit(PyObject* self, PyObject* args)
   {
     PyObject* m = PyImport_ImportModule((char*)"_omnipy");
-    PyObject* o = PyObject_GetAttrString(m, (char*)"orb_func");
+    PyObject* o = PyObject_GetAttrString(m, (char*)"omni_func");
     PyObject* f = 0;
     
     if (o && PyModule_Check(o))
-      f = PyObject_GetAttrString(o, (char*)"destroy");
+      f = PyObject_GetAttrString(o, (char*)"log");
 
     if (!o || !PyModule_Check(o) || !f || f == Py_None) {
+      PyErr_Clear();
+
       omniORB::logs(5, "Reinitialise omniORBpy sub-modules.");
       PyObject* d = PyModule_GetDict(m);
       omniPy::initORBFunc(d);
@@ -612,16 +625,12 @@ extern "C" {
     {0,0}
   };
 
-  void DLL_EXPORT init_omnipy()
+  static void initModule(PyObject* m)
   {
-    // Make sure Python is running multi-threaded
-    PyEval_InitThreads();
-
-    PyObject* m = Py_InitModule((char*)"_omnipy", omnipy_methods);
     PyObject* d = PyModule_GetDict(m);
 
     PyDict_SetItemString(d, (char*)"__version__",
-			 PyString_FromString(OMNIPY_VERSION_STRING));
+			 String_FromString(OMNIPY_VERSION_STRING));
 
     PyObject* excs = generateExceptionList();
     PyDict_SetItemString(d, (char*)"system_exceptions", excs);
@@ -640,7 +649,11 @@ extern "C" {
     omniPy::initServant(d);
 
     // Set up the C++ API singleton
+#if (PY_VERSION_HEX < 0x03000000)
     PyObject* api = PyCObject_FromVoidPtr((void*)&omniPy::cxxAPI, 0);
+#else
+    PyObject* api = PyCapsule_New((void*)&omniPy::cxxAPI, "_omnipy.API", 0);
+#endif
     PyDict_SetItemString(d, (char*)"API", api);
     Py_DECREF(api);
 
@@ -656,6 +669,51 @@ extern "C" {
     PyDict_SetItemString(d, (char*)"policyFns", omniPy::py_policyFns);
     Py_DECREF(omniPy::py_policyFns);
 
+    // Codesets
+    omniPy::ncs_c_utf_8 = omniCodeSet::getNCS_C("UTF-8");
+
+    // omniORB module initialiser
     omniInitialiser::install(&the_omni_python_initialiser);
   }
+
+#if (PY_VERSION_HEX < 0x03000000)
+
+  void DLL_EXPORT init_omnipy()
+  {
+    // Make sure Python is running multi-threaded
+    PyEval_InitThreads();
+
+    PyObject* m = Py_InitModule((char*)"_omnipy", omnipy_methods);
+    initModule(m);
+  }
+
+#else
+
+  static struct PyModuleDef omnipymodule = {
+    PyModuleDef_HEAD_INIT,
+    "_omnipy",
+    "omniORBpy",
+    -1,
+    omnipy_methods,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+  };
+
+  PyMODINIT_FUNC
+  PyInit__omnipy(void)
+  {
+    // Make sure Python is running multi-threaded
+    PyEval_InitThreads();
+
+    PyObject* m = PyModule_Create(&omnipymodule);
+    if (!m)
+      return 0;
+
+    initModule(m);
+    return m;
+  }
+
+#endif
 }

@@ -3,7 +3,7 @@
 // pyLocalObjects.cc          Created on: 2005/10/20
 //                            Author    : Duncan Grisby (dgrisby)
 //
-//    Copyright (C) 2005-2008 Apasphere Ltd.
+//    Copyright (C) 2005-2014 Apasphere Ltd.
 //    Copyright (C) 1999 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORBpy library
@@ -311,13 +311,12 @@ Py_AdapterActivatorObj::_ptrToObjRef(const char* id)
 CORBA::LocalObject_ptr
 omniPy::getLocalObjectForPyObject(PyObject* pyobj)
 {
-  PyObject* pyrepoId = PyObject_GetAttrString(pyobj,(char*)"_NP_RepositoryId");
+  PyRefHolder pyrepoId(PyObject_GetAttrString(pyobj,(char*)"_NP_RepositoryId"));
 
-  if (!(pyrepoId && PyString_Check(pyrepoId)))
+  if (!(pyrepoId.valid() && String_Check(pyrepoId)))
     return 0;
 
-  PyRefHolder holder(pyrepoId);
-  const char* repoId = PyString_AS_STRING(pyrepoId);
+  const char* repoId = String_AS_STRING(pyrepoId.obj());
 
   if (omni::ptrStrMatch(repoId, PortableServer::ServantActivator::_PD_repoId))
     return new Py_ServantActivatorObj(pyobj);
@@ -409,7 +408,7 @@ Py_ServantActivator::incarnate(const PortableServer::ObjectId& oid,
     if (evalue)
       erepoId = PyObject_GetAttrString(evalue, (char*)"_NP_RepositoryId");
 
-    if (!(erepoId && PyString_Check(erepoId))) {
+    if (!(erepoId && String_Check(erepoId))) {
       PyErr_Clear();
       Py_XDECREF(erepoId);
       if (omniORB::trace(1)) {
@@ -426,7 +425,7 @@ Py_ServantActivator::incarnate(const PortableServer::ObjectId& oid,
       OMNIORB_THROW(UNKNOWN, UNKNOWN_PythonException, CORBA::COMPLETED_MAYBE);
     }
 
-    if (omni::strMatch(PyString_AS_STRING(erepoId),
+    if (omni::strMatch(String_AS_STRING(erepoId),
 		       PortableServer::ForwardRequest::_PD_repoId)) {
       Py_DECREF(erepoId); Py_DECREF(etype); Py_XDECREF(etraceback);
       PyObject* pyfr = PyObject_GetAttrString(evalue,
@@ -448,8 +447,7 @@ Py_ServantActivator::incarnate(const PortableServer::ObjectId& oid,
     }
 
     // Is it a LOCATION_FORWARD?
-    if (omni::strMatch(PyString_AS_STRING(erepoId),
-		       "omniORB.LOCATION_FORWARD")) {
+    if (omni::strMatch(String_AS_STRING(erepoId), "omniORB.LOCATION_FORWARD")) {
       Py_DECREF(erepoId); Py_DECREF(etype); Py_XDECREF(etraceback);
       omniPy::handleLocationForward(evalue);
     }
@@ -581,7 +579,7 @@ Py_ServantLocator::preinvoke(const PortableServer::ObjectId& oid,
     if (evalue)
       erepoId = PyObject_GetAttrString(evalue, (char*)"_NP_RepositoryId");
 
-    if (!(erepoId && PyString_Check(erepoId))) {
+    if (!(erepoId && String_Check(erepoId))) {
       PyErr_Clear();
       Py_XDECREF(erepoId);
       if (omniORB::trace(1)) {
@@ -598,7 +596,7 @@ Py_ServantLocator::preinvoke(const PortableServer::ObjectId& oid,
       OMNIORB_THROW(UNKNOWN, UNKNOWN_PythonException, CORBA::COMPLETED_MAYBE);
     }
 
-    if (omni::strMatch(PyString_AS_STRING(erepoId),
+    if (omni::strMatch(String_AS_STRING(erepoId),
 		       PortableServer::ForwardRequest::_PD_repoId)) {
       Py_DECREF(erepoId); Py_DECREF(etype); Py_XDECREF(etraceback);
       PyObject* pyfr = PyObject_GetAttrString(evalue,
@@ -619,8 +617,7 @@ Py_ServantLocator::preinvoke(const PortableServer::ObjectId& oid,
       }
     }
     // Is it a LOCATION_FORWARD?
-    if (omni::strMatch(PyString_AS_STRING(erepoId),
-		       "omniORB.LOCATION_FORWARD")) {
+    if (omni::strMatch(String_AS_STRING(erepoId), "omniORB.LOCATION_FORWARD")) {
       Py_DECREF(erepoId); Py_DECREF(etype); Py_XDECREF(etraceback);
       omniPy::handleLocationForward(evalue);
     }
@@ -710,11 +707,7 @@ Py_AdapterActivator::unknown_adapter(PortableServer::POA_ptr parent,
   Py_DECREF(argtuple);
 
   if (pyresult) {
-    if (!PyInt_Check(pyresult)) {
-      Py_DECREF(pyresult);
-      OMNIORB_THROW(BAD_PARAM, BAD_PARAM_WrongPythonType, CORBA::COMPLETED_NO);
-    }
-    CORBA::Boolean result = PyInt_AS_LONG(pyresult);
+    CORBA::Boolean result = PyObject_IsTrue(pyresult);
     Py_DECREF(pyresult);
     return result;
   }
