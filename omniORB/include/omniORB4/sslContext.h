@@ -108,8 +108,8 @@ class sslContext {
   // Default to return SSLv23_method().
 
   virtual void set_supported_versions(); 
-  // Default to SSL_CTX_set_options(ssL_ctx, SSL_OP_NO_SSLv2); That is
-  // only accept SSL version 3 or TLS version 1.
+  // Default to SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3);
+  // That is only accept TLS.
 
   virtual void set_CA();
   // Default to read the certificates of the Certificate Authorities in the 

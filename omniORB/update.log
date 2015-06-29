@@ -1,3 +1,12 @@
+Mon Jun 29 09:28:53 BST 2015 dgrisby
+====================================
+
+- Use SSL_pending() to avoid incorrect read blocking.
+
+include/omniORB4/sslContext.h
+src/lib/omniORB/orbcore/ssl/sslConnection.cc
+
+
 Mon  8 Jun 12:41:56 BST 2015 dgrisby
 ====================================
 
