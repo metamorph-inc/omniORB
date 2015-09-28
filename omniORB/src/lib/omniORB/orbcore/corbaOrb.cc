@@ -944,7 +944,7 @@ public:
     orbOptions::Handler("id",
 			"id = " ORB_ID_STRING,
 			1,
-			"-ORBid " ORB_ID_STRING" (standard option)") {}
+			"-ORBid " ORB_ID_STRING " (standard option)") {}
 
 
   void visit(const char* value,orbOptions::Source) throw (orbOptions::BadParam) {
