@@ -6,15 +6,15 @@ omniORB on Win32 and Win64 platforms.
 
 omniORB has been tested with the following software configuration:
 
-- Operating System  : Windows NT 4.0 or any later version
+- Operating System  : Any modern Windows version, back to NT 4.
 - Architecture      : x86, x86-64 (and alpha in earlier versions)
-- Compiler          : Visual C++ 6, 7, 8, 9, 10. VC++ 5 may still work.
+- Compiler          : Visual C++ 6 and later
 
 
 Roadmap
 =======
 
-When the omniORB4 distribution is unpacked, the following are created:
+When the omniORB distribution is unpacked, the following are created:
 
 <Top-Level Directory>\                     : Directory where distribution was 
                                              unpacked
@@ -41,12 +41,6 @@ When the omniORB4 distribution is unpacked, the following are created:
 Installation
 ============
 
-If you downloaded a Win32 binary distribution of omniORB, ready-built
-binaries are provided. The binaries are compiled with VC++ 9 or 10,
-depending on the version you downloaded. If you are using any other
-version of VC++, the binaries will not work, and you must compile
-omniORB from source.
-
 Note that although there are many references to "win32", everything
 works on 64 bit Windows platforms. There is no separate "win64"
 platform in the build environment.
@@ -58,11 +52,126 @@ You should set up your PATH environment to include
    <Top-Level Directory>\bin\x86_win32
 otherwise the DLLs will not be picked up when omniORB programs are run.
 
-If you have the source-only distribution, you will need to build
-omniORB. Please read the "Building omniORB from the source files"
-section, below.  (If you want the Win32 binary distribution, but don't
-have it, you can download it from SourceForge via
-http://omniorb.sourceforge.net/download.html)
+omniORB is primarily shipped in source form. To use it, you must first
+compile it. There are a few pre-requisites, but as long as you follow
+these instructions, compilation should be easy.
+
+
+Building omniORB from the source files
+======================================
+
+omniORB should be compiled using Visual C++ 6.0 or higher. It compiles
+fine with the latest Visual Studio Community versions that are free
+for non-commercial use. You can get it from https://www.visualstudio.com/
+
+
+ A. Pre-requisites
+    --------------
+
+    The omniORB build system requires the Cygwin utilities and
+    Python. Cygwin is only used at build time; Python is used by the
+    IDL compiler, omniidl. Neither Cygwin or Python are used at
+    runtime by compiled omniORB code.
+
+
+    Cygwin
+    ------
+
+    The full Cygwin distribution is freely available at:
+
+       http://www.cygwin.com/
+
+    The installer allows you to choose from a vast number of packages.
+    To build omniORB, you just need the standard tools from the base
+    package, plus GNU make from the devel package.
+
+
+    Python
+    ------
+
+    omniidl requires Python 2.7 or 3.x. You can download the full
+    Python distribution from:
+
+       http://www.python.org/download/download_windows.html
+
+    Make sure you install a 64 bit or 32 bit Python version that
+    matches the architecture you want to use for omniORB. The Cygwin
+    version of Python does not work. You must use the version from
+    python.org.
+
+
+
+  B. Choose the right platform configuration file
+     --------------------------------------------
+
+     Edit <top>\config\config.mk to select the right platform file
+     according to the compiler you are using:
+
+       platform = x86_win32_vs_X
+
+     Where X is the version of Visual C++ you are using. (Microsoft
+     confusingly gives both a year-version and a numeric version to
+     their releases. Visual Studio 2015 contains Visual C++ 14, so for
+     that you use x86_win32_vs_14.)
+
+
+     Instead of using Visual C++, you may have some success with MinGW
+     instead, in which case you can use 
+
+       platform = x86_win32_mingw
+
+     The MinGW is not maintained and tested as part of the core
+     omniORB development, so you may need to make some modifications
+     to the platform file for it to work.
+
+
+  C. Set the location of the Python interpreter
+     ------------------------------------------
+
+     Edit <top>\mk\platforms\<platform>.mk
+
+     where <platform> is the platform you just chose in config.mk,
+     e.g. <top>\mk\platforms\x86_win32_vs_14.mk.
+
+     Set PYTHON to the location of your Python executable. Note that
+     you must use a Unix-style Cygwin path,
+     e.g. /cygdrive/c/Python34/python
+
+
+  D. Building and installing
+     --------------------------
+     
+     Visual C++ needs lots of environment variables to be set for it
+     to find all the components it needs. By far the easiest way to
+     get the right settings is to use the "Command Prompt" shortcuts
+     created in the Start menu by the Visual Studio Installer. For
+     example, to use the 64 bit compiler from Visual Studio 2015, run
+
+     Start -> All Programs -> Visual Studio 2015 ->
+        Visual Studio Tools -> Windows Desktop Command Prompts ->
+           VS2015 x64 Native Tools Command Prompt
+
+     In the terminal window that opens, you now need to add the Cygwin
+     binaries to the end of the path:
+
+       set path=%path%;c:\cygwin64\bin
+
+
+     Now, to compile, go into the directory <top>\src and type 'make
+     export'. If all goes well:
+
+        1. The executables and DLLs will be installed into
+               <top>\bin\x86_win32\
+
+        2. The libraries will be installed into
+               <top>\lib\x86_win32\
+
+
+     If you are using mingw to build omniORB, before you build the
+     main distribution, you must build the omkdepend tool first by
+     going to the directory <top>\src\tool\omkdepend and typing 'make
+     export'.
+
 
 
 Libraries
@@ -150,7 +259,8 @@ Compiling the examples with nmake
 =================================
 
 Once the installation is completed. You can try compiling and running
-the examples in <Top-Level Directory>\src\examples.
+the examples in <Top-Level Directory>\src\examples. You can use GNU
+make as with the core omniORB build, or you can use Microsoft's nmake.
 
 Just do the following:
 
@@ -160,6 +270,7 @@ Just do the following:
 Have a look at the dir.mak file in <Top-Level Directory>\src\examples,
 it should give you some idea about the compiler flags and libraries to
 compile and link omniORB programs.
+
 
 
 Building Projects using omniORB and Visual C++ 7 and later
@@ -247,84 +358,6 @@ module A {
      };
   };
 };
-
-
-
-Building omniORB from the source files
-======================================
-
-omniORB should be compiled using Visual C++ 6.0 or higher. It may
-still work with Visual C++ 5 but that has not been tested.
-
-
- A. Pre-requisites
-    --------------
-
-    The omniORB source tree requires the Cygwin utilities to build. It
-    also requires the scripting language Python to be able to compile
-    IDL to C++.
-
-    Cygwin
-    ------
-
-    The full Cygwin distribution is freely available at:
-
-       http://www.cygwin.com/
-
-
-    Python
-    ------
-
-    omniidl requires Python 2.5, 2.6 or 2.7. You can download the full
-    Python distribution from:
-
-       http://www.python.org/download/download_windows.html
-
-
-    Previous omniORB versions supported the use of a minimal version
-    of Python 1.5.2, named omnipython. That is no longer supported.
-
-
-  B. Choose the right platform configuration file
-     --------------------------------------------
-
-     Edit <top>\config\config.mk to select one of the following
-     depending on the compiler you are using:
-
-     platform = x86_win32_vs_6
-     platform = x86_win32_vs_7
-     platform = x86_win32_vs_8
-     platform = x86_win32_vs_9
-     platform = x86_win32_vs_10
-     platform = x86_win32_mingw
-
-
-  C. Set the location of the Python interpreter
-     ------------------------------------------
-
-     Edit <top>\mk\platforms\<platform>.mk
-
-     where <platform> is the platform you just chose in config.mk,
-     e.g. <top>\mk\platforms\x86_win32_vs_10.mk.
-
-     Set PYTHON to the location of your Python executable. Note that
-     you must use a Unix-style Cygwin path.
-
-
-  D. Building and installing
-     --------------------------
-
-     Go into the directory <top>\src and type 'make export'. If all
-     goes well:
-        1. The executables and DLLs will be installed into
-               <top>\bin\x86_win32\
-        2. The libraries will be installed into
-               <top>\lib\x86_win32\
-
-     If you are using mingw to build omniORB, before you build the
-     main distribution, you must build the omkdepend tool first by
-     going to the directory <top>\src\tool\omkdepend and typing 'make
-     export'.
 
 
 
