@@ -72,10 +72,9 @@ ContextImpl::~ContextImpl()
 {
   // This destructor can only be called when the reference count
   // has gone to zero, and there are no children.
-  if( pd_refCount || pd_children )
-    throw omniORB::fatalException(__FILE__, __LINE__,
-		  "Application deleted a CORBA::Context explicitly");
 
+  OMNIORB_USER_CHECK(pd_refCount == 0);
+  OMNIORB_USER_CHECK(!pd_children);
   OMNIORB_USER_CHECK(this != default_context);
   // This fails if the application releases the default context too many times.
 

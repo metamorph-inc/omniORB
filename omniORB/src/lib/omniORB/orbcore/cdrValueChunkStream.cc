@@ -51,9 +51,11 @@ cdrValueChunkStream::
         endInputValue();
       }
       catch (...) {
+        omniORB::logs(1, "Caught unexpected exception in "
+                      "cdrValueChunkStream destructor.");
         copyStateToActual();
         pd_valueTracker = 0;
-        throw;
+        return;
       }
     }
     OMNIORB_ASSERT(pd_nestLevel == 0);

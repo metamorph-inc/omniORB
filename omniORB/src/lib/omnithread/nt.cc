@@ -346,7 +346,6 @@ omni_semaphore::~omni_semaphore(void)
   if (!CloseHandle(nt_sem)) {
     DB( cerr << "omni_semaphore::~omni_semaphore: CloseHandle error "
 	     << GetLastError() << endl );
-    throw omni_thread_fatal(GetLastError());
   }
 }
 
@@ -591,10 +590,11 @@ omni_thread::~omni_thread(void)
         }
 	delete [] _values;
     }
-    if (handle && !CloseHandle(handle))
-	throw omni_thread_fatal(GetLastError());
-    if (cond_semaphore && !CloseHandle(cond_semaphore))
-	throw omni_thread_fatal(GetLastError());
+    if (handle)
+      CloseHandle(handle);
+
+    if (cond_semaphore)
+      CloseHandle(cond_semaphore);
 }
 
 
@@ -931,8 +931,7 @@ public:
   }
   inline ~omni_thread_dummy()
   {
-    if (!TlsSetValue(self_tls_index, (LPVOID)0))
-      throw omni_thread_fatal(GetLastError());
+    TlsSetValue(self_tls_index, (LPVOID)0);
   }
 };
 
