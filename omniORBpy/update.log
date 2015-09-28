@@ -1,3 +1,19 @@
+Mon 28 Sep 12:14:23 BST 2015 dgrisby
+====================================
+
+- This is omniORBpy 4.2.1.
+
+README.txt
+ReleaseNotes.txt
+THIS_IS_OMNIORBPY_4_2_0
+THIS_IS_OMNIORBPY_4_2_1
+configure.ac
+configure
+contrib/RPMs/omniORBpy.spec
+contrib/RPMs/omniORBpy_new.spec
+mk/version.mk
+
+
 Mon Jun  8 12:39:12 BST 2015 dgrisby
 ====================================
 

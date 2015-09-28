@@ -1,10 +1,26 @@
 RELEASE NOTES
 =============
 
-This is omniORB 4.2.0
+This is omniORB 4.2.1
 
 See README.unix.txt or README.win32.txt for building instructions.
 See the documentation in the doc directory for more information.
+
+
+Changes since omniORB 4.2.0
+---------------------------
+
+omniORB 4.2.1 is primarily a bug fix release. See update.log for full
+details of changes. Highlights include:
+
+ - Improved Python 3 support.
+
+ - Additional SSL / TLS options.
+
+ - The default DH parameters for TLS are now 2048 bits.
+
+ - More efficient marshalling of messages including large numbers of
+   valuetypes.
 
 
 Changes since omniORB 4.1.x

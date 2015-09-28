@@ -1,3 +1,20 @@
+Mon 28 Sep 12:14:23 BST 2015 dgrisby
+====================================
+
+- This is omniORB 4.2.1.
+
+README.FIRST.txt
+ReleaseChecklist.txt
+ReleaseNotes.txt
+THIS_IS_OMNIORB_4_2_0
+THIS_IS_OMNIORB_4_2_1
+configure.ac
+configure
+contrib/RPMs/omniORB.spec
+contrib/RPMs/omniORB_new.spec
+mk/version.mk
+
+
 Mon 28 Sep 12:01:29 BST 2015 dgrisby
 ====================================
 
