@@ -1,3 +1,15 @@
+Thu 29 Oct 13:59:05 GMT 2015 dgrisby
+====================================
+
+- Fix use of lower() in Windows build with Python 3.
+
+modules/codesets/dir.mk
+modules/connections/dir.mk
+modules/dir.mk
+modules/sslTP/dir.mk
+modules/ziop/dir.mk
+
+
 Thu 29 Oct 11:39:54 GMT 2015 dgrisby
 ====================================
 
