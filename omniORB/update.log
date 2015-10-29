@@ -1,3 +1,11 @@
+Thu 29 Oct 12:47:34 GMT 2015 dgrisby
+====================================
+
+- Add VS platforms to config.mk.
+
+config.mk
+
+
 Thu 29 Oct 11:38:46 GMT 2015 dgrisby
 ====================================
 

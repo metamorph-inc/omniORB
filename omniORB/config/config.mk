@@ -6,11 +6,15 @@
 # Uncomment one of the following platform lines to build for the
 # target platform
 #
-#  x86_win32_vs_6            x86 Windows, MS VC++ 6.0 or 5.0
-#  x86_win32_vs_7            x86 Windows, MS VC++ 7.x (.NET)
-#  x86_win32_vs_8            x86 Windows, MS VC++ 8.x (.NET)
-#  x86_win32_vs_9            x86 Windows, MS VC++ 9.x (2008)
+#  x86_win32_vs_14           x86 Windows, MS VC++ 14.x (2015)
+#  x86_win32_vs_13           x86 Windows, MS VC++ 13.x
+#  x86_win32_vs_12           x86 Windows, MS VC++ 12.x
+#  x86_win32_vs_11           x86 Windows, MS VC++ 11.x
 #  x86_win32_vs_10           x86 Windows, MS VC++ 10.x (2010)
+#  x86_win32_vs_9            x86 Windows, MS VC++ 9.x (2008)
+#  x86_win32_vs_8            x86 Windows, MS VC++ 8.x (.NET)
+#  x86_win32_vs_7            x86 Windows, MS VC++ 7.x (.NET)
+#  x86_win32_vs_6            x86 Windows, MS VC++ 6.0 or 5.0
 #  x86_win32_mingw           x86 Windows, mingw/g++ build
 #  x86_win32_dmc             x86 Win32, Digital Mars C++ (>= 8.32.14)
 #  x86_ets                   Phar Lap Realtime ETS-kernel
@@ -55,11 +59,15 @@
 # You should also look at <top>/mk/platforms/$(platform).mk and if necessary
 # edit the make variables, such as CC and CXX, in the file.
 
-#platform = x86_win32_vs_6
-#platform = x86_win32_vs_7
-#platform = x86_win32_vs_8
-#platform = x86_win32_vs_9
+#platform = x86_win32_vs_14
+#platform = x86_win32_vs_13
+#platform = x86_win32_vs_12
+#platform = x86_win32_vs_11
 #platform = x86_win32_vs_10
+#platform = x86_win32_vs_9
+#platform = x86_win32_vs_8
+#platform = x86_win32_vs_7
+#platform = x86_win32_vs_6
 #platform = x86_win32_mingw
 #platform = x86_win32_dmc
 #platform = powerpc_LynxOS_4.0
