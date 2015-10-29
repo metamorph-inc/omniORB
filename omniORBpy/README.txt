@@ -55,12 +55,12 @@ compilers and Python. It will always choose gcc over the platform's
 native compiler if it is available. To change the choices it makes,
 use variables CC, CXX and PYTHON, e.g.:
 
-  ../configure CXX=/usr/bin/platform_c++ PYTHON=/usr/local/bin/python2.3
+  ../configure CXX=/usr/bin/platform_c++ PYTHON=/usr/local/bin/python2.7
 
 
 If you do not have Autoconf support on your platform (e.g. on
 Windows), you must install the omniORBpy source in the $TOP/src/lib
-directory of a working omniORB 4.1 tree. Make sure the directory is
+directory of a working omniORB 4.2 tree. Make sure the directory is
 called omniORBpy -- if you downloaded a release archive you must
 rename the directory to remove the version from the directory name.
 
@@ -82,7 +82,7 @@ add this path:
   export PYTHONPATH=$PYTHONPATH:$PREFIX/lib/pythonX.Y/site-packages
 
 replacing pythonX.Y with the version of Python you are using,
-e.g. python2.4
+e.g. python2.7
 
 With the non Autoconf build, you must add two directories to
 PYTHONPATH:
