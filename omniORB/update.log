@@ -1,3 +1,14 @@
+Thu 29 Oct 11:38:46 GMT 2015 dgrisby
+====================================
+
+- Add missing VS platform files.
+
+mk/platforms/x86_win32_vs_11.mk
+mk/platforms/x86_win32_vs_12.mk
+mk/platforms/x86_win32_vs_13.mk
+mk/platforms/x86_win32_vs_14.mk
+
+
 Mon 28 Sep 12:14:23 BST 2015 dgrisby
 ====================================
 
