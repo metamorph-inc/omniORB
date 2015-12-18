@@ -3,7 +3,7 @@
 # python.py                 Created on: 1999/10/29
 #			    Author    : Duncan Grisby (dpg1)
 #
-#    Copyright (C) 2002-2014 Apasphere Ltd
+#    Copyright (C) 2002-2015 Apasphere Ltd
 #    Copyright (C) 1999 AT&T Laboratories Cambridge
 #
 #  This file is part of omniidl.
@@ -2634,8 +2634,9 @@ def real_updateModules(modules, pymodule):
                 
             outf.write(line)
             
-        already    = 0
-        outputline = "import " + submod + "\n"
+        already        = 0
+        outputline     = "from . import " + submod + "\n"
+        old_outputline = "import " + submod + "\n"
 
         while line != "\n":
             line = inf.readline()
@@ -2643,7 +2644,7 @@ def real_updateModules(modules, pymodule):
                 error_exit('Output error: "%s" ended while I was '
                            'looking at imports.' % modfile)
 
-            if line != "\n":
+            if line != "\n" and line != old_outputline:
                 outf.write(line)
                 if line == outputline:
                     already = 1
