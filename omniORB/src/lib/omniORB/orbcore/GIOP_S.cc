@@ -438,6 +438,8 @@ GIOP_S::handleRequest() {
     }
   }
   pd_state = ReplyCompleted;
+
+  clearValueTracker();
   clearDeadline();
   return 1;
 }
@@ -546,6 +548,8 @@ GIOP_S::handleLocateRequest() {
   }
 
   pd_state = ReplyCompleted;
+
+  clearValueTracker();
   clearDeadline();
   return 1;
 }
