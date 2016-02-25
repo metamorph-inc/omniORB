@@ -69,7 +69,7 @@ _d_Servant = omniORB.tcInternal.tv_native
 
 # interface POAManager
 class POAManager (CORBA.Object) :
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/POAManager:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/POAManager:1.0"
 
     def __init__(self, pm):
         CORBA.Object.__init__(self, pm)
@@ -93,7 +93,7 @@ class POAManager (CORBA.Object) :
     # Generated declarations
 
     class AdapterInactive (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POAManager/AdapterInactive:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POAManager/AdapterInactive:1.0"
 
     _d_AdapterInactive  = (omniORB.tcInternal.tv_except, AdapterInactive,
                            AdapterInactive._NP_RepositoryId, "AdapterInactive")
@@ -105,7 +105,7 @@ class POAManager (CORBA.Object) :
     ACTIVE     = omniORB.EnumItem("ACTIVE", 1)
     DISCARDING = omniORB.EnumItem("DISCARDING", 2)
     INACTIVE   = omniORB.EnumItem("INACTIVE", 3)
-    State = omniORB.Enum("IDL:omg.org/PortableServer/POAManager/State:2.4",
+    State = omniORB.Enum("IDL:omg.org/PortableServer/POAManager/State:1.0",
                          (HOLDING, ACTIVE, DISCARDING, INACTIVE))
     
     _d_State  = (omniORB.tcInternal.tv_enum, State._NP_RepositoryId,
@@ -117,7 +117,7 @@ class POAManager (CORBA.Object) :
 
 # interface POA
 _d_POA = (omniORB.tcInternal.tv_objref,
-          "IDL:omg.org/PortableServer/POA:2.4", "POA")
+          "IDL:omg.org/PortableServer/POA:1.0", "POA")
 
 class POA (CORBA.Object) :
     """POA implementation."""
@@ -243,7 +243,7 @@ class POA (CORBA.Object) :
     # Generated exception declarations
     # exception AdapterAlreadyExists
     class AdapterAlreadyExists (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/AdapterAlreadyExists:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/AdapterAlreadyExists:1.0"
 
     _d_AdapterAlreadyExists  = (omniORB.tcInternal.tv_except,
                                 AdapterAlreadyExists,
@@ -255,7 +255,7 @@ class POA (CORBA.Object) :
     
     # exception AdapterInactive
     class AdapterInactive (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/AdapterInactive:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/AdapterInactive:1.0"
     
     _d_AdapterInactive  = (omniORB.tcInternal.tv_except, AdapterInactive,
                            AdapterInactive._NP_RepositoryId, "AdapterInactive")
@@ -265,7 +265,7 @@ class POA (CORBA.Object) :
     
     # exception AdapterNonExistent
     class AdapterNonExistent (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/AdapterNonExistent:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/AdapterNonExistent:1.0"
     
     _d_AdapterNonExistent  = (omniORB.tcInternal.tv_except,
                               AdapterNonExistent,
@@ -277,7 +277,7 @@ class POA (CORBA.Object) :
     
     # exception InvalidPolicy
     class InvalidPolicy (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/InvalidPolicy:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/InvalidPolicy:1.0"
     
         def __init__(self, index):
             self.index = index
@@ -291,7 +291,7 @@ class POA (CORBA.Object) :
     
     # exception NoServant
     class NoServant (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/NoServant:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/NoServant:1.0"
     
     _d_NoServant  = (omniORB.tcInternal.tv_except, NoServant,
                      NoServant._NP_RepositoryId, "NoServant")
@@ -301,7 +301,7 @@ class POA (CORBA.Object) :
     
     # exception ObjectAlreadyActive
     class ObjectAlreadyActive (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/ObjectAlreadyActive:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/ObjectAlreadyActive:1.0"
     
     _d_ObjectAlreadyActive  = (omniORB.tcInternal.tv_except,
                                ObjectAlreadyActive,
@@ -313,7 +313,7 @@ class POA (CORBA.Object) :
     
     # exception ObjectNotActive
     class ObjectNotActive (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/ObjectNotActive:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/ObjectNotActive:1.0"
     
     _d_ObjectNotActive  = (omniORB.tcInternal.tv_except, ObjectNotActive,
                            ObjectNotActive._NP_RepositoryId, "ObjectNotActive")
@@ -323,7 +323,7 @@ class POA (CORBA.Object) :
     
     # exception ServantAlreadyActive
     class ServantAlreadyActive (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/ServantAlreadyActive:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/ServantAlreadyActive:1.0"
     
     _d_ServantAlreadyActive  = (omniORB.tcInternal.tv_except,
                                 ServantAlreadyActive,
@@ -335,7 +335,7 @@ class POA (CORBA.Object) :
     
     # exception ServantNotActive
     class ServantNotActive (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/ServantNotActive:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/ServantNotActive:1.0"
     
     _d_ServantNotActive  = (omniORB.tcInternal.tv_except, ServantNotActive,
                             ServantNotActive._NP_RepositoryId,
@@ -346,7 +346,7 @@ class POA (CORBA.Object) :
     
     # exception WrongAdapter
     class WrongAdapter (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/WrongAdapter:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/WrongAdapter:1.0"
     
     _d_WrongAdapter  = (omniORB.tcInternal.tv_except, WrongAdapter,
                         WrongAdapter._NP_RepositoryId, "WrongAdapter")
@@ -356,7 +356,7 @@ class POA (CORBA.Object) :
     
     # exception WrongPolicy
     class WrongPolicy (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/WrongPolicy:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/POA/WrongPolicy:1.0"
     
     _d_WrongPolicy  = (omniORB.tcInternal.tv_except, WrongPolicy,
                        WrongPolicy._NP_RepositoryId, "WrongPolicy")
@@ -367,7 +367,7 @@ class POA (CORBA.Object) :
 
 # interface Current
 class Current (CORBA.Object) :
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/Current:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/Current:1.0"
 
     def __init__(self, pc):
         CORBA.Object.__init__(self, pc)
@@ -388,7 +388,7 @@ class Current (CORBA.Object) :
     # Generated declarations
 
     class NoContext (CORBA.UserException):
-        _NP_RepositoryId = "IDL:omg.org/PortableServer/Current/NoContext:2.4"
+        _NP_RepositoryId = "IDL:omg.org/PortableServer/Current/NoContext:1.0"
 
     _d_NoContext  = (omniORB.tcInternal.tv_except, NoContext,
                      NoContext._NP_RepositoryId, "NoContext")
@@ -401,13 +401,13 @@ class Current (CORBA.Object) :
 
 # ObjectId
 class ObjectId(object):
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/ObjectId:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/ObjectId:1.0"
     def __init__(self):
         raise RuntimeError("Cannot construct objects of this type.")
 
 _d_ObjectId  = (omniORB.tcInternal.tv_sequence, omniORB.tcInternal.tv_octet, 0)
 _ad_ObjectId = (omniORB.tcInternal.tv_alias,
-                "IDL:omg.org/PortableServer/ObjectId:2.4", "ObjectId",
+                "IDL:omg.org/PortableServer/ObjectId:1.0", "ObjectId",
                 (omniORB.tcInternal.tv_sequence,
                  omniORB.tcInternal.tv_octet, 0))
 _tc_ObjectId = omniORB.tcInternal.createTypeCode(_ad_ObjectId)
@@ -415,7 +415,7 @@ _tc_ObjectId = omniORB.tcInternal.createTypeCode(_ad_ObjectId)
 
 # exception ForwardRequest
 class ForwardRequest (CORBA.UserException):
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/ForwardRequest:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/ForwardRequest:1.0"
 
     def __init__(self, forward_reference):
         self.forward_reference = forward_reference
@@ -451,7 +451,7 @@ omniORB.policyMakers.append(_create_policy)
 
 
 class ThreadPolicy (CORBA.Policy):
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/ThreadPolicy:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/ThreadPolicy:1.0"
 
     def __init__(self, value):
         if value not in ThreadPolicyValue._items:
@@ -466,7 +466,7 @@ class ThreadPolicy (CORBA.Policy):
 
 
 class LifespanPolicy (CORBA.Policy):
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/LifespanPolicy:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/LifespanPolicy:1.0"
 
     def __init__(self, value):
         if value not in LifespanPolicyValue._items:
@@ -481,7 +481,7 @@ class LifespanPolicy (CORBA.Policy):
 
 
 class IdUniquenessPolicy (CORBA.Policy):
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/IdUniquenessPolicy:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/IdUniquenessPolicy:1.0"
 
     def __init__(self, value):
         if value not in IdUniquenessPolicyValue._items:
@@ -496,7 +496,7 @@ class IdUniquenessPolicy (CORBA.Policy):
 
 
 class IdAssignmentPolicy (CORBA.Policy):
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/IdAssignmentPolicy:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/IdAssignmentPolicy:1.0"
 
     def __init__(self, value):
         if value not in IdAssignmentPolicyValue._items:
@@ -511,7 +511,7 @@ class IdAssignmentPolicy (CORBA.Policy):
 
 
 class ImplicitActivationPolicy (CORBA.Policy):
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/ImplicitActivationPolicy:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/ImplicitActivationPolicy:1.0"
 
     def __init__(self, value):
         if value not in ImplicitActivationPolicyValue._items:
@@ -526,7 +526,7 @@ class ImplicitActivationPolicy (CORBA.Policy):
 
 
 class ServantRetentionPolicy (CORBA.Policy):
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/ServantRetentionPolicy:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/ServantRetentionPolicy:1.0"
 
     def __init__(self, value):
         if value not in ServantRetentionPolicyValue._items:
@@ -541,7 +541,7 @@ class ServantRetentionPolicy (CORBA.Policy):
 
 
 class RequestProcessingPolicy (CORBA.Policy):
-    _NP_RepositoryId = "IDL:omg.org/PortableServer/RequestProcessingPolicy:2.4"
+    _NP_RepositoryId = "IDL:omg.org/PortableServer/RequestProcessingPolicy:1.0"
 
     def __init__(self, value):
         if value not in RequestProcessingPolicyValue._items:
@@ -560,7 +560,7 @@ ORB_CTRL_MODEL      = omniORB.EnumItem("ORB_CTRL_MODEL", 0)
 SINGLE_THREAD_MODEL = omniORB.EnumItem("SINGLE_THREAD_MODEL", 1)
 MAIN_THREAD_MODEL   = omniORB.EnumItem("MAIN_THREAD_MODEL", 2)
 ThreadPolicyValue   = omniORB.Enum(\
-    "IDL:omg.org/PortableServer/ThreadPolicyValue:2.4",
+    "IDL:omg.org/PortableServer/ThreadPolicyValue:1.0",
     (ORB_CTRL_MODEL, SINGLE_THREAD_MODEL, MAIN_THREAD_MODEL))
 
 _d_ThreadPolicyValue  = (omniORB.tcInternal.tv_enum,
@@ -574,7 +574,7 @@ omniORB.registerType(ThreadPolicyValue._NP_RepositoryId,
 TRANSIENT  = omniORB.EnumItem("TRANSIENT", 0)
 PERSISTENT = omniORB.EnumItem("PERSISTENT", 1)
 LifespanPolicyValue = omniORB.Enum(\
-    "IDL:omg.org/PortableServer/LifespanPolicyValue:2.4",
+    "IDL:omg.org/PortableServer/LifespanPolicyValue:1.0",
     (TRANSIENT, PERSISTENT))
 
 _d_LifespanPolicyValue  = (omniORB.tcInternal.tv_enum,
@@ -588,7 +588,7 @@ omniORB.registerType(LifespanPolicyValue._NP_RepositoryId,
 UNIQUE_ID   = omniORB.EnumItem("UNIQUE_ID", 0)
 MULTIPLE_ID = omniORB.EnumItem("MULTIPLE_ID", 1)
 IdUniquenessPolicyValue = omniORB.Enum(\
-    "IDL:omg.org/PortableServer/IdUniquenessPolicyValue:2.4",
+    "IDL:omg.org/PortableServer/IdUniquenessPolicyValue:1.0",
     (UNIQUE_ID, MULTIPLE_ID))
 
 _d_IdUniquenessPolicyValue  = (omniORB.tcInternal.tv_enum,
@@ -603,7 +603,7 @@ omniORB.registerType(IdUniquenessPolicyValue._NP_RepositoryId,
 USER_ID   = omniORB.EnumItem("USER_ID", 0)
 SYSTEM_ID = omniORB.EnumItem("SYSTEM_ID", 1)
 IdAssignmentPolicyValue = omniORB.Enum(\
-    "IDL:omg.org/PortableServer/IdAssignmentPolicyValue:2.4",
+    "IDL:omg.org/PortableServer/IdAssignmentPolicyValue:1.0",
     (USER_ID, SYSTEM_ID))
 
 _d_IdAssignmentPolicyValue  = (omniORB.tcInternal.tv_enum,
@@ -619,7 +619,7 @@ omniORB.registerType(IdAssignmentPolicyValue._NP_RepositoryId,
 IMPLICIT_ACTIVATION    = omniORB.EnumItem("IMPLICIT_ACTIVATION", 0)
 NO_IMPLICIT_ACTIVATION = omniORB.EnumItem("NO_IMPLICIT_ACTIVATION", 1)
 ImplicitActivationPolicyValue = omniORB.Enum(\
-    "IDL:omg.org/PortableServer/ImplicitActivationPolicyValue:2.4",
+    "IDL:omg.org/PortableServer/ImplicitActivationPolicyValue:1.0",
     (IMPLICIT_ACTIVATION, NO_IMPLICIT_ACTIVATION))
 
 _d_ImplicitActivationPolicyValue  = (omniORB.tcInternal.tv_enum,
@@ -635,7 +635,7 @@ omniORB.registerType(ImplicitActivationPolicyValue._NP_RepositoryId,
 RETAIN     = omniORB.EnumItem("RETAIN", 0)
 NON_RETAIN = omniORB.EnumItem("NON_RETAIN", 1)
 ServantRetentionPolicyValue = omniORB.Enum(\
-    "IDL:omg.org/PortableServer/ServantRetentionPolicyValue:2.4",
+    "IDL:omg.org/PortableServer/ServantRetentionPolicyValue:1.0",
     (RETAIN, NON_RETAIN))
 
 _d_ServantRetentionPolicyValue  = (omniORB.tcInternal.tv_enum,
@@ -652,7 +652,7 @@ USE_ACTIVE_OBJECT_MAP_ONLY = omniORB.EnumItem("USE_ACTIVE_OBJECT_MAP_ONLY", 0)
 USE_DEFAULT_SERVANT        = omniORB.EnumItem("USE_DEFAULT_SERVANT", 1)
 USE_SERVANT_MANAGER        = omniORB.EnumItem("USE_SERVANT_MANAGER", 2)
 RequestProcessingPolicyValue = omniORB.Enum(\
-    "IDL:omg.org/PortableServer/RequestProcessingPolicyValue:2.4",
+    "IDL:omg.org/PortableServer/RequestProcessingPolicyValue:1.0",
     (USE_ACTIVE_OBJECT_MAP_ONLY, USE_DEFAULT_SERVANT, USE_SERVANT_MANAGER))
 
 _d_RequestProcessingPolicyValue  = (omniORB.tcInternal.tv_enum,
@@ -669,7 +669,7 @@ omniORB.registerType(RequestProcessingPolicyValue._NP_RepositoryId,
 
 # interface ServantManager
 _d_ServantManager = (omniORB.tcInternal.tv_local_interface,
-                     "IDL:omg.org/PortableServer/ServantManager:2.4",
+                     "IDL:omg.org/PortableServer/ServantManager:1.0",
                      "ServantManager")
 
 class ServantManager (CORBA.LocalObject):
@@ -693,7 +693,7 @@ omniORB.registerObjref(ServantManager._NP_RepositoryId, _objref_ServantManager)
 
 # interface ServantActivator
 _d_ServantActivator = (omniORB.tcInternal.tv_local_interface,
-                       "IDL:omg.org/PortableServer/ServantActivator:2.4",
+                       "IDL:omg.org/PortableServer/ServantActivator:1.0",
                        "ServantActivator")
 
 class ServantActivator (ServantManager):
@@ -749,7 +749,7 @@ omniORB.registerObjref(ServantActivator._NP_RepositoryId,
 
 # interface ServantLocator
 _d_ServantLocator = (omniORB.tcInternal.tv_local_interface,
-                     "IDL:omg.org/PortableServer/ServantLocator:2.4",
+                     "IDL:omg.org/PortableServer/ServantLocator:1.0",
                      "ServantLocator")
 
 class ServantLocator (ServantManager):
@@ -807,7 +807,7 @@ omniORB.registerObjref(ServantLocator._NP_RepositoryId, _objref_ServantLocator)
 
 # interface AdapterActivator
 _d_AdapterActivator = (omniORB.tcInternal.tv_local_interface,
-                       "IDL:omg.org/PortableServer/AdapterActivator:2.4",
+                       "IDL:omg.org/PortableServer/AdapterActivator:1.0",
                        "AdapterActivator")
 
 class AdapterActivator (CORBA.LocalObject):

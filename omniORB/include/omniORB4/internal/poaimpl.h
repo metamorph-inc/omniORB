@@ -49,7 +49,7 @@
 
 OMNI_NAMESPACE_BEGIN(omni)
 
-#define PS_VERSION  ":2.4"
+#define PS_VERSION  ":1.0"
 
 class omniOrbPOAManager;
 class omniServantActivatorTaskQueue;

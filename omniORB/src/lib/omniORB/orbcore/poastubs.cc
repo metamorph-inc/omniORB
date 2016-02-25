@@ -64,7 +64,7 @@ PortableServer::ForwardRequest::~ForwardRequest() {}
 
 void PortableServer::ForwardRequest::_raise() const { throw *this; }
 
-const char* PortableServer::ForwardRequest::_PD_repoId = "IDL:omg.org/PortableServer/ForwardRequest:2.3";
+const char* PortableServer::ForwardRequest::_PD_repoId = "IDL:omg.org/PortableServer/ForwardRequest:1.0";
 const char* PortableServer::ForwardRequest::_PD_typeId = "Exception/UserException/PortableServer::ForwardRequest";
 
 PortableServer::ForwardRequest* PortableServer::ForwardRequest::_downcast(::CORBA::Exception* _e) {
