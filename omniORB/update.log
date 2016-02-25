@@ -1,3 +1,16 @@
+Thu Feb 25 17:38:07 GMT 2016 dgrisby
+====================================
+
+- Compile error with lock tracing enabled.
+
+include/omniORB4/ami.h
+
+- Correct version number in POA repository ids.
+
+include/omniORB4/internal/poaimpl.h
+src/lib/omniORB/orbcore/poastubs.cc
+
+
 Mon  4 Jan 10:50:42 GMT 2016 dgrisby
 ====================================
 

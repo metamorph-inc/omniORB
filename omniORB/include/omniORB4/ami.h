@@ -151,7 +151,7 @@ public:
 
   inline ::CORBA::Boolean _remFromSet(omni_tracedcondition* set_cond)
   {
-    ASSERT_OMNI_TRACEDMUTEX_HELD(sd_lock, 1);
+    ASSERT_OMNI_TRACEDMUTEX_HELD(omniAsyncCallDescriptor::sd_lock, 1);
 
     if (pd_set_cond)
       return 0;
@@ -177,7 +177,7 @@ public:
 
   inline ::CORBA::Boolean _lockedIsReady()
   {
-    ASSERT_OMNI_TRACEDMUTEX_HELD(sd_lock, 1);
+    ASSERT_OMNI_TRACEDMUTEX_HELD(omniAsyncCallDescriptor::sd_lock, 1);
     return pd_ready ? 1 : 0;
   }
 
