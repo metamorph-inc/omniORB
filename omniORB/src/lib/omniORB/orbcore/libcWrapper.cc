@@ -106,7 +106,7 @@ void LibcWrapper::SRand(unsigned int s)
 //
 
 static inline CORBA::Boolean
-check_number(const char* num, int base, long int max)
+checkNumber(const char* num, int base, long int max)
 {
   char* end;
 
@@ -134,7 +134,7 @@ CORBA::Boolean LibcWrapper::isip4addr(const char* node)
 
       buf[bi] = '\0';
       bi = 0;
-      if (!check_number(buf, 10, 255))
+      if (!checkNumber(buf, 10, 255))
 	return 0;
     }
     else {
@@ -150,7 +150,7 @@ CORBA::Boolean LibcWrapper::isip4addr(const char* node)
     return 0;
 
   buf[bi] = '\0';
-  if (!check_number(buf, 10, 255))
+  if (!checkNumber(buf, 10, 255))
     return 0;
 
   return 1;
@@ -161,30 +161,35 @@ CORBA::Boolean LibcWrapper::isip6addr(const char* node)
   // Test if string node is an IPv6 address
   // Return: 0: not ip address,  1: is ip address
 
-  const char* c;
-  char buf[16];
-  int bi     = 0;
-  int colons = 0;
-  int dots   = 0;
+  const char*    c;
+  char           buf[16];
+  int            bi         = 0;
+  int            colons     = 0;
+  int            dots       = 0;
   CORBA::Boolean seen_blank = 0;
 
   for (c=node; *c; ++c) {
     if (*c == ':') {
       ++colons;
-      if (*(c+1) == ':') {
-	if (seen_blank) {
-	  // Only one :: permitted
-	  return 0;
-	}
-	seen_blank = 1;
-	++c;
-	++colons;
-      }
+
       if (bi) {
 	buf[bi] = '\0';
 	bi = 0;
-	if (!check_number(buf, 16, 0xffff))
+	if (!checkNumber(buf, 16, 0xffff))
 	  return 0;
+      }
+      else if (c == node) {
+        // First character is a colon. Only valid if the next one is a
+        // colon too.
+        if (*(c+1) != ':')
+          return 0;
+      }
+      else {
+        if (seen_blank) {
+          // Only one :: permitted
+          return 0;
+        }
+        seen_blank = 1;
       }
     }
     else if ((*c >= '0' && *c <= '9') ||
@@ -212,18 +217,19 @@ CORBA::Boolean LibcWrapper::isip6addr(const char* node)
       return 0;
     }
   }
-  if (colons < 2 || colons > 7)
-    return 0;
+  if (seen_blank) {
+    if (colons < 2 || colons > 7)
+      return 0;
+  }
+  else {
+    if (colons != (dots ? 6 : 7))
+      return 0;
+  }
 
   if (bi == 0) {
-    // No number at the end. Counts equivalent to ::
-    if (seen_blank) {
-      if (colons == 2)
-	return 1;
-      else
-	return 0;
-    }
-    return 1;
+    // No number at the end. Only valid if it ends ::
+    const char* t = c-2;
+    return (t[0] == ':' && t[1] == ':');
   }
 
   buf[bi] = '\0';
@@ -237,7 +243,7 @@ CORBA::Boolean LibcWrapper::isip6addr(const char* node)
     }
   }
   else {
-    return check_number(buf, 16, 0xffff);
+    return checkNumber(buf, 16, 0xffff);
   }
 }
 
