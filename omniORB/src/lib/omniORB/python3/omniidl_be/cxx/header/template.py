@@ -1027,8 +1027,10 @@ public:
   }
   
   @unionname@(const @unionname@& _value) : _pd__initialised(0) {
-    @copy_constructor@
-    _pd__initialised = _value._pd__initialised;
+    if (_value._pd__initialised) {
+      @copy_constructor@
+      _pd__initialised = _value._pd__initialised;
+    }
   }
 
   ~@unionname@() {
@@ -1037,8 +1039,13 @@ public:
 
   @unionname@& operator=(const @unionname@& _value) {
     if (&_value != this) {
-      @copy_constructor@
-      _pd__initialised = _value._pd__initialised;
+      if (_value._pd__initialised) {
+        @copy_constructor@
+        _pd__initialised = _value._pd__initialised;
+      }
+      else {
+        _release_member();
+      }
     }
     return *this;
   }
@@ -1107,6 +1114,7 @@ _pd__d = @default@;
 union_implicit_default = """\
 void _default()
 {
+  _release_member();
   _pd__initialised = 1;
   _pd__d = @arbitraryDefault@;
   _pd__default = 1;
@@ -1423,7 +1431,7 @@ void _release_member () {
   switch(_pd__d) {
     @cases@
   } 
-  _pd__initialised = false;
+  _pd__initialised = 0;
 }
 """
 

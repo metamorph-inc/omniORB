@@ -1114,6 +1114,7 @@ _pd__d = @default@;
 union_implicit_default = """\
 void _default()
 {
+  _release_member();
   _pd__initialised = 1;
   _pd__d = @arbitraryDefault@;
   _pd__default = 1;
@@ -1430,7 +1431,7 @@ void _release_member () {
   switch(_pd__d) {
     @cases@
   } 
-  _pd__initialised = false;
+  _pd__initialised = 0;
 }
 """
 

@@ -1,3 +1,16 @@
+Wed Mar 30 11:36:49 BST 2016 dgrisby
+====================================
+
+- Fix incorrect IPv6 address validation logic.
+
+src/lib/omniORB/orbcore/libcWrapper.cc
+
+- Fix leak in union _default().
+
+src/lib/omniORB/python/omniidl_be/cxx/header/template.py
+src/lib/omniORB/python3/omniidl_be/cxx/header/template.py
+
+
 Thu Feb 25 17:38:07 GMT 2016 dgrisby
 ====================================
 
