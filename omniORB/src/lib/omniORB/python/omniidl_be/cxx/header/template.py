@@ -1006,12 +1006,12 @@ case @discrimvalue@: @name@(_value.@name@()); break;
 
 union_ctor_bool_default = """\
 #ifndef HAS_Cplusplus_Bool
-  default: break;
+default: @name@(_value.@name@()); break;
 #endif
 """
 
 union_ctor_default = """\
-  default: break;
+default: break;
 """
 
 union = """\
