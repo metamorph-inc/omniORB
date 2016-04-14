@@ -75,6 +75,27 @@ public:
     pd_context = CORBA::Context::_duplicate(ctx);
   }
 
+  inline _CORBA_Boolean isCalledBack()
+  {
+    omni_tracedmutex_lock l(sd_lock);
+    return !pd_do_callback;
+  }
+
+  inline void waitForCallback()
+  {
+    omni_tracedmutex_lock l(sd_lock);
+    
+    if (!pd_do_callback)
+      return;
+
+    if (!pd_cond)
+      pd_cond = new omni_tracedcondition(&sd_lock,
+                                         "DIICallDescriptor::pd_cond");
+
+    while (pd_do_callback)
+      pd_cond->wait();
+  }
+
 private:
   RequestImpl*             pd_req;
   CORBA::NVList_var        pd_arguments;

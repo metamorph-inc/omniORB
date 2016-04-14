@@ -165,6 +165,14 @@ completeCallback()
     pd_environment->exception(getException());
 
   omniAMI::DIIPollableImpl::_PD_instance._replyReady();
+
+  {
+    omni_tracedmutex_lock l(sd_lock);
+    pd_do_callback = 0;
+    if (pd_cond)
+      pd_cond->broadcast();
+  }
+
   pd_req->decrRefCount();
 }
 
@@ -530,7 +538,7 @@ RequestImpl::get_response()
   if (pd_state == RS_DONE_DEFERRED)
     return;
 
-  pd_cd.wait();
+  pd_cd.waitForCallback();
   pd_state = RS_DONE_DEFERRED;
   omniAMI::DIIPollableImpl::_PD_instance._replyCollected();
 
@@ -565,7 +573,7 @@ RequestImpl::poll_response()
 		  BAD_INV_ORDER_ResultAlreadyReceived,
 		  CORBA::COMPLETED_NO);
 
-  if (!pd_cd.isComplete())
+  if (!pd_cd.isCalledBack())
     return 0;
 
   pd_state = RS_POLLED_DONE_DEFERRED;

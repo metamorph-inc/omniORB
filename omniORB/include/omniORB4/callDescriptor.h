@@ -381,13 +381,13 @@ public:
       completeCallback();
   }
 
-  inline bool isComplete()
+  inline _CORBA_Boolean isComplete()
   {
     omni_tracedmutex_lock l(sd_lock);
     return pd_complete;
   }
 
-  inline bool lockedIsComplete()
+  inline _CORBA_Boolean lockedIsComplete()
   {
     ASSERT_OMNI_TRACEDMUTEX_HELD(sd_lock, 1);
     return pd_complete;

@@ -1,3 +1,13 @@
+Thu 14 Apr 11:17:11 BST 2016 dgrisby
+====================================
+
+- Avoid race in DII deferred calls that throw exceptions.
+
+include/omniORB4/callDescriptor.h
+include/omniORB4/internal/request.h
+src/lib/omniORB/dynamic/request.cc
+
+
 Thu Apr  7 10:17:37 BST 2016 dgrisby
 ====================================
 
