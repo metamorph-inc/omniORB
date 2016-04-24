@@ -32,7 +32,7 @@ LIB_NAME     := omniZIOPDynamic
 LIB_VERSION  := $(OMNIORB_VERSION)
 LIB_OBJS     := $(ORB_OBJS)
 LIB_IMPORTS  := $(patsubst %,$(LibPathPattern),../orbcore/shared) \
-                $(OMNIORB_DLL_NAME) \
+                $(OMNIORB_DLL_NAME) $(OMNIORB_DYNAMIC_DLL_NAME) \
                 $(OMNITHREAD_LIB) $(EXTRA_LIBS)
 LIB_SHARED_ONLY_OBJS := $(SHARED_ONLY_OBJS)
 
