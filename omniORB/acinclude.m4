@@ -133,7 +133,7 @@ int main() {
 }
 ],
  omni_cv_cxx_catch_by_base=yes, omni_cv_cxx_catch_by_base=no,
- omni_cv_cxx_catch_by_base=no)
+ omni_cv_cxx_catch_by_base=yes)
  AC_LANG_POP(C++)
 ])
 if test "$omni_cv_cxx_catch_by_base" = yes; then

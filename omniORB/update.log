@@ -1,3 +1,18 @@
+Sun 24 Apr 22:27:55 BST 2016 dgrisby
+====================================
+
+- Missing omniDynamic library in omniZiopDynamic link.
+
+src/lib/omniORB/ziopdynamic/dir.mk
+
+- Support cross compilation.
+
+acinclude.m4
+configure.ac
+configure
+mk/beforeauto.mk.in
+
+
 Thu 14 Apr 11:17:11 BST 2016 dgrisby
 ====================================
 

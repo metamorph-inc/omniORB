@@ -44,14 +44,38 @@ INSTALLPYTHONDIR := $(DESTDIR)@pythondir@
 INSTALLPYEXECDIR := $(DESTDIR)@pyexecdir@
 INSTALLIDLDIR    := $(DESTDIR)@datadir@/idl
 
+
+#############################################################################
+#
+# Cross compilation
+#
+
+ifeq (@CROSS_COMPILING@,yes)
+  EmbeddedSystem = 1
+endif
+
+
 #############################################################################
 #
 # Tool bindir to use depends on make target
 #
+
+ifndef EmbeddedSystem
+
 ifeq ($(MAKECMDGOALS),install)
-  TOOLBINDIR = $(INSTALLBINDIR)
+    TOOLBINDIR = $(INSTALLBINDIR)
 else
-  TOOLBINDIR = $(TOP)/$(BINDIR)
+    TOOLBINDIR = $(TOP)/$(BINDIR)
+endif
+
+OMKDEPEND        = $(TOOLBINDIR)/omkdepend
+OMNIORB_IDL_ONLY = $(TOOLBINDIR)/omniidl -bcxx
+
+else
+
+OMKDEPEND        = @OMKDEPEND@
+OMNIORB_IDL_ONLY = @OMNIIDL@ -bcxx
+
 endif
 
 
@@ -457,7 +481,6 @@ OMNIORB_DLL_NAME = $(patsubst %,$(LibSearchPattern),\
 OMNIORB_DYNAMIC_DLL_NAME = $(patsubst %,$(LibSearchPattern),\
                            omniDynamic$(OMNIORB_MAJOR_VERSION))
 
-OMNIORB_IDL_ONLY = $(TOOLBINDIR)/omniidl -bcxx
 OMNIORB_IDL_ANY_FLAGS = -Wba
 OMNIORB_IDL = $(OMNIORB_IDL_ONLY) $(OMNIORB_IDL_ANY_FLAGS)
 OMNIORB_CPPFLAGS = -D__OMNIORB$(OMNIORB_MAJOR_VERSION)__ \
@@ -691,7 +714,6 @@ INSTEXEFLAGS	= -m 0755
 CP		= cp
 MV		= mv -f
 CPP		= @CPP@
-OMKDEPEND	= $(TOOLBINDIR)/omkdepend
 RMDIRHIER	= $(RM) -rf
 
 CXXMAKEDEPEND   = $(OMKDEPEND) -D__cplusplus

@@ -37,6 +37,24 @@ AM_PATH_PYTHON
 
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 
+
+dnl ** Cross compilation
+
+if test "$cross_compiling" = yes; then
+  AC_PATH_PROG(OMNIIDL, omniidl, no)
+  if test "x$ac_cv_path_OMNIIDL" = "xno"; then
+    AC_MSG_ERROR(cannot find omniidl on the path)
+  fi
+
+  AC_PATH_PROG(OMKDEPEND, omkdepend, no)
+  if test "x$ac_cv_path_OMKDEPEND" = "xno"; then
+    AC_MSG_ERROR(cannot find omkdepend on the path)
+  fi
+fi
+
+AC_SUBST(CROSS_COMPILING, $cross_compiling)
+
+
 AC_LANG(C++)
 
 dnl OMNI_CHECK_NO_UNIT_AT_A_TIME
