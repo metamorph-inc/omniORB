@@ -1,3 +1,11 @@
+Mon 25 Apr 09:45:51 BST 2016 dgrisby
+====================================
+
+- No longer a need for -bind_at_load on Mac OS X.
+
+mk/beforeauto.mk.in
+
+
 Thu Feb 25 17:38:07 GMT 2016 dgrisby
 ====================================
 

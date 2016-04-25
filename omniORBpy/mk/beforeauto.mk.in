@@ -1060,7 +1060,7 @@ IMPORT_CPPFLAGS += -D__darwin__
 OMNITHREAD_POSIX_CPPFLAGS = -DPthreadDraftVersion=10 \
                             -DPthreadSupportThreadPriority -DNoNanoSleep
 
-CXXOPTIONS = -fno-common -bind_at_load @EXTRA_GCC_CXXFLAGS@
+CXXOPTIONS = -fno-common @EXTRA_GCC_CXXFLAGS@
 SHAREDLIB_SUFFIX = dylib
 
 SharedLibraryFullNameTemplate = lib$$1$$2.$$3.$$4.$(SHAREDLIB_SUFFIX)
@@ -1071,8 +1071,7 @@ SharedLibraryPlatformLinkFlagsTemplate = -dynamiclib \
                                          -flat_namespace \
                                          -undefined suppress
 PythonLibraryPlatformLinkFlagsTemplate = -bundle -flat_namespace \
-                                         -undefined suppress \
-                                         -bind_at_load
+                                         -undefined suppress
 PythonSHAREDLIB_SUFFIX = so
 
 
