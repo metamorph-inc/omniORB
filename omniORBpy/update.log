@@ -1,3 +1,12 @@
+Mon 27 Jun 15:38:50 BST 2016 dgrisby
+====================================
+
+- Interceptors need to use bytes, not string, on Python 3.
+
+modules/omnipy_sysdep.h
+modules/pyInterceptors.cc
+
+
 Mon 25 Apr 09:45:51 BST 2016 dgrisby
 ====================================
 

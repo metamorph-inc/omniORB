@@ -100,11 +100,11 @@ callInterceptorsAndSetContexts(PyObject*                fnlist,
 
 	  PyObject* data = PyTuple_GET_ITEM(sc, 1);
 
-	  if (!String_Check(data))
+	  if (!RawString_Check(data))
 	    OMNIORB_THROW(BAD_PARAM, BAD_PARAM_WrongPythonType, completion);
 
           CORBA::ULong size;
-          const char*  str = String_AS_STRING_AND_SIZE(data, size);
+          const char*  str = RawString_AS_STRING_AND_SIZE(data, size);
 
 	  service_contexts[sci].context_data.length(size);
 
@@ -168,7 +168,7 @@ getContextsAndCallInterceptors(PyObject*                fnlist,
     const char* data = (const char*)service_contexts[i].context_data.NP_data();
     int len = service_contexts[i].context_data.length();
     
-    PyTuple_SET_ITEM(sc, 1, String_FromStringAndSize(data, len));
+    PyTuple_SET_ITEM(sc, 1, RawString_FromStringAndSize(data, len));
     PyTuple_SET_ITEM(sctuple, i, sc);
   }
 
