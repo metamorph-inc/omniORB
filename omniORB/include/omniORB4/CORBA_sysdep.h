@@ -119,7 +119,6 @@ typedef size_t omni_ptr_arith_t;
 
 #if defined(__GNUG__)
 // GNU G++ compiler
-#  define EGCS_WORKAROUND
 #  define NEED_DUMMY_RETURN
 #endif
 

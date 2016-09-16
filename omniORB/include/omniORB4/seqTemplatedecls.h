@@ -287,7 +287,7 @@ public:
     return *this;
   }
 
-  static inline T* allocbuf(_CORBA_ULong nelems) {
+  static inline T* allocbuf(_CORBA_ULong /*nelems*/) {
     return Base_T_seq::allocbuf(max);
   }
 
@@ -1294,7 +1294,7 @@ public:
 
   inline ~_CORBA_Bounded_Sequence_Array() {}
 
-  static inline T* allocbuf(_CORBA_ULong nelems) {
+  static inline T* allocbuf(_CORBA_ULong /*nelems*/) {
     return Base_T_seq::allocbuf(max);
   }
 
@@ -2139,7 +2139,7 @@ public:
     return *this;
   }
 
-  static inline T** allocbuf(_CORBA_ULong nelems) {
+  static inline T** allocbuf(_CORBA_ULong /*nelems*/) {
     return Base_T_seq::allocbuf(max);
   }
 

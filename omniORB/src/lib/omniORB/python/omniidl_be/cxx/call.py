@@ -285,8 +285,12 @@ class CallDescriptor:
         # no contexts, we don't use the call descriptor argument at
         # all, so we do not give it a name, so as to avoid warnings on
         # some compilers.
-        if result_string or impl_args or self.__exceptions or self.__contexts:
+        if result_string or impl_args or self.__contexts:
             cd_arg = " cd"
+
+        elif self.__exceptions:
+            cd_arg = " _OMNIORB_EX_ONLY_CD(cd)"
+
         else:
             cd_arg = ""
 

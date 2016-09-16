@@ -615,7 +615,14 @@ _CORBA_MODULE_BEG
 private:
 #endif
 
-#ifndef HAS_Cplusplus_catch_exception_by_base
+#ifdef HAS_Cplusplus_catch_exception_by_base
+
+#  define _OMNIORB_EX_ONLY_CD(x)
+
+#else
+
+#  define _OMNIORB_EX_ONLY_CD(x) x
+
   // Internal omniORB class.  Used in the stubs to pass
   // user-defined exceptions to a lower level.
 

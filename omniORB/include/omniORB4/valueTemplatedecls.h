@@ -725,7 +725,7 @@ public:
     return *this;
   }
 
-  static inline T** allocbuf(_CORBA_ULong nelems) {
+  static inline T** allocbuf(_CORBA_ULong /*nelems*/) {
     return Base_T_seq::allocbuf(max);
   }
 
