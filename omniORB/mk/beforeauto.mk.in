@@ -191,7 +191,7 @@ unexport SUBDIRS
 
 define CreateDir
 if [ ! -d $$dir ]; then \
-   (umask 002; set -x; $(MKDIRHIER) $$dir); \
+   (umask 022; set -x; $(MKDIRHIER) $$dir); \
 fi
 endef
 
