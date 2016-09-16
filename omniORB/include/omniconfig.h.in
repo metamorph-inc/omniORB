@@ -26,9 +26,8 @@
  * Description:
  *	*** PROPRIETARY INTERFACE ***
  *
- *      omniconfig.h used when using autoconf. Nothing in this file is
- *      replaced by autoconf, but the copying of this file over the
- *      non-autoconf version selects the autoconf setup.
+ *      omniconfig.h used when using autoconf. Copying of this file
+ *      over the non-autoconf version selects the autoconf setup.
  */
 
 #ifndef __omniconfig_h__

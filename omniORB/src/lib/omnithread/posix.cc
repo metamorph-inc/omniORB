@@ -78,10 +78,14 @@
 #include <errno.h>
 #include <time.h>
 #include <omnithread.h>
+#include <omniconfig.h>
 
-#if (defined(__GLIBC__) && __GLIBC__ >= 2) || defined(__SCO_VERSION__) || defined(__aix__) || defined (__cygwin__) || defined(__darwin__) || defined(__macos__)
+#if (defined(HAVE_SYS_TIME_H) || defined(__GLIBC__) && __GLIBC__ >= 2) || defined(__SCO_VERSION__) || defined(__aix__) || defined (__cygwin__) || defined(__darwin__) || defined(__macos__)
 // typedef of struct timeval and gettimeofday();
 #include <sys/time.h>
+#endif
+
+#if (defined(HAVE_UNISTD_H) || defined(__GLIBC__) && __GLIBC__ >= 2) || defined(__SCO_VERSION__) || defined(__aix__) || defined (__cygwin__) || defined(__darwin__) || defined(__macos__)
 #include <unistd.h>
 #endif
 
