@@ -2902,12 +2902,7 @@ omniOrbPOA::synchronise_request(omniLocalIdentity* lid)
   // Check to see if the object has been deactivated while we've been
   // holding. If so, throw a TRANSIENT exception.
 
-  CORBA::Boolean deactivated;
-  pd_lock.lock();
-  deactivated = lid->deactivated();
-  pd_lock.unlock();
-
-  if (deactivated) {
+  if (lid->deactivated()) {
     // We have to do startRequest() here, since the identity
     // will do endInvocation() when we pass through there.
     startRequest();

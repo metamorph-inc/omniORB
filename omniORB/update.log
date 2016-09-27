@@ -1,3 +1,11 @@
+Tue Sep 27 17:52:53 BST 2016 dgrisby
+====================================
+
+- Unnecessary lock leading to deadlock. Thanks Michael Teske.
+
+src/lib/omniORB/orbcore/poa.cc
+
+
 Fri 16 Sep 23:38:25 BST 2016 dgrisby
 ====================================
 
