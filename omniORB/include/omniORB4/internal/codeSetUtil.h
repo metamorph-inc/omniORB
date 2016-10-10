@@ -266,23 +266,29 @@ do { \
       GIOP::Version v = gs->version(); \
       if (v.major == 1 && v.minor == 0) { \
         if (GIOP_S::downcast(&stream)) \
-          OMNIORB_THROW(MARSHAL, MARSHAL_WCharSentByGIOP10Server, \
+          OMNIORB_THROW(MARSHAL, MARSHAL_WCharSentByGIOP10Client, \
                         (CORBA::CompletionStatus)stream.completion()); \
         if (GIOP_C::downcast(&stream)) \
-          OMNIORB_THROW(MARSHAL, MARSHAL_WCharSentByGIOP10Client, \
+          OMNIORB_THROW(MARSHAL, MARSHAL_WCharSentByGIOP10Server, \
                         (CORBA::CompletionStatus)stream.completion()); \
       } \
     } \
-    OMNIORB_THROW(BAD_PARAM,BAD_PARAM_WCharTCSNotKnown, \
-		  (CORBA::CompletionStatus)stream.completion()); \
+    if (GIOP_C::downcast(&stream))                                 \
+      OMNIORB_THROW(INV_OBJREF, INV_OBJREF_WCharNotSupported,      \
+                    (CORBA::CompletionStatus)stream.completion()); \
+    OMNIORB_THROW(BAD_PARAM,BAD_PARAM_WCharTCSNotKnown,            \
+		  (CORBA::CompletionStatus)stream.completion());   \
   } \
 } while(0)
 
 #define OMNIORB_CHECK_TCS_W_FOR_MARSHAL(tcs, stream) \
 do { \
   if (!tcs) { \
-    OMNIORB_THROW(BAD_PARAM,BAD_PARAM_WCharTCSNotKnown, \
-		  (CORBA::CompletionStatus)stream.completion()); \
+    if (GIOP_C::downcast(&stream))                                 \
+      OMNIORB_THROW(INV_OBJREF, INV_OBJREF_WCharNotSupported,      \
+                    (CORBA::CompletionStatus)stream.completion()); \
+    OMNIORB_THROW(BAD_PARAM,BAD_PARAM_WCharTCSNotKnown,            \
+                  (CORBA::CompletionStatus)stream.completion());   \
   } \
 } while(0)
 

@@ -1,3 +1,14 @@
+Mon 10 Oct 23:56:55 BST 2016 dgrisby
+====================================
+
+- New defaultCharCodeSet and defaultWhatCodeSet configuration
+  parameters; always use correct exceptions when codesets are missing.
+
+include/omniORB4/internal/codeSetUtil.h
+include/omniORB4/internal/orbParameters.h
+src/lib/omniORB/orbcore/codeSets.cc
+
+
 Tue Sep 27 17:52:53 BST 2016 dgrisby
 ====================================
 

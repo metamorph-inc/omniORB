@@ -109,6 +109,15 @@ _CORBA_MODULE_VAR _core_attr omniCodeSet::TCS_W* anyWCharCodeSet;
 //  set the preferred code set for wchar data inside anys
 //
 
+_CORBA_MODULE_VAR _core_attr omniCodeSet::TCS_C* defaultCharCodeSet;
+//  set the code set for char data sent to servers that have not specified one
+//
+
+_CORBA_MODULE_VAR _core_attr omniCodeSet::TCS_W* defaultWCharCodeSet;
+//  set the code set for wchar data sent to servers that have not specified one
+//
+
+
 _CORBA_MODULE_VAR _core_attr CORBA::Boolean      lcdMode;
 //  Set to 1 to enable 'Lowest Common Denominator' Mode.
 //  This will disable various features of IIOP and GIOP which are

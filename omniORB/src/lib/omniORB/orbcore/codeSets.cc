@@ -69,6 +69,15 @@ omniCodeSet::TCS_C* orbParameters::anyCharCodeSet = 0;
 
 omniCodeSet::TCS_W* orbParameters::anyWCharCodeSet = 0;
 //  set the preferred code set for wchar data inside anys
+//
+
+omniCodeSet::TCS_C* orbParameters::defaultCharCodeSet = 0;
+//  set the code set for char data sent to servers that have not specified one
+//
+
+omniCodeSet::TCS_W* orbParameters::defaultWCharCodeSet = 0;
+//  set the code set for wchar data sent to servers that have not specified one
+//
 
 
 //
@@ -471,11 +480,9 @@ omniIOR::unmarshal_TAG_CODE_SETS(const IOP::TaggedComponent& c, omniIOR& ior)
       if (tcs_c) break;
     }
   }
-  if (!tcs_c && (info.ForCharData.native_code_set ||
-		 info.ForCharData.conversion_code_sets.length())) {
-    // The server has specified its native code set or at least one
-    // conversion code set. But we cannot a TCS_C for any of these
-    // code set. In this case, we use the fallback code set.
+  if (!tcs_c) {
+    // The server either specified code sets we do not know, or did
+    // not specify any at all. We use the fallback code set.
     tcs_c = omniCodeSet::getTCS_C(omniCodeSet::ID_UTF_8,
 				  ior.getIORInfo()->version());
   }
@@ -496,11 +503,9 @@ omniIOR::unmarshal_TAG_CODE_SETS(const IOP::TaggedComponent& c, omniIOR& ior)
       if (tcs_w) break;
     }
   }
-  if (!tcs_w && (info.ForWcharData.native_code_set ||
-		 info.ForWcharData.conversion_code_sets.length())) {
-    // The server has specified its native code set or at least one
-    // conversion code set. But we cannot a TCS_W for any of these
-    // code set. In this case, we use the fallback code set.
+  if (!tcs_w) {
+    // The server either specified code sets we do not know, or did
+    // not specify any at all. We use the fallback code set.
     tcs_w = omniCodeSet::getTCS_W(omniCodeSet::ID_UTF_16,
 				  ior.getIORInfo()->version());
   }
@@ -565,9 +570,23 @@ setCodeSetServiceContext(omniInterceptors::clientSendRequest_T::info_T& info)
   }
 
   // Get codeset information from the IOR.
-  const omniIOR* ior = info.giop_c.ior();
-  tcs_c = ior->getIORInfo()->TCS_C();
-  tcs_w = ior->getIORInfo()->TCS_W();
+  const omniIOR::IORInfo* ior_info = info.giop_c.ior()->getIORInfo();
+  tcs_c = ior_info->TCS_C();
+  tcs_w = ior_info->TCS_W();
+
+  if (!(tcs_c || tcs_w)) {
+    // The IOR did not specify anything, so according to the CORBA
+    // specification, we should use the default ISO-8859-1 fpr char
+    // and nothing for wchar, as below. We allow the defaults to be
+    // overridden so we can gracefully handle badly behaved servers.
+    tcs_c = orbParameters::defaultCharCodeSet;
+    tcs_w = orbParameters::defaultWCharCodeSet;
+
+    if (omniORB::trace(25) && (tcs_c || tcs_w)) {
+      omniORB::logger log;
+      log << "Use default codesets for server that did not specify any.\n";
+    }
+  }
 
   if (tcs_c || tcs_w) {
     d.tcs_c = tcs_c;
@@ -776,6 +795,76 @@ public:
 static nativeWCharCodeSetHandler nativeWCharCodeSetHandler_;
 
 
+/////////////////////////////////////////////////////////////////////////////
+class defaultCharCodeSetHandler : public orbOptions::Handler {
+public:
+
+  defaultCharCodeSetHandler() : 
+    orbOptions::Handler("defaultCharCodeSet",
+			"defaultCharCodeSet = <code set name, e.g. ISO-8859-1>",
+			1,
+			"-ORBdefaultCharCodeSet <code set name, e.g. ISO-8859-1>") {}
+
+  void visit(const char* value,orbOptions::Source) throw (orbOptions::BadParam) {
+    omniCodeSet::TCS_C* v = omniCodeSet::getTCS_C(value, omniCodeSetUtil::GIOP12);
+    if (!v) {
+      throw orbOptions::BadParam(key(),value,unknown_code_set_msg);
+    }
+    orbParameters::defaultCharCodeSet = v;
+  }
+
+  void dump(orbOptions::sequenceString& result) {
+
+    const char* v;
+    if (orbParameters::defaultCharCodeSet)
+      v = orbParameters::defaultCharCodeSet->name();
+    else
+      v = "nil";
+    orbOptions::addKVString(key(),v,result);
+  }
+};
+
+static defaultCharCodeSetHandler defaultCharCodeSetHandler_;
+
+/////////////////////////////////////////////////////////////////////////////
+class defaultWCharCodeSetHandler : public orbOptions::Handler {
+public:
+
+  defaultWCharCodeSetHandler() : 
+    orbOptions::Handler("defaultWCharCodeSet",
+			"defaultWCharCodeSet = <code set name, e.g. UTF-16>",
+			1,
+			"-ORBdefaultWCharCodeSet <code set name, e.g. UTF-16>") {}
+
+  void visit(const char* value,orbOptions::Source) throw (orbOptions::BadParam) {
+    omniCodeSet::TCS_W* v = omniCodeSet::getTCS_W(value, omniCodeSetUtil::GIOP12);
+    if (!v) {
+      throw orbOptions::BadParam(key(),value,unknown_code_set_msg);
+    }
+    orbParameters::defaultWCharCodeSet = v;
+
+    if (!orbParameters::defaultCharCodeSet) {
+      // If the wchar codeset is selected, we must have a char codeset.
+      orbParameters::defaultCharCodeSet =
+        omniCodeSet::getTCS_C(omniCodeSet::ID_UTF_8, omniCodeSetUtil::GIOP12);
+    }
+  }
+
+  void dump(orbOptions::sequenceString& result) {
+
+    const char* v;
+    if (orbParameters::defaultWCharCodeSet)
+      v = orbParameters::defaultWCharCodeSet->name();
+    else
+      v = "nil";
+    orbOptions::addKVString(key(),v,result);
+  }
+};
+
+static defaultWCharCodeSetHandler defaultWCharCodeSetHandler_;
+
+
+
 //
 // Module initialiser
 //
@@ -828,6 +917,8 @@ public:
   omni_codeSet_initialiser() {
     orbOptions::singleton().registerHandler(nativeCharCodeSetHandler_);
     orbOptions::singleton().registerHandler(nativeWCharCodeSetHandler_);
+    orbOptions::singleton().registerHandler(defaultCharCodeSetHandler_);
+    orbOptions::singleton().registerHandler(defaultWCharCodeSetHandler_);
   }
 
   void attach() {
