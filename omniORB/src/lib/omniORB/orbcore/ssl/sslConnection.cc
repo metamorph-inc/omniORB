@@ -488,7 +488,12 @@ sslConnection::setPeerDetails() {
     else {
       int len = ASN1_STRING_length(asn1_str);
       CORBA::ULong(len+1) >>= stream;
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
       stream.put_octet_array(ASN1_STRING_data(asn1_str), len);
+#else
+      stream.put_octet_array(ASN1_STRING_get0_data(asn1_str), len);
+#endif
       stream.marshalOctet(0);
     }
 

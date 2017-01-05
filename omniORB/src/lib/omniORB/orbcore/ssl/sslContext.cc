@@ -306,13 +306,20 @@ sslContext::set_DH() {
     0x02,
   };
 
-  dh->p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
-  dh->g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
-
-  if (!dh->p || !dh->g) {
+  BIGNUM* p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
+  BIGNUM* g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
+  
+  if (!p || !g) {
     OMNIORB_THROW(INITIALIZE,INITIALIZE_TransportError,CORBA::COMPLETED_NO);
   }
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+  dh->p = p;
+  dh->g = g;
+#else
+  DH_set0_pqg(dh, p, 0, g);
+#endif
+  
   SSL_CTX_set_tmp_dh(pd_ctx, dh);
   DH_free(dh);
 }
