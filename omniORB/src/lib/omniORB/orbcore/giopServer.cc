@@ -741,6 +741,12 @@ giopServer::csRemove(giopConnection* conn)
 	// been temporarily suspended.
 	if (!pd_thread_per_connection &&
 	    pd_nconnections <= orbParameters::threadPerConnectionLowerLimit) {
+
+          if (omniORB::trace(10)) {
+            omniORB::logger log;
+            log << "Switch to thread per connection policy. "
+                << pd_nconnections << " connections.\n";
+          }
 	  pd_thread_per_connection = 1;
 	}
       }
@@ -783,6 +789,12 @@ giopServer::csInsert(giopConnection* conn)
     // turn off the one thread per connection policy temporarily.
     if (pd_thread_per_connection &&
 	pd_nconnections >= orbParameters::threadPerConnectionUpperLimit) {
+
+      if (omniORB::trace(10)) {
+        omniORB::logger log;
+        log << "Switch to thread pool policy (c). "
+            << pd_nconnections << " connections.\n";
+      }
       pd_thread_per_connection = 0;
     }
   }
@@ -817,6 +829,12 @@ giopServer::csInsert(giopStrand* s)
     // turn off the one thread per connection policy temporarily.
     if (pd_thread_per_connection &&
 	pd_nconnections >= orbParameters::threadPerConnectionUpperLimit) {
+
+      if (omniORB::trace(10)) {
+        omniORB::logger log;
+        log << "Switch to thread pool policy (s). "
+            << pd_nconnections << " connections.\n";
+      }
       pd_thread_per_connection = 0;
     }
   }
