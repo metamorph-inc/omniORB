@@ -900,7 +900,10 @@ giopImpl12::unmarshalWildCardRequestHeader(giopStream* g) {
 	l << "Server has closed a bi-directional connection on strand "
 	  << (void*)g->pd_strand << ". Will scavenge it.\n";
       }
-      g->pd_strand->startIdleCounter();
+      {
+	omni_tracedmutex_lock sync(*omniTransportLock);
+	g->pd_strand->startIdleCounter();
+      }
     }
     inputRaiseCommFailure(g, "Orderly connection shutdown");
     break;

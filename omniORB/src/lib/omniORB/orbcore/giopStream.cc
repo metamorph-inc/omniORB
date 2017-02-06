@@ -708,6 +708,20 @@ giopStream::errorOnReceive(int rc, const char* filename, CORBA::ULong lineno,
   pd_strand->state(giopStrand::DYING);
   if (buf) giopStream_Buffer::deleteBuffer(buf);
 
+  if (pd_strand->state() == giopStrand::DYING &&
+      pd_strand->isBiDir() && pd_strand->isClient()) {
+
+    if (omniORB::trace(30)) {
+      omniORB::logger l;
+      l << "Error on client receiving from bi-directional connection on strand "
+	<< (void*)pd_strand << ". Will scavenge it.\n";
+    }
+    {
+      omni_tracedmutex_lock sync(*omniTransportLock);
+      pd_strand->startIdleCounter();
+    }
+  }
+
   CommFailure::_raise(minor,(CORBA::CompletionStatus)completion(),retry,
 		      filename,lineno, message, pd_strand);
   // never reaches here.
@@ -1138,6 +1152,20 @@ giopStream::errorOnSend(int rc, const char* filename, CORBA::ULong lineno,
   }
   else {
     pd_strand->state(giopStrand::DYING);
+  }
+
+  if (pd_strand->state() == giopStrand::DYING &&
+      pd_strand->isBiDir() && pd_strand->isClient()) {
+
+    if (omniORB::trace(30)) {
+      omniORB::logger l;
+      l << "Error on client sending to bi-directional connection on strand "
+	<< (void*)pd_strand << ". Will scavenge it.\n";
+    }
+    {
+      omni_tracedmutex_lock sync(*omniTransportLock);
+      pd_strand->startIdleCounter();
+    }
   }
 
   CommFailure::_raise(minor,(CORBA::CompletionStatus)completion(),retry,

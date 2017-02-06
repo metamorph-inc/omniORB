@@ -694,7 +694,11 @@ Scavenger::execute()
           // message.
           sendCloseConnection(s);
         }
-	s->safeDelete(1);
+	{
+	  omni_optional_lock sync(*omniTransportLock,
+                                  !s->isBiDir(), !s->isBiDir());
+	  s->safeDelete(1);
+	}
       }
     }
 
