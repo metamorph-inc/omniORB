@@ -191,7 +191,7 @@ sslAddress::Connect(const omni_time_t& deadline,
 	  omniORB::logger log;
 	  char buf[128];
 	  ERR_error_string_n(ERR_get_error(),buf,128);
-	  log << "openSSL error connecting to " << pd_address.host
+	  log << "OpenSSL error connecting to " << pd_address.host
 	      << ": " << (const char*) buf << "\n";
 	}
 	SSL_free(ssl);

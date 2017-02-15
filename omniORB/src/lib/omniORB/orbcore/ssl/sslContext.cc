@@ -36,7 +36,6 @@
 #else
 #include <process.h>
 #endif
-#include <sys/stat.h>
 #include <omniORB4/minorCode.h>
 #include <omniORB4/sslContext.h>
 #include <exceptiondefs.h>
@@ -161,6 +160,19 @@ sslContext::set_CA() {
 
   if (!(SSL_CTX_load_verify_locations(pd_ctx, pd_cafile,
                                       certificate_authority_path))) {
+    if (omniORB::trace(1)) {
+      omniORB::logger log;
+      log << "Failed to set CA";
+
+      if (pd_cafile)
+        log << " file '" << pd_cafile << "'";
+
+      if (certificate_authority_path)
+        log << " path '" << certificate_authority_path << "'";
+
+      log << ".\n";
+    }
+      
     report_error();
     OMNIORB_THROW(INITIALIZE,INITIALIZE_TransportError,CORBA::COMPLETED_NO);
   }
@@ -173,18 +185,20 @@ sslContext::set_CA() {
 void
 sslContext::set_certificate() {
   {
-    struct stat buf;
-    if (!pd_keyfile || stat(pd_keyfile,&buf) < 0) {
+    if (!pd_keyfile) {
       if (omniORB::trace(5)) {
 	omniORB::logger log;
-	log << "sslContext certificate file is not set "
-	    << "or cannot be found\n";
+	log << "sslContext certificate file is not set.\n";
       }
       return;
     }
   }
 
   if(!(SSL_CTX_use_certificate_chain_file(pd_ctx, pd_keyfile))) {
+    if (omniORB::trace(1)) {
+      omniORB::logger log;
+      log << "Failed to use certificate file '" << pd_keyfile << "'.\n";
+    }
     report_error();
     OMNIORB_THROW(INITIALIZE,INITIALIZE_TransportError,CORBA::COMPLETED_NO);
   }
@@ -407,7 +421,6 @@ static void report_error() {
     char buf[128];
     ERR_error_string_n(ERR_get_error(),buf,128);
     omniORB::logger log;
-    log << "sslContext.cc : " << (const char*) buf << "\n";
+    log << "OpenSSL: " << (const char*) buf << "\n";
   }
 }
-

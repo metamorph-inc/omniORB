@@ -372,7 +372,7 @@ sslConnection::gatekeeperCheckSpecific(giopStrand* strand)
 	  char buf[128];
 	  ERR_error_string_n(ERR_get_error(), buf, 128);
 	  CORBA::String_var peer = tcpSocket::peerToURI(pd_socket, "giop:ssl");
-	  log << "openSSL error detected in SSL accept from "
+	  log << "OpenSSL error detected in SSL accept from "
 	      << peer << " : " << (const char*) buf << "\n";
 	}
 	go = 0;

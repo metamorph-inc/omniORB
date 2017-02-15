@@ -29,7 +29,6 @@
 // 
 
 #include <omniORB4/CORBA.h>
-#include <sys/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <omniORB4/giopEndpoint.h>
@@ -354,12 +353,6 @@ static sslAcceptTimeOutHandler sslAcceptTimeOutHandler_;
 /////////////////////////////////////////////////////////////////////////
 static sslTransportImpl* _the_sslTransportImpl = 0;
 
-static inline CORBA::Boolean validPath(const char* path)
-{
-  struct stat sb;
-  return (path && stat(path, &sb) == 0);
-}
-
 class omni_sslTransport_initialiser : public omniInitialiser {
 public:
 
@@ -383,13 +376,13 @@ public:
 	log << "No SSL context object supplied. Attempt to create one "
 	    << "with the default constructor.\n";
       }
-      if (!(validPath(sslContext::certificate_authority_file) ||
-            validPath(sslContext::certificate_authority_path))) {
+      if (!(sslContext::certificate_authority_file ||
+            sslContext::certificate_authority_path)) {
 
 	if (omniORB::trace(1)) {
 	  omniORB::logger log;
-	  log << "Warning: SSL CA certificate location is not set "
-	      << "or cannot be found. SSL transport disabled.\n";
+	  log << "Warning: SSL CA certificate location is not set. "
+	      << "SSL transport disabled.\n";
 	}
 	return;
       }
