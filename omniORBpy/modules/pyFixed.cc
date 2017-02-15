@@ -246,6 +246,7 @@ extern "C" {
     case Py_NE: r = cmp != 0; break;
     case Py_GT: r = cmp >  0; break;
     case Py_GE: r = cmp >= 0; break;
+    default:    r = 0;
     };
     
     PyObject* r_o = r ? Py_True : Py_False;
