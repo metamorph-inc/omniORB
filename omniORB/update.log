@@ -1,3 +1,41 @@
+Wed 15 Feb 23:32:12 GMT 2017 dgrisby
+====================================
+
+- Correctly set exit status in init script.
+
+etc/init.d/omniNames.in
+
+- Suppress lots of warnings.
+
+aclocal.m4
+include/omniORB4/internal/poacurrentimpl.h
+src/lib/omniORB/dynamic/valueType.cc
+src/lib/omniORB/orbcore/giopImpl12.cc
+src/lib/omniORB/orbcore/giopStream.cc
+src/tool/omkdepend/cppsetup.c
+src/tool/omkdepend/def.h
+src/tool/omkdepend/ifparser.c
+src/tool/omkdepend/include.c
+src/tool/omkdepend/main.c
+src/tool/omkdepend/parse.c
+src/tool/omkdepend/pr.c
+src/tool/omniidl/cxx/cccp/cccp.c
+src/tool/omniidl/cxx/cccp/cexp.c
+src/tool/omniidl/cxx/cccp/cexp.y.source
+src/tool/omniidl/cxx/cccp/cexp.y
+src/tool/omniidl/cxx/cccp/config.h
+src/tool/omniidl/cxx/dir.mk
+src/tool/omniidl/cxx/idl.ll.source
+src/tool/omniidl/cxx/idl.ll
+src/tool/omniidl/cxx/idl.yy.source
+src/tool/omniidl/cxx/idl.yy
+src/tool/omniidl/cxx/idlast.cc
+src/tool/omniidl/cxx/idldump.cc
+src/tool/omniidl/cxx/lex.yy.cc
+src/tool/omniidl/cxx/y.tab.cc
+src/tool/omniidl/cxx/y.tab.h
+
+
 Mon  6 Feb 18:34:17 GMT 2017 dgrisby
 ====================================
 

@@ -974,6 +974,7 @@ giopStream::inputChunk(CORBA::ULong maxsize)
 			"New message received in the middle of an existing "
 			"message", pd_strand);
     // never reaches here.
+    buf = 0; // avoid compiler warning
   }
   else if (pd_strand->spare) {
     buf = pd_strand->spare;

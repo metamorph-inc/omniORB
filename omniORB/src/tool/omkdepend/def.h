@@ -144,3 +144,51 @@ extern void fatalerr(char *, ...);
 extern void warning(char *, ...);
 extern void warning1(char *, ...);
 #endif
+
+void define(char* def, struct inclist* file);
+void define2(char* name, char* val, struct inclist* file);
+void undefine(char* symbol, struct inclist* file);
+void inc_clean();
+
+int find_includes(struct filepointer *filep,
+                  struct inclist     *file,
+                  struct inclist     *file_red,
+                  int		      recursion,
+                  boolean	      failOK);
+
+void recursive_pr_include(struct inclist *head,
+                          char           *file,
+                          char           *base);
+
+void add_include(struct filepointer *filep,
+                 struct inclist     *file,
+                 struct inclist     *file_red,
+                 char               *include,
+                 boolean             dot,
+                 boolean             failOK);
+
+void included_by(struct inclist	*ip,
+                 struct inclist *newfile);
+
+int gobble(struct filepointer *filep,
+           struct inclist     *file,
+           struct inclist     *file_red);
+
+int match(char  *str,
+          char **list);
+
+int zero_value(char               *exp,
+               struct filepointer *filep,
+               struct inclist     *file_red);
+
+int cppsetup(char                    *line,
+             struct filepointer      *filep,
+             struct inclist *inc);
+
+int freefile(struct filepointer	*fp);
+
+int deftype(char               *line,
+            struct filepointer *filep,
+            struct inclist     *file_red,
+            struct inclist     *file,
+            int                 parse_it);

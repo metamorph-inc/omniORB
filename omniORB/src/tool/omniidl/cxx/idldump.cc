@@ -266,8 +266,15 @@ visitConst(Const* c)
     printf("\"");
     break;
 #ifdef HAS_LongLong
+
+#  if defined(SIZEOF_LONG) && (SIZEOF_LONG == 8)
+  case IdlType::tk_longlong:  printf("%ld", c->constAsLongLong());     break;
+  case IdlType::tk_ulonglong: printf("%lu", c->constAsULongLong());    break;
+#  else
   case IdlType::tk_longlong:  printf("%Ld", c->constAsLongLong());     break;
   case IdlType::tk_ulonglong: printf("%Lu", c->constAsULongLong());    break;
+#  endif
+
 #endif
 #ifdef HAS_LongDouble
   case IdlType::tk_longdouble:printlongdouble(c->constAsLongDouble()); break;
@@ -410,8 +417,15 @@ visitCaseLabel(CaseLabel* l)
     printf("'");
     break;
 #ifdef HAS_LongLong
+
+#  if defined(SIZEOF_LONG) && (SIZEOF_LONG == 8)
+  case IdlType::tk_longlong:  printf("%ld", l->labelAsLongLong());  break;
+  case IdlType::tk_ulonglong: printf("%lu", l->labelAsULongLong()); break;
+#  else
   case IdlType::tk_longlong:  printf("%Ld", l->labelAsLongLong());  break;
   case IdlType::tk_ulonglong: printf("%Lu", l->labelAsULongLong()); break;
+#  endif
+
 #endif
   case IdlType::tk_wchar:     printf("'\\u%hx", l->labelAsWChar()); break;
   case IdlType::tk_enum: l->labelAsEnumerator()->accept(*this);     break;

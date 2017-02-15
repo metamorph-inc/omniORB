@@ -51,7 +51,7 @@ idlc = $(patsubst %,$(BinPattern),idlc)
 # 	mv -f y.tab.c y.tab.cc
 
 # lex.yy.cc: $(LLSRC) y.tab.h
-# 	$(FLEX) $< | sed -e 's/^#include <unistd.h>//' > $@
+# 	$(FLEX) $< | sed -e 's/^#include <unistd.h>//' -e 's/<stdout>/lex.yy.cc/' > $@
 # 	echo '#ifdef __VMS' >> $@
 # 	echo '// Some versions of DEC C++ for OpenVMS set the module name used by the' >> $@
 # 	echo '// librarian based on the last #line encountered.' >> $@

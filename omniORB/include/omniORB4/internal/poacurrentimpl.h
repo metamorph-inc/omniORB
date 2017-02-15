@@ -92,8 +92,10 @@ public:
       pd_old_cd  = pd_current->callDescriptor();
       pd_current->setCallDescriptor(desc);
     }
-    else
+    else {
       pd_current = 0;
+      pd_old_cd  = 0;
+    }
   }
   inline ~poaCurrentStackInsert()
   {

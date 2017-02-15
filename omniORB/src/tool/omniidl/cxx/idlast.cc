@@ -1018,7 +1018,7 @@ kindAsString() const
 {
   if (alias_)     return "typedef declarator";
   if (attribute_) return "attribute declarator";
-                  return "declarator";
+  return "declarator";
 }
 
 void
@@ -1641,7 +1641,7 @@ Union::
 // come up with a default label value. Loops are O(n^2), but n will
 // usually be quite small. ***
 #define UNION_SWITCH(lt, op, defstart, islastdef, nextdef) { \
-  lt label; \
+  lt label = defstart; \
   for (c = cases; c; c = (UnionCase*)c->next()) { \
     for (l = c->labels(); l; l = (CaseLabel*)l->next()) { \
       l->setType(t); \

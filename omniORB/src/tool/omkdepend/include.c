@@ -38,6 +38,44 @@ extern boolean warn_multiple;
 
 void remove_dotdot(char* path);
 
+int isdot(p)
+	register char	*p;
+{
+	if(p && *p++ == '.' && *p++ == '\0')
+		return(TRUE);
+	return(FALSE);
+}
+
+int isdotdot(p)
+	register char	*p;
+{
+	if(p && *p++ == '.' && *p++ == '.' && *p++ == '\0')
+		return(TRUE);
+	return(FALSE);
+}
+
+int issymbolic(dir, component)
+	register char	*dir, *component;
+{
+#ifdef S_IFLNK
+	struct stat	st;
+	char	buf[ BUFSIZ ], **pp;
+
+	sprintf(buf, "%s%s%s", dir, *dir ? "/" : "", component);
+	for (pp=notdotdot; *pp; pp++)
+		if (strcmp(*pp, buf) == 0)
+			return (TRUE);
+	if (lstat(buf, &st) == 0
+	&& (st.st_mode & S_IFMT) == S_IFLNK) {
+		*pp++ = copy(buf);
+		if (pp >= &notdotdot[ MAXDIRS ])
+			fatalerr("out of .. dirs, increase MAXDIRS\n");
+		return(TRUE);
+	}
+#endif
+	return(FALSE);
+}
+
 
 struct inclist *inc_path(file, include, dot)
 	register char	*file,
@@ -198,44 +236,6 @@ void remove_dotdot(path)
 	strcpy(path, newpath);
 }
 
-isdot(p)
-	register char	*p;
-{
-	if(p && *p++ == '.' && *p++ == '\0')
-		return(TRUE);
-	return(FALSE);
-}
-
-isdotdot(p)
-	register char	*p;
-{
-	if(p && *p++ == '.' && *p++ == '.' && *p++ == '\0')
-		return(TRUE);
-	return(FALSE);
-}
-
-issymbolic(dir, component)
-	register char	*dir, *component;
-{
-#ifdef S_IFLNK
-	struct stat	st;
-	char	buf[ BUFSIZ ], **pp;
-
-	sprintf(buf, "%s%s%s", dir, *dir ? "/" : "", component);
-	for (pp=notdotdot; *pp; pp++)
-		if (strcmp(*pp, buf) == 0)
-			return (TRUE);
-	if (lstat(buf, &st) == 0
-	&& (st.st_mode & S_IFMT) == S_IFLNK) {
-		*pp++ = copy(buf);
-		if (pp >= &notdotdot[ MAXDIRS ])
-			fatalerr("out of .. dirs, increase MAXDIRS\n");
-		return(TRUE);
-	}
-#endif
-	return(FALSE);
-}
-
 /*
  * Add an include file to the list of those included by 'file'.
  */
@@ -263,7 +263,7 @@ struct inclist *newinclude(newfile, incstring)
 void included_by(ip, newfile)
 	register struct inclist	*ip, *newfile;
 {
-	register i;
+	register int i;
 
 	if (ip == NULL)
 		return;

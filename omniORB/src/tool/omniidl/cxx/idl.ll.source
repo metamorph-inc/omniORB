@@ -3,7 +3,7 @@
 // idl.ll                   Created on: 1999/10/05
 //			    Author    : Duncan Grisby (dpg1)
 //
-//    Copyright (C) 2003-2005 Apasphere Ltd
+//    Copyright (C) 2003-2017 Apasphere Ltd
 //    Copyright (C) 1999      AT&T Laboratories Cambridge
 //
 //  This file is part of omniidl.
@@ -19,90 +19,11 @@
 //  General Public License for more details.
 //
 //  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-//  02111-1307, USA.
+//  along with this program.  If not, see http://www.gnu.org/licenses/
 //
 // Description:
 //   
 //   Flex lexical analyser
-
-// $Id$
-// $Log$
-// Revision 1.13.2.2  2005/01/06 23:11:14  dgrisby
-// Big merge from omni4_0_develop.
-//
-// Revision 1.13.2.1  2003/03/23 21:01:48  dgrisby
-// Start of omniORB 4.1.x development branch.
-//
-// Revision 1.9.2.8  2001/10/22 10:48:22  dpg1
-// Cope with DOS line endings in all IDL situations.
-//
-// Revision 1.9.2.7  2001/10/17 16:48:32  dpg1
-// Minor error message tweaks
-//
-// Revision 1.9.2.6  2001/06/13 11:28:20  dpg1
-// Proper omniidl support for wchar/wstring constants.
-//
-// Revision 1.9.2.5  2001/03/13 10:32:10  dpg1
-// Fixed point support.
-//
-// Revision 1.9.2.4  2000/11/01 12:45:55  dpg1
-// Update to CORBA 2.4 specification.
-//
-// Revision 1.9.2.3  2000/10/27 16:31:07  dpg1
-// Clean up of omniidl dependencies and types, from omni3_develop.
-//
-// Revision 1.9.2.2  2000/10/10 10:18:50  dpg1
-// Update omniidl front-end from omni3_develop.
-//
-// Revision 1.7.2.8  2000/08/07 15:34:35  dpg1
-// Partial back-port of long long from omni3_1_develop.
-//
-// Revision 1.7.2.7  2000/06/09 11:20:47  dpg1
-// Last fix put __omni_pragma line numbers off by one...
-//
-// Revision 1.7.2.6  2000/06/08 14:58:19  dpg1
-// Line numbers for #pragmas and // comments were off by one
-//
-// Revision 1.7.2.5  2000/06/08 14:36:19  dpg1
-// Comments and pragmas are now objects rather than plain strings, so
-// they can have file,line associated with them.
-//
-// Revision 1.7.2.4  2000/06/05 18:12:25  dpg1
-// Support for __omni_pragma
-//
-// Revision 1.7.2.3  2000/04/26 09:55:48  dpg1
-// cccp escapes characters like \ in line directives, so
-// parseLineDirective() needs to use escapedStringToString().
-//
-// Revision 1.7.2.2  2000/03/06 15:03:49  dpg1
-// Minor bug fixes to omniidl. New -nf and -k flags.
-//
-// Revision 1.7.2.1  2000/02/16 16:30:54  dpg1
-// #pragma ID was misspelled #pragma id. Oops.
-//
-// Revision 1.7  2000/02/04 12:17:10  dpg1
-// Support for VMS.
-//
-// Revision 1.6  1999/12/28 17:44:01  dpg1
-// Stupid string allocation bug.
-//
-// Revision 1.5  1999/11/19 16:03:40  dpg1
-// Flex scanner now accepts \r as whitespace.
-//
-// Revision 1.4  1999/11/05 10:36:42  dpg1
-// Sorted out isatty() problems.
-//
-// Revision 1.3  1999/11/02 17:07:28  dpg1
-// Changes to compile on Solaris.
-//
-// Revision 1.2  1999/11/01 10:05:00  dpg1
-// New file attribute to AST.
-//
-// Revision 1.1  1999/10/27 14:06:00  dpg1
-// *** empty log message ***
-//
 
 #define YY_NEVER_INTERACTIVE 1
 
@@ -133,6 +54,12 @@ IDL_UShort escapeToWChar(char* s);
 char* escapedStringToString(char* s);
 IDL_UShort* escapedStringToWString(char* s);
 void parseLineDirective(char* s);
+
+// We never run on a tty
+int not_isatty(int fd) {
+   return 0;
+}
+#define isatty not_isatty
 
 %}
 

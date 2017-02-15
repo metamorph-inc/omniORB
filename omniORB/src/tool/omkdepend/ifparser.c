@@ -59,6 +59,8 @@
 
 #include "ifparser.h"
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
 
 /****************************************************************************
 		   Internal Macros and Utilities for Parser

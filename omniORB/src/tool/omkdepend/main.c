@@ -56,6 +56,8 @@ in this Software without prior written authorization from the X Consortium.
 int	_debugmask;
 #endif
 
+int freefile(struct filepointer *fp);
+
 char *ProgramName;
 
 char	*directives[] = {
@@ -123,7 +125,7 @@ catch (sig)
 struct sigaction sig_act;
 #endif /* USGISH */
 
-main(argc, argv)
+int main(argc, argv)
 	int	argc;
 	char	**argv;
 {
@@ -308,7 +310,7 @@ main(argc, argv)
 		default:
 			if (endmarker) break;
 	/*		fatalerr("unknown opt = %s\n", argv[0]); */
-			warning("ignoring option %s\n", argv[0]);
+			/* warning("ignoring option %s\n", argv[0]); */
 		}
 	}
 	if (!defincdir) {
@@ -438,7 +440,7 @@ struct filepointer *getfile(file)
 	return(content);
 }
 
-freefile(fp)
+int freefile(fp)
 	struct filepointer	*fp;
 {
 	free(fp->f_base);
@@ -455,7 +457,7 @@ char *copy(str)
 	return(p);
 }
 
-match(str, list)
+int match(str, list)
 	register char	*str, **list;
 {
 	register int	i;
@@ -476,7 +478,7 @@ char *get_line(filep)
 	register char	*p,	/* walking pointer */
 			*eof,	/* end of file pointer */
 			*bol;	/* beginning of line pointer */
-	register	lineno;	/* line number */
+	register int	lineno;	/* line number */
 
 	p = filep->f_p;
 	eof = filep->f_end;

@@ -31,11 +31,7 @@ in this Software without prior written authorization from the X Consortium.
 extern char	*directives[];
 extern struct inclist	maininclist;
 
-void define(char* def, struct inclist* file);
-void define2(char* name, char* val, struct inclist* file);
-void undefine(char* symbol, struct inclist* file);
-
-find_includes(filep, file, file_red, recursion, failOK)
+int find_includes(filep, file, file_red, recursion, failOK)
 	struct filepointer	*filep;
 	struct inclist		*file, *file_red;
 	int			recursion;
@@ -163,7 +159,7 @@ find_includes(filep, file, file_red, recursion, failOK)
 	return(-1);
 }
 
-gobble(filep, file, file_red)
+int gobble(filep, file, file_red)
 	register struct filepointer *filep;
 	struct inclist		*file, *file_red;
 {
@@ -410,7 +406,7 @@ struct symtab *fdefined(symbol, file, srcfile)
 /*
  * Return type based on if the #if expression evaluates to 0
  */
-zero_value(exp, filep, file_red)
+int zero_value(exp, filep, file_red)
 	register char	*exp;
 	register struct filepointer *filep;
 	register struct inclist *file_red;

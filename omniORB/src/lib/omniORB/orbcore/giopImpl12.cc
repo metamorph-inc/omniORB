@@ -173,6 +173,7 @@ giopImpl12::inputQueueMessage(giopStream* g, giopStream_Buffer* b) {
     inputTerminalProtocolError(g, __FILE__, __LINE__,
 			       "Received a MessageError message");
     // never reach here
+    reqid = 0; // avoid compiler warning
   }
   else if (g->pd_strand->isClient() || g->pd_strand->isBiDir()) {
     // orderly shutdown.
@@ -189,11 +190,13 @@ giopImpl12::inputQueueMessage(giopStream* g, giopStream_Buffer* b) {
 				    "Orderly connection shutdown",
 				    g->pd_strand);
     // never reach here
+    reqid = 0; // avoid compiler warning
   }
   else {
     giopStream_Buffer::deleteBuffer(b);
     inputTerminalProtocolError(g, __FILE__, __LINE__,
 			       "Orderly connection shutdown on server");
+    reqid = 0; // avoid compiler warning
     // never reach here
   }
 
@@ -1788,8 +1791,8 @@ giopImpl12::sendLocateReply(giopStream* g,GIOP::LocateStatusType rc,
     break;
   }
 
-  int repoid_size;
-  const char* repoid;
+  int         repoid_size = 0;
+  const char* repoid      = 0;
   
   // Compute and initialise the message size field
   {
