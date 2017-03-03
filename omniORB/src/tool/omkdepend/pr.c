@@ -41,12 +41,12 @@ extern boolean	show_where_not;
 void pr(struct inclist* ip, char* file, char* base);
 
 
-void add_include(filep, file, file_red, include, dot, failOK)
-	struct filepointer	*filep;
-	struct inclist	*file, *file_red;
-	char	*include;
-	boolean	dot;
-        boolean failOK;
+void add_include(struct filepointer *filep,
+                 struct inclist     *file,
+                 struct inclist     *file_red,
+                 char               *include,
+                 boolean             dot,
+                 boolean             failOK)
 {
 	register struct inclist	*newfile;
 	register struct filepointer	*content;

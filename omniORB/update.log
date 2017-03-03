@@ -1,3 +1,15 @@
+Fri  3 Mar 22:44:16 GMT 2017
+============================
+
+- More warning suppression.
+
+src/tool/omkdepend/parse.c
+src/tool/omkdepend/pr.c
+src/tool/omniidl/cxx/cccp/cccp.c
+src/tool/omniidl/cxx/cccp/cexp.c
+src/tool/omniidl/cxx/cccp/cexp.y.source
+
+
 Fri  3 Mar 22:21:43 GMT 2017
 ============================
 

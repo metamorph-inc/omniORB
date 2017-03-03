@@ -31,17 +31,17 @@ in this Software without prior written authorization from the X Consortium.
 extern char	*directives[];
 extern struct inclist	maininclist;
 
-int find_includes(filep, file, file_red, recursion, failOK)
-	struct filepointer	*filep;
-	struct inclist		*file, *file_red;
-	int			recursion;
-	boolean			failOK;
+int find_includes(struct filepointer *filep,
+                  struct inclist     *file,
+                  struct inclist     *file_red,
+                  int		      recursion,
+                  boolean	      failOK)
 {
 	register char	*line;
 	register int	type;
 	boolean recfailOK;
 
-	while (line = get_line(filep)) {
+	while ((line = get_line(filep))) {
 		switch(type = deftype(line, filep, file_red, file, TRUE)) {
 		case IF:
 		doif:
@@ -166,7 +166,7 @@ int gobble(filep, file, file_red)
 	register char	*line;
 	register int	type;
 
-	while (line = get_line(filep)) {
+	while ((line = get_line(filep))) {
 		switch(type = deftype(line, filep, file_red, file, FALSE)) {
 		case IF:
 		case IFFALSE:
@@ -363,12 +363,12 @@ struct symtab *isdefined(symbol, file, srcfile)
 {
 	register struct symtab	*val;
 
-	if (val = slookup(symbol, &maininclist)) {
+	if ((val = slookup(symbol, &maininclist))) {
 		debug(1,("%s defined on command line\n", symbol));
 		if (srcfile != NULL) *srcfile = &maininclist;
 		return(val);
 	}
-	if (val = fdefined(symbol, file, srcfile))
+	if ((val = fdefined(symbol, file, srcfile)))
 		return(val);
 	debug(1,("%s not defined in %s\n", symbol, file->i_file));
 	return(NULL);
@@ -387,12 +387,12 @@ struct symtab *fdefined(symbol, file, srcfile)
 	if (file->i_defchecked)
 		return(NULL);
 	file->i_defchecked = TRUE;
-	if (val = slookup(symbol, file))
+	if ((val = slookup(symbol, file)))
 		debug(1,("%s defined in %s as %s\n", symbol, file->i_file, val->s_value));
 	if (val == NULL && file->i_list)
 		{
 		for (ip = file->i_list, i=0; i < file->i_listlen; i++, ip++)
-			if (val = fdefined(symbol, *ip, srcfile)) {
+                  if ((val = fdefined(symbol, *ip, srcfile))) {
 				break;
 			}
 		}

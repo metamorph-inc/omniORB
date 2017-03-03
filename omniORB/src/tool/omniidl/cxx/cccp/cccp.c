@@ -8974,8 +8974,12 @@ vwarning_with_line (line, msg, args)
       break;
     }
 
-  if (ip != NULL)
-    fprintf (stderr, line ? "%s:%d: " : "%s: ", ip->nominal_fname, line);
+  if (ip != NULL) {
+    if (line)
+      fprintf (stderr, "%s:%d: ", ip->nominal_fname, line);
+    else
+      fprintf (stderr, "%s: ", ip->nominal_fname);
+  }
   fprintf (stderr, "warning: ");
   vfprintf (stderr, msg, args);
   fprintf (stderr, "\n");
