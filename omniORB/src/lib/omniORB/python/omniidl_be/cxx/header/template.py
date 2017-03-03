@@ -1553,11 +1553,11 @@ public:
   @tie_name@(_omniT& t)
     : pd_obj(&t), pd_poa(0), pd_rel(0) {}
   @tie_name@(_omniT& t, ::PortableServer::POA_ptr p)
-    : pd_obj(&t), pd_poa(p), pd_rel(0) {}
+    : pd_obj(&t), pd_poa(::PortableServer::POA::_duplicate(p)), pd_rel(0) {}
   @tie_name@(_omniT* t, _CORBA_Boolean r=1)
     : pd_obj(t), pd_poa(0), pd_rel(r) {}
   @tie_name@(_omniT* t, ::PortableServer::POA_ptr p,_CORBA_Boolean r=1)
-    : pd_obj(t), pd_poa(p), pd_rel(r) {}
+    : pd_obj(t), pd_poa(::PortableServer::POA::_duplicate(p)), pd_rel(r) {}
   ~@tie_name@() {
     if (pd_poa)  ::CORBA::release(pd_poa);
     if (pd_rel)  delete pd_obj;

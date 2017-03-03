@@ -1,3 +1,12 @@
+Fri  3 Mar 22:21:43 GMT 2017
+============================
+
+- Correctly duplicate POA reference in tie class. Thanks Daniel Krügler.
+
+src/lib/omniORB/python/omniidl_be/cxx/header/template.py
+src/lib/omniORB/python3/omniidl_be/cxx/header/template.py
+
+
 Mon 20 Feb 22:43:15 GMT 2017 dgrisby
 ====================================
 
@@ -81,7 +90,7 @@ src/lib/omniORB/orbcore/ssl/sslContext.cc
 Mon 10 Oct 23:56:55 BST 2016 dgrisby
 ====================================
 
-- New defaultCharCodeSet and defaultWhatCodeSet configuration
+- New defaultCharCodeSet and defaultWCharCodeSet configuration
   parameters; always use correct exceptions when codesets are missing.
 
 include/omniORB4/internal/codeSetUtil.h
