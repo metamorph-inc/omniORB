@@ -447,6 +447,10 @@ omniIOR::unmarshal_TAG_CSI_SEC_MECH_LIST(const IOP::TaggedComponent& c,
   CORBA::ULong mech_count;
   mech_count <<= e;
 
+  if (mech_count > c.component_data.length())
+    OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                  CORBA::COMPLETED_NO);
+
   for (CORBA::ULong mech_idx = 0; mech_idx != mech_count; ++mech_idx) {
     CORBA::UShort target_requires;
 
