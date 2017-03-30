@@ -624,6 +624,8 @@ giopServer::deactivate()
       l << "Wait for " << pd_n_temporary_workers << " temporary worker"
 	<< plural(pd_n_temporary_workers) << "...\n";
     }
+
+    omni_thread::get_time(&s, &ns, timeout);
     int go = 1;
     while (go && pd_n_temporary_workers) {
       go = pd_cond.timedwait(s, ns);

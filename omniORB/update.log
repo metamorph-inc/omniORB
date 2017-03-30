@@ -1,3 +1,21 @@
+Thu 30 Mar 14:51:58 BST 2017
+============================
+
+- Miscellaneous minor fixes based on Coverity testing.
+
+include/omniORB4/minorCode.h
+src/appl/utils/genior/genior.cc
+src/lib/omniORB/dynamic/tcParser.cc
+src/lib/omniORB/dynamic/typecode.cc
+src/lib/omniORB/orbcore/codeSets.cc
+src/lib/omniORB/orbcore/cs-16bit.cc
+src/lib/omniORB/orbcore/giopServer.cc
+src/lib/omniORB/orbcore/ior.cc
+src/lib/omniORB/orbcore/omniObjRef.cc
+src/tool/omniidl/cxx/idldump.cc
+src/tool/omniidl/cxx/idlpython.cc
+
+
 Fri  3 Mar 22:44:16 GMT 2017
 ============================
 

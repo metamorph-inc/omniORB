@@ -167,6 +167,7 @@ OMNI_NAMESPACE_BEGIN(omni)
 #define OMNIORBMinorCode_128 OMNIORBMinorCode(128)
 #define OMNIORBMinorCode_129 OMNIORBMinorCode(129)
 #define OMNIORBMinorCode_130 OMNIORBMinorCode(130)
+#define OMNIORBMinorCode_131 OMNIORBMinorCode(131)
 
 #define OMNI_COMMA ,
 #define DeclareValue(name,value) name = value
@@ -256,7 +257,8 @@ code( BAD_PARAM_SequenceIsTooLong            , OMNIORBMinorCode_101 ) sep \
 code( BAD_PARAM_WrongUnionMemberSelected     , OMNIORBMinorCode_107 ) sep \
 code( BAD_PARAM_InvalidFixedPointLimits      , OMNIORBMinorCode_109 ) sep \
 code( BAD_PARAM_AttemptToMarshalAbstractValue, OMNIORBMinorCode_115 ) sep \
-code( BAD_PARAM_InvalidPollerType            , OMNIORBMinorCode_127 )
+code( BAD_PARAM_InvalidPollerType            , OMNIORBMinorCode_127 ) sep \
+code( BAD_PARAM_PerThreadTimeoutWithNoCurrent, OMNIORBMinorCode_131 )
 
 enum BAD_PARAM_minor {
   DECLARE_BAD_PARAM_minors(DeclareValue,OMNI_COMMA)

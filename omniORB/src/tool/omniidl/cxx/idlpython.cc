@@ -447,9 +447,11 @@ visitConst(Const* c)
 
   case IdlType::tk_fixed:
     {
-      char* fs = c->constAsFixed()->asString();
-      pyv = PyString_FromString(fs);
+      IDL_Fixed* fv = c->constAsFixed();
+      char*      fs = fv->asString();
+      pyv           = PyString_FromString(fs);
       delete [] fs;
+      delete    fv;
     }
     break;
 

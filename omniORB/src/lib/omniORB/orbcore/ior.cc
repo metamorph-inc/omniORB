@@ -311,6 +311,10 @@ IIOP::unmarshalObjectKey(const IOP::TaggedProfile& profile,
 
   len <<= s; // Get object key length
 
+  if (len > profile.profile_data.length())
+    OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                  CORBA::COMPLETED_NO);
+
   if (s.readOnly()) {
     CORBA::Octet* p = (CORBA::Octet*)((omni::ptr_arith_t)s.bufPtr() +
 				      s.currentInputPtr());
@@ -471,6 +475,11 @@ omniIOR::unmarshal_TAG_CSI_SEC_MECH_LIST(const IOP::TaggedComponent& c,
     sas_target_supports <<= e;
     sas_target_requires <<= e;
     sas_privilege_authorities_len <<= e;
+
+    if (sas_privilege_authorities_len > transport_mech.component_data.length())
+      OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                    CORBA::COMPLETED_NO);
+
     for (CORBA::ULong pi = 0; pi != sas_privilege_authorities_len; ++pi) {
       CORBA::ULong syntax;
       _CORBA_Unbounded_Sequence_Octet name;
@@ -497,6 +506,10 @@ omniIOR::unmarshal_TAG_CSI_SEC_MECH_LIST(const IOP::TaggedComponent& c,
       tls_target_requires <<= tls_e;
       addresses_len <<= tls_e;
 
+      if (addresses_len > transport_mech.component_data.length())
+        OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                      CORBA::COMPLETED_NO);
+      
       for (CORBA::ULong ai = 0; ai != addresses_len; ++ai) {
 	IIOP::Address ssladdr;
 

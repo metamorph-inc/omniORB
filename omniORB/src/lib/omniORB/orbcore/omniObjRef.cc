@@ -186,12 +186,15 @@ omniObjRef::_realNarrow(const char* repoId)
       {
 	omni_tracedmutex_lock sync(*omni::internalLock);
 	objref = omni::createObjRef(repoId,ior,1,_identity());
-	objref->pd_flags.forward_location = pd_flags.forward_location;
-	objref->pd_flags.type_verified = 1;
-	objref->pd_flags.object_exists = 1;
+
+        if (objref) {
+          objref->pd_flags.forward_location = pd_flags.forward_location;
+          objref->pd_flags.type_verified    = 1;
+          objref->pd_flags.object_exists    = 1;
+        }
       }
 
-      if( objref ) {
+      if (objref) {
 	target = objref->_ptrToObjRef(repoId);
 	OMNIORB_ASSERT(target);
       }
@@ -830,14 +833,20 @@ AsyncRequest::execute()
     log << "Asynchronous invoke '" << pd_callDescriptor->op() << "'...\n";
   }
 
-  if (pd_threadTimeout) {
-    if (pd_timeoutAbsolute)
-      omniCurrent::get()->setDeadline(pd_threadTimeout);
-    else
-      omniCurrent::get()->setTimeout(pd_threadTimeout);
-  }
-
   try {
+    if (pd_threadTimeout) {
+      omniCurrent* current = omniCurrent::get();
+
+      if (!current)
+        OMNIORB_THROW(BAD_PARAM, BAD_PARAM_PerThreadTimeoutWithNoCurrent,
+                      CORBA::COMPLETED_NO);
+
+      if (pd_timeoutAbsolute)
+        current->setDeadline(pd_threadTimeout);
+      else
+        current->setTimeout(pd_threadTimeout);
+    }
+
     pd_objref->_invoke(*pd_callDescriptor);
 
     if (omniORB::trace(25)) {

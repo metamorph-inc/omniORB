@@ -574,7 +574,7 @@ setCodeSetServiceContext(omniInterceptors::clientSendRequest_T::info_T& info)
 
   if (!(tcs_c || tcs_w)) {
     // The IOR did not specify anything, so according to the CORBA
-    // specification, we should use the default ISO-8859-1 fpr char
+    // specification, we should use the default ISO-8859-1 for char
     // and nothing for wchar, as below. We allow the defaults to be
     // overridden so we can gracefully handle badly behaved servers.
     tcs_c = orbParameters::defaultCharCodeSet;
@@ -586,7 +586,7 @@ setCodeSetServiceContext(omniInterceptors::clientSendRequest_T::info_T& info)
     }
   }
 
-  if (tcs_c || tcs_w) {
+  if (tcs_c) {
     d.tcs_c = tcs_c;
     d.tcs_w = tcs_w;
     d.version = ver;

@@ -282,9 +282,11 @@ visitConst(Const* c)
 
   case IdlType::tk_fixed:
     {
-      char* fs = c->constAsFixed()->asString();
+      IDL_Fixed* fv = c->constAsFixed();
+      char*      fs = fv->asString();
       printf("%sd", fs);
       delete [] fs;
+      delete    fv;
     }
     break;
 

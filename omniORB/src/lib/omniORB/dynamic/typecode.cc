@@ -2487,6 +2487,10 @@ TypeCode_struct::NP_unmarshalComplexParams(cdrStream& s,
     _ptr->pd_name   = s.unmarshalRawString();
     _ptr->pd_nmembers <<= s;
 
+    if (!s.checkInputOverrun(1, _ptr->pd_nmembers))
+      OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                    (CORBA::CompletionStatus)s.completion());
+    
     // We need to initialised the members of <pd_members> to zero
     // to ensure we can destroy this properly in the case of an
     // exception being thrown.
@@ -2919,6 +2923,10 @@ TypeCode_except::NP_unmarshalComplexParams(cdrStream& s,
     _ptr->pd_name   = s.unmarshalRawString();
     _ptr->pd_nmembers <<= s;
 
+    if (!s.checkInputOverrun(1, _ptr->pd_nmembers))
+      OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                    (CORBA::CompletionStatus)s.completion());
+    
     // We need to initialised the members of <pd_members> to zero
     // to ensure we can destroy this properly in the case of an
     // exception being thrown.
@@ -3315,6 +3323,10 @@ TypeCode_enum::NP_unmarshalComplexParams(cdrStream &s,
   CORBA::ULong len;
   len <<= s;
 
+  if (!s.checkInputOverrun(1, len))
+    OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                  (CORBA::CompletionStatus)s.completion());
+  
   _ptr->pd_members.length(len);
   char** buffer = _ptr->pd_members.get_buffer(0);
 
@@ -3632,6 +3644,10 @@ TypeCode_union::NP_unmarshalComplexParams(cdrStream &s,
   CORBA::ULong memberCount;
   memberCount <<= s;
 
+  if (!s.checkInputOverrun(1, memberCount))
+    OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                  (CORBA::CompletionStatus)s.completion());
+  
   _ptr->pd_members.length(memberCount);
 
   // Read in the different labels, names and types
@@ -4141,6 +4157,10 @@ TypeCode_value::NP_unmarshalComplexParams(cdrStream& s,
     }
     _ptr->pd_nmembers <<= s;
 
+    if (!s.checkInputOverrun(1, _ptr->pd_nmembers))
+      OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                    (CORBA::CompletionStatus)s.completion());
+    
     // We need to initialise the members of <pd_members> to zero
     // to ensure we can destroy this properly in the case of an
     // exception being thrown.

@@ -4,7 +4,7 @@
 //                            Author1   : James Weatherall (jnw)
 //                            Author2   : David Riddoch (djr)
 //
-//    Copyright (C) 2002-2008 Apasphere Ltd
+//    Copyright (C) 2002-2017 Apasphere Ltd
 //    Copyright (C) 1996-1999 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORB library
@@ -196,6 +196,10 @@ inline void fastCopyUsingTC(TypeCode_base* tc, cdrStream& ibuf, cdrStream& obuf)
 	    CORBA::ULong length; length <<= ibuf; length >>= obuf;
 	    if( !length )  break;
 
+            if (!ibuf.checkInputOverrun(1, length))
+              OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                            (CORBA::CompletionStatus)ibuf.completion());
+            
 	    TypeCode_base* elem_tc = tc->NP_content_type();
 	    elem_tc = TypeCode_indirect::strip(elem_tc);
 	    const TypeCode_alignTable& eat = elem_tc->alignmentTable();
@@ -479,7 +483,12 @@ void copyUsingTC(TypeCode_base* tc, cdrStream& ibuf, cdrStream& obuf)
     case CORBA::tk_sequence:
       {
 	CORBA::ULong max; max <<= ibuf; max >>= obuf;
-	TypeCode_base* tctmp = tc->NP_content_type();
+
+        if (!ibuf.checkInputOverrun(1, max))
+          OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                        (CORBA::CompletionStatus)ibuf.completion());
+
+        TypeCode_base* tctmp = tc->NP_content_type();
 
 	for (CORBA::ULong i=0; i < max; i++)
 	  copyUsingTC(tctmp, ibuf, obuf);
@@ -630,6 +639,10 @@ void skipUsingTC(TypeCode_base* tc, cdrStream& buf)
 	    CORBA::ULong length; length <<= buf;
 	    if( !length )  break;
 
+            if (!buf.checkInputOverrun(1, length))
+              OMNIORB_THROW(MARSHAL, MARSHAL_PassEndOfMessage,
+                            (CORBA::CompletionStatus)buf.completion());
+            
 	    TypeCode_base* elem_tc = tc->NP_content_type();
 	    elem_tc = TypeCode_indirect::strip(elem_tc);
 	    const TypeCode_alignTable& eat = elem_tc->alignmentTable();

@@ -285,7 +285,7 @@ omniCodeSet::TCS_W_16bit::unmarshalWString(cdrStream& stream,
 
   for (i=0; i < len; i++) {
     tc <<= stream;
-    uc = pd_toU[(tc & 0xff00) >> 16][tc & 0x00ff];
+    uc = pd_toU[(tc & 0xff00) >> 8][tc & 0x00ff];
     if (tc && !uc) OMNIORB_THROW(DATA_CONVERSION, 
 				 DATA_CONVERSION_CannotMapChar,
 				 (CORBA::CompletionStatus)stream.completion());

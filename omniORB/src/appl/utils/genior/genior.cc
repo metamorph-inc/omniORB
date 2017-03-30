@@ -263,6 +263,7 @@ genRef(const char* IRTypeId, const char* hostname, int port,
 	  hi = ((curr - 'a' + 10) << 4);
 	else {
 	  cerr << "Hexadecimal key is corrupted." << endl;
+          delete keySeed;
 	  return 0;
 	}
 	curr = tolower(objKey[j+1]);
@@ -286,7 +287,9 @@ genRef(const char* IRTypeId, const char* hostname, int port,
   
   CORBA::String_var result;
   result = omniObjRef::_toString(objref);
-  
+
+  delete keySeed;
+
   return result._retn();
 }  
   
