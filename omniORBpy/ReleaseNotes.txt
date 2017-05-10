@@ -1,10 +1,18 @@
 RELEASE NOTES
 =============
 
-This is omniORBpy 4.2.1.
+This is omniORBpy 4.2.2.
 
 See README.txt for building instructions.
 See the documentation in the doc directory for more information.
+
+
+Changes since omniORB 4.2.1
+---------------------------
+
+omniORB 4.2.2 is primarily a bug fix release. See update.log for full
+details of changes. The main omniORBpy highlight is better support for
+Python 3. For other new features, see the omniORB release notes.
 
 
 Changes since omniORB 4.2.0

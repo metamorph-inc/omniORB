@@ -1,6 +1,6 @@
 READ ME FIRST!
 
-This is omniORB 4.2.1
+This is omniORB 4.2.2
 
 omniORB is copyright Apasphere Ltd, AT&T Laboratories Cambridge and
 others. It is free software. The programs in omniORB are distributed
@@ -22,7 +22,8 @@ README.win32.txt - contains important information on building and
                    using omniORB on Windows NT and Windows 95.
 
 README.unix.txt  - contains important information on building and
-                   using omniORB on Unix / Linux platforms.
+                   using omniORB on Unix / Linux platforms, including
+                   cross-compilation
 
 Other readmes live the the readmes/ subdirectory. See if there is one
 for your platform.

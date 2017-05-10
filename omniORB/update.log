@@ -1,3 +1,48 @@
+Thu 11 May 00:50:17 BST 2017
+============================
+
+- Updates for 4.2.2.
+
+README.FIRST.txt
+README.unix.txt
+ReleaseChecklist.txt
+ReleaseNotes.txt
+THIS_IS_OMNIORB_4_2_1
+THIS_IS_OMNIORB_4_2_2
+configure.ac
+configure
+contrib/RPMs/omniORB.spec
+contrib/RPMs/omniORB_new.spec
+doc/omniORB.pdf
+doc/omniORB/index.html
+doc/omniORB/omniORB.html
+doc/omniORB/omniORB001.html
+doc/omniORB/omniORB002.html
+doc/omniORB/omniORB003.html
+doc/omniORB/omniORB004.html
+doc/omniORB/omniORB005.html
+doc/omniORB/omniORB006.html
+doc/omniORB/omniORB007.html
+doc/omniORB/omniORB008.html
+doc/omniORB/omniORB009.html
+doc/omniORB/omniORB010.html
+doc/omniORB/omniORB011.html
+doc/omniORB/omniORB012.html
+doc/omniORB/omniORB013.html
+doc/omniORB/omniORB014.html
+doc/omniORB/omniORB015.html
+doc/omniORB/omniORB016.html
+doc/tex/cover.tex
+doc/tex/ode.tex
+doc/tex/omniORB.tex
+doc/tex/omniURLDefs.hva
+doc/tex/omniURLDefs.sty
+doc/tex/omniidl.tex
+mk/version.mk
+sample.cfg
+update.log
+
+
 Thu 30 Mar 14:51:58 BST 2017
 ============================
 

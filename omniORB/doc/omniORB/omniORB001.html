@@ -1,35 +1,37 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
-<HTML>
-<HEAD>
-
-<META http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<META name="GENERATOR" content="hevea 1.10">
-<LINK rel="stylesheet" type="text/css" href="omniORB.css">
-<TITLE>Introduction</TITLE>
-</HEAD>
-<BODY >
-<A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
-<A HREF="omniORB002.html"><IMG SRC="next_motif.gif" ALT="Next"></A>
-<HR>
-<H1 CLASS="chapter"><A NAME="htoc1">Chapter&#XA0;1</A>&#XA0;&#XA0;Introduction</H1><P>omniORB is an Object Request Broker (ORB) that implements version 2.6
+<!DOCTYPE html>
+<html >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="generator" content="hevea 2.29">
+<link rel="stylesheet" type="text/css" href="omniORB.css">
+<title>Introduction</title>
+</head>
+<body >
+<a href="index.html"><img src="contents_motif.gif" alt="Up"></a>
+<a href="omniORB002.html"><img src="next_motif.gif" alt="Next"></a>
+<hr>
+<h1 id="sec1" class="chapter">Chapter&#XA0;1&#XA0;&#XA0;Introduction</h1>
+<p>omniORB is an Object Request Broker (ORB) that implements version 2.6
 of the Common Object Request Broker Architecture
-(CORBA)&#XA0;[<A HREF="omniORB016.html#corba26-spec">OMG01</A>] specification. Where possible, backward
+(CORBA)&#XA0;[<a href="omniORB016.html#corba26-spec">OMG01</a>] specification. Where possible, backward
 compatibility has been maintained back to specification 2.0. It passed
 the Open Group CORBA compliant testsuite (for CORBA 2.1) and was one
-of the three ORBs to be granted the CORBA brand in June
-1999<SUP><A NAME="text1" HREF="#note1">1</A></SUP>.</P><P>This user guide tells you how to use omniORB to develop CORBA
-applications. It assumes a basic understanding of CORBA.</P><P>In this chapter, we give an overview of the main features of omniORB
-and what you need to do to set up your environment to run omniORB.</P><H2 CLASS="section"><A NAME="toc1"></A><A NAME="htoc2">1.1</A>&#XA0;&#XA0;Features</H2><P>omniORB is quite feature-rich, but it does not slavishly implement
+of the three ORBs to be granted the CORBA brand in June 1999.</p><p>This user guide tells you how to use omniORB to develop CORBA
+applications. It assumes a basic understanding of CORBA.</p><p>In this chapter, we give an overview of the main features of omniORB
+and what you need to do to set up your environment to run omniORB.</p>
+<h2 id="sec2" class="section">1.1&#XA0;&#XA0;Features</h2>
+<p>omniORB is quite feature-rich, but it does not slavishly implement
 every last part of the CORBA specification. The goal is to provide the
 most generally useful parts of the specification in a clean and
-efficient manner. Highlights are:</P><UL CLASS="itemize"><LI CLASS="li-itemize">C++ and Python language bindings.</LI><LI CLASS="li-itemize">Support for the complete Portable Object Adapter (POA) specification.</LI><LI CLASS="li-itemize">Support for the Interoperable Naming Service (INS).</LI><LI CLASS="li-itemize">Internet Inter-ORB Protocol (IIOP 1.2) is used as the native
-protocol.</LI><LI CLASS="li-itemize">The omniORB runtime is fully multithreaded. It uses platform
+efficient manner. Highlights are:</p><ul class="itemize"><li class="li-itemize">C++ and Python language bindings.</li><li class="li-itemize">Support for the complete Portable Object Adapter (POA) specification.</li><li class="li-itemize">Support for the Interoperable Naming Service (INS).</li><li class="li-itemize">Internet Inter-ORB Protocol (IIOP 1.2) is used as the native
+protocol.</li><li class="li-itemize">The omniORB runtime is fully multithreaded. It uses platform
 thread support encapsulated with a small class library, omnithread,
-to abstract away from differences in native thread APIs.</LI><LI CLASS="li-itemize">TypeCode and type Any are supported.</LI><LI CLASS="li-itemize">DynAny is supported.</LI><LI CLASS="li-itemize">The Dynamic Invocation and Dynamic Skeleton interfaces are supported.</LI><LI CLASS="li-itemize">Valuetype and abstract interfaces are supported.</LI><LI CLASS="li-itemize">Asynchronous Method Invocation (AMI) supported, including both
-polling and callback models.</LI><LI CLASS="li-itemize">Extensive control over connection management.</LI><LI CLASS="li-itemize">Soft real-time features including call deadlines and timeouts.</LI><LI CLASS="li-itemize">A COS Naming Service, omniNames.</LI><LI CLASS="li-itemize">Many platforms are supported, including most Unix platforms and
-Windows.</LI><LI CLASS="li-itemize">It has been successfully tested for interoperability via IIOP with
-other ORBs.</LI></UL><H3 CLASS="subsection"><A NAME="htoc3">1.1.1</A>&#XA0;&#XA0;Multithreading</H3><P>omniORB is fully multithreaded. To achieve low call overhead,
+to abstract away from differences in native thread APIs.</li><li class="li-itemize">TypeCode and type Any are supported.</li><li class="li-itemize">DynAny is supported.</li><li class="li-itemize">The Dynamic Invocation and Dynamic Skeleton interfaces are supported.</li><li class="li-itemize">Valuetype and abstract interfaces are supported.</li><li class="li-itemize">Asynchronous Method Invocation (AMI) supported, including both
+polling and callback models.</li><li class="li-itemize">Extensive control over connection management.</li><li class="li-itemize">Soft real-time features including call deadlines and timeouts.</li><li class="li-itemize">A COS Naming Service, omniNames.</li><li class="li-itemize">Many platforms are supported, including most Unix platforms and
+Windows.</li><li class="li-itemize">It has been successfully tested for interoperability via IIOP with
+other ORBs.</li></ul>
+<h3 id="sec3" class="subsection">1.1.1&#XA0;&#XA0;Multithreading</h3>
+<p>omniORB is fully multithreaded. To achieve low call overhead,
 unnecessary call multiplexing is eliminated. With the default
 policies, there is at most one call in-flight in each communication
 channel between two address spaces at any one time. To do this without
@@ -42,108 +44,113 @@ call. Furthermore, to maximise the throughput in processing large call
 arguments, large data elements are sent as soon as they are processed
 while the other arguments are being marshalled. With GIOP 1.2, large
 messages are fragmented, so the marshaller can start transmission
-before it knows how large the entire message will be.</P><P>omniORB also supports a flexible thread pool policy, and supports
+before it knows how large the entire message will be.</p><p>omniORB also supports a flexible thread pool policy, and supports
 sending multiple interleaved calls on a single connection. This policy
 leads to a small amount of additional call overhead, compared to the
 default thread per connection model, but allows omniORB to scale to
-extremely large numbers of concurrent clients.</P><H3 CLASS="subsection"><A NAME="htoc4">1.1.2</A>&#XA0;&#XA0;Portability</H3><P>omniORB runs on many flavours of Unix, Windows, several embedded
+extremely large numbers of concurrent clients.</p>
+<h3 id="sec4" class="subsection">1.1.2&#XA0;&#XA0;Portability</h3>
+<p>omniORB runs on many flavours of Unix, Windows, several embedded
 operating systems, and relatively obscure systems such as OpenVMS and
 Fujitsu-Siemens BS2000. It is designed to be easy to port to new
 platforms. The IDL to C++ mapping for all target platforms is the
-same.</P><P>omniORB uses real C++ exceptions and nested classes. It keeps to the
+same.</p><p>omniORB uses real C++ exceptions and nested classes. It keeps to the
 CORBA specification&#X2019;s standard mapping as much as possible and does
 not use the alternative mappings for C++ dialects. The only small
 exception is the mapping of IDL modules, which can use either
 namespaces according to the standard, or nested classes for truly
-ancient C++ compilers without namespace support.</P><P>omniORB relies on native thread libraries to provide multithreading
-capability. A small class library (omnithread&#XA0;[<A HREF="omniORB016.html#tjr96a">Ric96</A>]) is used
+ancient C++ compilers without namespace support.</p><p>omniORB relies on native thread libraries to provide multithreading
+capability. A small class library (omnithread&#XA0;[<a href="omniORB016.html#tjr96a">Ric96</a>]) is used
 to encapsulate the APIs of the native thread libraries. In application
 code, it is recommended but not mandatory to use this class library
 for thread management. It should be easy to port omnithread to any
 platform that either supports the POSIX thread standard or has a
-thread package that supports similar capabilities.</P><P>Partly for historical reasons, and partly to support users with
-archaic compilers, omniORB does not use the C++ standard library.</P><P>The omniORB IDL compiler, omniidl, requires Python 2.5, 2.6 or 2.7.</P><H3 CLASS="subsection"><A NAME="htoc5">1.1.3</A>&#XA0;&#XA0;Missing features</H3><P>
-<A NAME="sec:missing"></A></P><P>omniORB is not a complete implementation of the CORBA 2.6 core. The
-following is a list of the most significant missing features.</P><UL CLASS="itemize"><LI CLASS="li-itemize">omniORB does not have its own Interface Repository. However, it
+thread package that supports similar capabilities.</p><p>Partly for historical reasons, and partly to support users with
+archaic compilers, omniORB does not use the C++ standard library.</p><p>The omniORB IDL compiler, omniidl, requires Python 2.5, 2.6 or 2.7.</p>
+<h3 id="sec5" class="subsection">1.1.3&#XA0;&#XA0;Missing features</h3>
+<p>
+<a id="sec:missing"></a></p><p>omniORB is not a complete implementation of the CORBA 2.6 core. The
+following is a list of the most significant missing features.</p><ul class="itemize"><li class="li-itemize">omniORB does not have its own Interface Repository. However, it
 can act as a client to an IfR. The omniifr project
-(<A HREF="http://omniifr.sourceforge.net/"><TT>http://omniifr.sourceforge.net/</TT></A>) aims to create an IfR for
-omniORB.</LI><LI CLASS="li-itemize">omniORB supports interceptors, but not the standard Portable
-Interceptor API.</LI></UL><H2 CLASS="section"><A NAME="toc2"></A><A NAME="htoc6">1.2</A>&#XA0;&#XA0;Setting up your environment</H2><P>
-<A NAME="sec:setup"></A></P><P>To get omniORB running, you first need to install omniORB according to
+(<a href="http://omniifr.sourceforge.net/"><span style="font-family:monospace">http://omniifr.sourceforge.net/</span></a>) aims to create an IfR for
+omniORB.</li><li class="li-itemize">omniORB supports interceptors, but not the standard Portable
+Interceptor API.</li></ul>
+<h2 id="sec6" class="section">1.2&#XA0;&#XA0;Setting up your environment</h2>
+<p>
+<a id="sec:setup"></a></p><p>To get omniORB running, you first need to install omniORB according to
 the instructions in the installation notes for your platform. See
-<TT>README.FIRST.txt</TT> at the top of the omniORB tree for
+<span style="font-family:monospace">README.FIRST.txt</span> at the top of the omniORB tree for
 instructions. Most Unix platforms can use the Autoconf
-<TT>configure</TT> script to automate the configuration process.</P><P>Once omniORB is installed in a suitable location, you must configure
+<span style="font-family:monospace">configure</span> script to automate the configuration process.</p><p>Once omniORB is installed in a suitable location, you must configure
 it according to your required setup. The configuration can be set with
 a configuration file, environment variables, command-line arguments
-or, on Windows, the Windows registry.</P><UL CLASS="itemize"><LI CLASS="li-itemize">On Unix platforms, the omniORB runtime looks for the environment
-variable <TT>OMNIORB_CONFIG</TT>. If this variable is defined, it
+or, on Windows, the Windows registry.</p><ul class="itemize"><li class="li-itemize">On Unix platforms, the omniORB runtime looks for the environment
+variable <span style="font-family:monospace">OMNIORB_CONFIG</span>. If this variable is defined, it
 contains the pathname of the omniORB configuration file. If the
 variable is not set, omniORB will use the compiled-in pathname to
-locate the file (by default <TT>/etc/omniORB.cfg</TT>).</LI><LI CLASS="li-itemize">On Win32 / Win64 platforms, omniORB first checks the environment
-variable <TT>OMNIORB_CONFIG</TT> to obtain the pathname of the
+locate the file (by default <span style="font-family:monospace">/etc/omniORB.cfg</span>).</li><li class="li-itemize">On Win32 / Win64 platforms, omniORB first checks the environment
+variable <span style="font-family:monospace">OMNIORB_CONFIG</span> to obtain the pathname of the
 configuration file. If this is not set, it then attempts to obtain
 configuration data in the system registry. It searches for the data
-under the key <TT>HKEY_LOCAL_MACHINE\SOFTWARE\omniORB</TT>.</LI></UL><P>omniORB has a large number of parameters than can be configured. See
-chapter&#XA0;<A HREF="omniORB004.html#chap:config">4</A> for full details. The files
-<TT>sample.cfg</TT> and <TT>sample.reg</TT> contain an example
-configuration file and set of registry entries respectively.</P><P>To get all the omniORB examples running, the main thing you need to
+under the key <span style="font-family:monospace">HKEY_LOCAL_MACHINE\SOFTWARE\omniORB</span>.</li></ul><p>omniORB has a large number of parameters than can be configured. See
+chapter&#XA0;<a href="omniORB004.html#chap%3Aconfig">4</a> for full details. The files
+<span style="font-family:monospace">sample.cfg</span> and <span style="font-family:monospace">sample.reg</span> contain an example
+configuration file and set of registry entries respectively.</p><p>To get all the omniORB examples running, the main thing you need to
 configure is the Naming service, omniNames. To do that, the
-configuration file or registry should contain an entry of the form</P><PRE CLASS="verbatim">  InitRef = NameService=corbaname::my.host.name
-</PRE><P>See section&#XA0;<A HREF="omniORB007.html#sec:corbaname">7.1.4</A> for full details of
-corbaname URIs.</P><H2 CLASS="section"><A NAME="toc3"></A><A NAME="htoc7">1.3</A>&#XA0;&#XA0;Platform specific variables</H2><P>To compile omniORB programs correctly, several C++ preprocessor
-defines <EM>must</EM> be specified to identify the target platform. On
+configuration file or registry should contain an entry of the form</p><pre class="verbatim">  InitRef = NameService=corbaname::my.host.name
+</pre><p>See section&#XA0;<a href="omniORB007.html#sec%3Acorbaname">7.1.4</a> for full details of
+corbaname URIs.</p>
+<h2 id="sec7" class="section">1.3&#XA0;&#XA0;Platform specific variables</h2>
+<p>To compile omniORB programs correctly, several C++ preprocessor
+defines <em>must</em> be specified to identify the target platform. On
 Unix platforms where omniORB was configured with Autoconf, the
-<TT>omniconfig.h</TT> file sets these for you. On other platforms, and
+<span style="font-family:monospace">omniconfig.h</span> file sets these for you. On other platforms, and
 Unix platforms when Autoconf is not used, you must specify the
-following defines:</P><DIV CLASS="flushleft">
-<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=1><TR><TD ALIGN=left NOWRAP>Platform</TD><TD ALIGN=left NOWRAP>CPP defines</TD></TR>
-<TR><TD ALIGN=left NOWRAP>Windows</TD><TD ALIGN=left NOWRAP><CODE>__x86__     __NT__       __OSVERSION__=4  __WIN32__</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-Windows NT 3.5</TD><TD ALIGN=left NOWRAP><CODE>__x86__     __NT__       __OSVERSION__=3  __WIN32__</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-Sun Solaris 2.5</TD><TD ALIGN=left NOWRAP><CODE>__sparc__   __sunos__    __OSVERSION__=5</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-HPUX 10.x</TD><TD ALIGN=left NOWRAP><CODE>__hppa__    __hpux__     __OSVERSION__=10</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-HPUX 11.x</TD><TD ALIGN=left NOWRAP><CODE>__hppa__    __hpux__     __OSVERSION__=11</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-IBM AIX 4.x</TD><TD ALIGN=left NOWRAP><CODE>__aix__     __powerpc__  __OSVERSION__=4</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-Digital Unix 3.2</TD><TD ALIGN=left NOWRAP><CODE>__alpha__   __osf1__     __OSVERSION__=3</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-Linux 2.x (x86)</TD><TD ALIGN=left NOWRAP><CODE>__x86__     __linux__    __OSVERSION__=2</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-Linux 2.x (powerpc)</TD><TD ALIGN=left NOWRAP><CODE>__powerpc__ __linux__    __OSVERSION__=2</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-OpenVMS 6.x (alpha)</TD><TD ALIGN=left NOWRAP><CODE>__alpha__   __vms        __OSVERSION__=6 </CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-OpenVMS 6.x (vax)</TD><TD ALIGN=left NOWRAP><CODE>__vax__     __vms        __OSVERSION__=6 </CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-SGI Irix 6.x</TD><TD ALIGN=left NOWRAP><CODE>__mips__    __irix__     __OSVERSION__=6 </CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-Reliant Unix 5.43</TD><TD ALIGN=left NOWRAP><CODE>__mips__    __SINIX__    __OSVERSION__=5 </CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-ATMos 4.0</TD><TD ALIGN=left NOWRAP><CODE>__arm__     __atmos__    __OSVERSION__=4</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-NextStep 3.x</TD><TD ALIGN=left NOWRAP><CODE>__m68k__    __nextstep__ __OSVERSION__=3</CODE></TD></TR>
-<TR><TD ALIGN=left NOWRAP>
-Unixware 7</TD><TD ALIGN=left NOWRAP><CODE>__x86__     __uw7__      __OSVERSION__=5</CODE></TD></TR>
-</TABLE>
-</DIV><P>The preprocessor defines for new platform ports not listed above can
+following defines:</p><div class="flushleft">
+<table border=1  style="border-spacing:0;" class="cellpadding1"><tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >Platform</td><td style="text-align:left;border:solid 1px;white-space:nowrap" >CPP defines </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >Windows</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__x86__     __NT__       __OSVERSION__=4  __WIN32__</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+Windows NT 3.5</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__x86__     __NT__       __OSVERSION__=3  __WIN32__</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+Sun Solaris 2.5</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__sparc__   __sunos__    __OSVERSION__=5</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+HPUX 10.x</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__hppa__    __hpux__     __OSVERSION__=10</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+HPUX 11.x</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__hppa__    __hpux__     __OSVERSION__=11</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+IBM AIX 4.x</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__aix__     __powerpc__  __OSVERSION__=4</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+Digital Unix 3.2</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__alpha__   __osf1__     __OSVERSION__=3</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+Linux 2.x (x86)</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__x86__     __linux__    __OSVERSION__=2</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+Linux 2.x (powerpc)</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__powerpc__ __linux__    __OSVERSION__=2</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+OpenVMS 6.x (alpha)</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__alpha__   __vms        __OSVERSION__=6 </code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+OpenVMS 6.x (vax)</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__vax__     __vms        __OSVERSION__=6 </code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+SGI Irix 6.x</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__mips__    __irix__     __OSVERSION__=6 </code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+Reliant Unix 5.43</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__mips__    __SINIX__    __OSVERSION__=5 </code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+ATMos 4.0</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__arm__     __atmos__    __OSVERSION__=4</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+NextStep 3.x</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__m68k__    __nextstep__ __OSVERSION__=3</code> </td></tr>
+<tr><td style="text-align:left;border:solid 1px;white-space:nowrap" >
+Unixware 7</td><td style="text-align:left;border:solid 1px;white-space:nowrap" ><code>__x86__     __uw7__      __OSVERSION__=5</code> </td></tr>
+</table>
+</div><p>The preprocessor defines for new platform ports not listed above can
 be found in the corresponding platform configuration files. For
 instance, the platform configuration file for Sun Solaris 2.6 is in
-<TT>mk/platforms/sun4_sosV_5.6.mk</TT>. The preprocessor defines to
+<span style="font-family:monospace">mk/platforms/sun4_sosV_5.6.mk</span>. The preprocessor defines to
 identify a platform are in the make variable
-<TT>IMPORT_CPPFLAGS</TT>.</P><P>In a single source multi-target environment, you can put the
+<span style="font-family:monospace">IMPORT_CPPFLAGS</span>.</p><p>In a single source multi-target environment, you can put the
 preprocessor defines as the command-line arguments for the compiler.
 If you are building for a single platform, you can edit
-include/omniconfig.h to add the definitions.</P><HR CLASS="footnoterule"><DL CLASS="thefootnotes"><DT CLASS="dt-thefootnotes">
-<A NAME="note1" HREF="#text1">1</A></DT><DD CLASS="dd-thefootnotes">More information can be found at
-<A HREF="http://www.opengroup.org/press/7jun99_b.htm"><TT>http://www.opengroup.org/press/7jun99_b.htm</TT></A>
-</DD></DL>
-<HR>
-<A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
-<A HREF="omniORB002.html"><IMG SRC="next_motif.gif" ALT="Next"></A>
-</BODY>
-</HTML>
+include/omniconfig.h to add the definitions.</p>
+<hr>
+<a href="index.html"><img src="contents_motif.gif" alt="Up"></a>
+<a href="omniORB002.html"><img src="next_motif.gif" alt="Next"></a>
+</body>
+</html>

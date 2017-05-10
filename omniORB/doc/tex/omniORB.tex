@@ -61,20 +61,7 @@
  {\end{itemize}}
 
 % URL-like things:
-\usepackage[T1]{url}
-\newcommand{\email}{\begingroup \urlstyle{sf}\Url}
-\newcommand{\file}{\begingroup \urlstyle{tt}\Url}
-\newcommand{\envvar}{\begingroup \urlstyle{tt}\Url}
-\newcommand{\makevar}{\begingroup \urlstyle{tt}\Url}
-\newcommand{\corbauri}{\begingroup \urlstyle{tt}\Url}
-%BEGIN LATEX
-\newcommand{\weburl}{\begingroup \urlstyle{sf}\Url}
-%END LATEX
-%HEVEA\def\weburl{\begingroup%
-%HEVEA\def\UrlLeft##1\UrlRight{\ahrefurl{##1}}%
-%HEVEA\urlstyle{tt}%
-%HEVEA\Url}
-
+\usepackage{omniURLDefs}
 
 % Mark-up for configuration options
 \newcommand{\confopt}[2]
@@ -217,9 +204,7 @@ of the Common Object Request Broker Architecture
 (CORBA)~\cite{corba26-spec} specification. Where possible, backward
 compatibility has been maintained back to specification 2.0. It passed
 the Open Group CORBA compliant testsuite (for CORBA 2.1) and was one
-of the three ORBs to be granted the CORBA brand in June
-1999\footnote{More information can be found at
-\weburl{http://www.opengroup.org/press/7jun99_b.htm}}.
+of the three ORBs to be granted the CORBA brand in June 1999.
 
 This user guide tells you how to use omniORB to develop CORBA
 applications. It assumes a basic understanding of CORBA.
@@ -1904,6 +1889,20 @@ The native code set the application is using for \type{char} and
 
 The native code set the application is using for \type{wchar} and
 \type{wstring}. See chapter~\ref{chap:codesets}.
+
+
+\confopt{defaultCharCodeSet}{\textit{none}}
+
+The default code set used for \type{char} and \type{string} if the
+server does not specify it in its IORs. See
+chapter~\ref{chap:codesets}.
+
+
+\confopt{defaultWCharCodeSet}{\textit{none}}
+
+The default code set used for \type{wchar} and \type{wstring} if the
+server does not specify it in its IORs. See
+chapter~\ref{chap:codesets}.
 
 
 \confopt{copyValuesInLocalCalls}{1}
@@ -4631,6 +4630,41 @@ select characters outside the first plane without having to use UTF-16
 surrogates\footnote{If you have no idea what this means, don't
 worry---you're better off not knowing unless you \emph{really} have
 to.}.
+
+
+\section{Default code sets}
+
+The way code set conversion is meant to work in CORBA communication is
+that each client and server has a \term{native} code set that it uses
+for character data in application code, and supports a number of
+\term{transmission} code sets that is uses for communication. When a
+client connects to a server, the client picks one of the server's
+transmission code sets to use for the interaction. For that to work,
+the client plainly has to know the server's supported transmission
+code sets.
+
+Code set information from servers is embedded in IORs. A client with
+an IOR from a server should therefore know what transmission code sets
+the server supports. This approach can fail for two reasons:
+
+\begin{enumerate}
+  \item A \corbauri{corbaloc} URI (see chapter~\ref{chap:ins}) does
+    not contain any code set information.
+
+  \item Some badly-behaved servers that do support code set conversion
+    fail to put codeset information in their IORs.
+\end{enumerate}
+
+The CORBA standard says that if a server has not specified
+transmission code set information, clients must assume that they only
+support ISO-8859-1 for char and string, and do not support wchar and
+wstring at all. The effect is that client code receives
+\code{DATA\_CONVERSION} or \code{BAD\_PARAM} exceptions.
+
+To avoid this issue, omniORB allows you to configure \term{default}
+code sets that are used as a server's transmission code sets if they
+are not otherwise known. Set \code{defaultCharCodeSet} for char and
+string data, and \code{defaultWCharCodeSet} for wchar and wstring data.
 
 
 \section{Code set library}

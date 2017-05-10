@@ -1,3 +1,39 @@
+Thu 11 May 00:50:17 BST 2017
+============================
+
+- Updates for 4.2.2.
+
+README.txt
+ReleaseNotes.txt
+THIS_IS_OMNIORBPY_4_2_1
+THIS_IS_OMNIORBPY_4_2_2
+configure.ac
+configure
+contrib/RPMs/omniORBpy.spec
+contrib/RPMs/omniORBpy_new.spec
+doc/omniORBpy.pdf
+doc/omniORBpy/index.html
+doc/omniORBpy/omniORBpy.html
+doc/omniORBpy/omniORBpy001.html
+doc/omniORBpy/omniORBpy002.html
+doc/omniORBpy/omniORBpy003.html
+doc/omniORBpy/omniORBpy004.html
+doc/omniORBpy/omniORBpy005.html
+doc/omniORBpy/omniORBpy006.html
+doc/omniORBpy/omniORBpy007.html
+doc/omniORBpy/omniORBpy008.html
+doc/omniORBpy/omniORBpy009.html
+doc/omniORBpy/omniORBpy010.html
+doc/omniORBpy/omniORBpy011.html
+doc/omniORBpy/omniORBpy012.html
+doc/omniORBpy/omniORBpy013.html
+doc/tex/omniORBpy.tex
+doc/tex/omniURLDefs.hva
+doc/tex/omniURLDefs.sty
+mk/version.mk
+update.log
+
+
 Mon 20 Feb 22:43:15 GMT 2017 dgrisby
 ====================================
 

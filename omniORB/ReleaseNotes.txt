@@ -1,10 +1,25 @@
 RELEASE NOTES
 =============
 
-This is omniORB 4.2.1
+This is omniORB 4.2.2
 
 See README.unix.txt or README.win32.txt for building instructions.
 See the documentation in the doc directory for more information.
+
+
+Changes since omniORB 4.2.1
+---------------------------
+
+omniORB 4.2.2 is primarily a bug fix release. See update.log for full
+details of changes. Highlights include:
+
+ - Support for cross-compilation using the configure script.
+
+ - New defaultCharCodeSet and defaultWCharCodeSet configuration
+   parameters to handle code set conversion with corbaloc URIs and
+   badly-behaved servers.
+
+ - Suppression of many compiler warnings.
 
 
 Changes since omniORB 4.2.0

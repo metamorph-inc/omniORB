@@ -124,6 +124,41 @@ Once omniORB is configured, build it with "make", then install it with
 "make install". You must use GNU make.
 
 
+Cross-compilation
+=================
+
+The configure script and make files support cross-compilation. The
+normal build makes various tools that are used later in the build, in
+particular omniidl. When cross-compiling, the tools must already be
+available for your native platform. To cross-compile, use these steps:
+
+ 1. configure, build and install omniORB for your native platform. As
+    recommended above, use a build subdirectory rather than building
+    in the source tree.
+
+    Make a note of the first few lines output by the configure script
+    that tell you the build system type. For example
+    "x86_64-unknown-linux-gnu".
+
+ 2. Add the ${prefix}/bin directory to your PATH so omniidl and other
+    tools are available.
+
+ 3. In a new build directory (e.g. build-cross), run the configure
+    script with arguments for cross-compiling. e.g. to compile on an
+    x86-64 Linux machine, cross-compiling for ARM:
+
+    cd build-cross
+    ../configure CC=cross-cc CXX=cross-cxx \
+                 --prefix=/home/example/cross-inst
+                 --build=x86_64-unknown-linux-gnu \
+                 --host=arm-unknown-linux-gnu
+
+    The essential part to trigger a cross compile is to specify both
+    --build and --host.
+
+ 4. Run make as usual.
+
+
 Configuring the Naming service
 ==============================
 
