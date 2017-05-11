@@ -1,11 +1,11 @@
 #
-# x86_win32_vc13.mk - make variables and rules specific to Visual Studio 13
+# x86_win32_vc15.mk - make variables and rules specific to Visual Studio 15
 #
 
 WindowsNT = 1
 x86Processor = 1
 
-compiler_version_suffix=_vc13
+compiler_version_suffix=_vc15
 
 WINVER = 0x0501
 
@@ -17,14 +17,11 @@ ABSTOP = $(shell cd $(TOP); pwd)
 #
 # Python set-up
 #
-# You must set a path to a Python 1.5.2 or later interpreter. If you
-# do not wish to make a complete installation, you may download a
-# minimal Python from
-# http://sourceforge.net/project/showfiles.php?group_id=51138&package_id=48638
-# In that case, uncomment the first line below.
+# You must set a path to a Python interpreter, either version 2.7 or
+# version 3.5 or later.
 
-#PYTHON = $(ABSTOP)/$(BINDIR)/omnipython
-#PYTHON = /cygdrive/c/Python26/python
+#PYTHON = /cygdrive/c/Python27/python
+#PYTHON = /cygdrive/c/Python36/python
 
 
 # Use the following set of flags to build and use multithreaded DLLs
@@ -86,8 +83,8 @@ OMNIORB_SSL_LIB += $(OPEN_SSL_LIB)
 OMNIORB_SSL_CPPFLAGS += $(OPEN_SSL_CPPFLAGS)
 
 
-# To build experimental ZIOP support, EnableZIOP must be defined and
-# ZLIB_ROOT must be set to the path to the zlib install. See also the
+# To build ZIOP support, EnableZIOP must be defined and ZLIB_ROOT must
+# be set to the path to the zlib install. See also the
 # OMNIORB_ENABLE_ZIOP define in include/omniORB4/CORBA_sysdep_trad.h.
 
 #EnableZIOP = 1

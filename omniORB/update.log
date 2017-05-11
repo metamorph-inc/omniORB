@@ -1,3 +1,21 @@
+Thu 11 May 14:01:08 BST 2017
+============================
+
+- Windows platform file updates.
+
+config/config.mk
+mk/platforms/x86_win32_vs_10.mk
+mk/platforms/x86_win32_vs_11.mk
+mk/platforms/x86_win32_vs_12.mk
+mk/platforms/x86_win32_vs_13.mk
+mk/platforms/x86_win32_vs_14.mk
+mk/platforms/x86_win32_vs_15.mk
+mk/platforms/x86_win32_vs_6.mk
+mk/platforms/x86_win32_vs_7.mk
+mk/platforms/x86_win32_vs_8.mk
+mk/platforms/x86_win32_vs_9.mk
+
+
 Thu 11 May 00:50:17 BST 2017
 ============================
 

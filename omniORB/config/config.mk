@@ -6,10 +6,10 @@
 # Uncomment one of the following platform lines to build for the
 # target platform
 #
+#  x86_win32_vs_15           x86 Windows, MS VC++ 15.x (2017)
 #  x86_win32_vs_14           x86 Windows, MS VC++ 14.x (2015)
-#  x86_win32_vs_13           x86 Windows, MS VC++ 13.x
-#  x86_win32_vs_12           x86 Windows, MS VC++ 12.x
-#  x86_win32_vs_11           x86 Windows, MS VC++ 11.x
+#  x86_win32_vs_12           x86 Windows, MS VC++ 12.x (2013)
+#  x86_win32_vs_11           x86 Windows, MS VC++ 11.x (2012)
 #  x86_win32_vs_10           x86 Windows, MS VC++ 10.x (2010)
 #  x86_win32_vs_9            x86 Windows, MS VC++ 9.x (2008)
 #  x86_win32_vs_8            x86 Windows, MS VC++ 8.x (.NET)
@@ -20,6 +20,28 @@
 #  x86_ets                   Phar Lap Realtime ETS-kernel
 #  x86_LynxOS_4.0            x86, LynxOS 4.0, gcc 2.95.3
 #  pc486_rtems_4.5.0         x86, RTEMS, gcc 2.95.2
+
+
+# You should also look at <top>/mk/platforms/$(platform).mk and if necessary
+# edit the make variables, such as CC and CXX, in the file.
+
+#platform = x86_win32_vs_15
+#platform = x86_win32_vs_14
+#platform = x86_win32_vs_12
+#platform = x86_win32_vs_11
+#platform = x86_win32_vs_10
+#platform = x86_win32_vs_9
+#platform = x86_win32_vs_8
+#platform = x86_win32_vs_7
+#platform = x86_win32_vs_6
+#platform = x86_win32_mingw
+#platform = x86_win32_dmc
+#platform = powerpc_LynxOS_4.0
+#platform = x86_ets
+#platform = x86_LynxOS_4.0
+#platform = pc486_rtems_4.5.0
+#platform = arm_linux_mvl_3.1
+
 
 # These platforms are mostly of historical interest. The configure
 # script is usually the best starting point.
@@ -55,26 +77,6 @@
 #  x86_uw7                   SCO UnixWare 7 (7.1.0)
 #  x86_freebsd_3.2           x86 FreeBSD 3.2, egcs 1.1.2
 #  x86_freebsd_4.0           x86 FreeBSD 4.0, gcc 2.95
-
-# You should also look at <top>/mk/platforms/$(platform).mk and if necessary
-# edit the make variables, such as CC and CXX, in the file.
-
-#platform = x86_win32_vs_14
-#platform = x86_win32_vs_13
-#platform = x86_win32_vs_12
-#platform = x86_win32_vs_11
-#platform = x86_win32_vs_10
-#platform = x86_win32_vs_9
-#platform = x86_win32_vs_8
-#platform = x86_win32_vs_7
-#platform = x86_win32_vs_6
-#platform = x86_win32_mingw
-#platform = x86_win32_dmc
-#platform = powerpc_LynxOS_4.0
-#platform = x86_ets
-#platform = x86_LynxOS_4.0
-#platform = pc486_rtems_4.5.0
-#platform = arm_linux_mvl_3.1
 
 #platform = sun4_sosV_5.5
 #platform = sun4_sosV_5.6
