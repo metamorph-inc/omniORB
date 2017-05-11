@@ -48,8 +48,10 @@ platform in the build environment.
 The executables and DLLs are in <Top-Level Directory>\bin\x86_win32.
 The libraries are in            <Top-Level Directory>\lib\x86_win32.
 
-You should set up your PATH environment to include 
+You should set up your PATH environment to include
+
    <Top-Level Directory>\bin\x86_win32
+
 otherwise the DLLs will not be picked up when omniORB programs are run.
 
 omniORB is primarily shipped in source form. To use it, you must first
@@ -60,9 +62,9 @@ these instructions, compilation should be easy.
 Building omniORB from the source files
 ======================================
 
-omniORB should be compiled using Visual C++ 6.0 or higher. It compiles
-fine with the latest Visual Studio Community versions that are free
-for non-commercial use. You can get it from https://www.visualstudio.com/
+omniORB should be compiled using Visual C++. It compiles fine with the
+latest Visual Studio Community versions that are free for
+non-commercial use. You can get it from https://www.visualstudio.com/
 
 
  A. Pre-requisites
@@ -109,10 +111,14 @@ for non-commercial use. You can get it from https://www.visualstudio.com/
 
        platform = x86_win32_vs_X
 
-     Where X is the version of Visual C++ you are using. (Microsoft
+     Where X is the version of Visual Studio you are using. Microsoft
      confusingly gives both a year-version and a numeric version to
-     their releases. Visual Studio 2015 contains Visual C++ 14, so for
-     that you use x86_win32_vs_14.)
+     their releases of Visual Studio. Even more confusingly, the
+     cl.exe compiler has its own different version number!  Visual
+     Studio 2017 is version 15, so for that you use x86_win32_vs_15.
+     For a helpful table of version numbers, see
+
+       https://en.wikipedia.org/wiki/Microsoft_Visual_Studio#History
 
 
      Instead of using Visual C++, you may have some success with MinGW
@@ -131,11 +137,11 @@ for non-commercial use. You can get it from https://www.visualstudio.com/
      Edit <top>\mk\platforms\<platform>.mk
 
      where <platform> is the platform you just chose in config.mk,
-     e.g. <top>\mk\platforms\x86_win32_vs_14.mk.
+     e.g. <top>\mk\platforms\x86_win32_vs_15.mk.
 
      Set PYTHON to the location of your Python executable. Note that
      you must use a Unix-style Cygwin path,
-     e.g. /cygdrive/c/Python34/python
+     e.g. /cygdrive/c/Python36/python
 
 
   D. Building and installing
@@ -145,16 +151,18 @@ for non-commercial use. You can get it from https://www.visualstudio.com/
      to find all the components it needs. By far the easiest way to
      get the right settings is to use the "Command Prompt" shortcuts
      created in the Start menu by the Visual Studio Installer. For
-     example, to use the 64 bit compiler from Visual Studio 2015, run
+     example, to use the 64 bit compiler from Visual Studio 2017, run
 
-     Start -> All Programs -> Visual Studio 2015 ->
-        Visual Studio Tools -> Windows Desktop Command Prompts ->
-           VS2015 x64 Native Tools Command Prompt
+     Start -> All Programs -> Visual Studio 2017 ->
+        VS2015 x64 Native Tools Command Prompt
 
      In the terminal window that opens, you now need to add the Cygwin
-     binaries to the end of the path:
+     binaries and Python directory to the END of the path:
 
-       set path=%path%;c:\cygwin64\bin
+       set path=%path%;c:\cygwin64\bin;c:\Python36
+
+     (Putting them at the end is essential -- cygwin includes a
+      link.exe which clashes with Visual Studio's link.exe.)
 
 
      Now, to compile, go into the directory <top>\src and type 'make
