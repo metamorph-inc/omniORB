@@ -687,7 +687,7 @@ public:
 
     if (unmarshal_byte_swap()) {
 
-#  if defined(Has_Longlong) && !defined (OMNI_MIXED_ENDIAN_DOUBLE)
+#  if defined(HAS_Longlong) && !defined (OMNI_MIXED_ENDIAN_DOUBLE)
       _CORBA_ULongLong* p=(_CORBA_ULongLong*)a;
       for( int i = 0; i < length; i++ ) {
 	p[i] = byteSwap(p[i]);
