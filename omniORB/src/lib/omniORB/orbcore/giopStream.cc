@@ -389,7 +389,7 @@ giopStream::sleepOnRdLockAlways()
     pd_strand->rdcond.wait();
   }
   else {
-      hastimeout = !(pd_strand->rdcond.timedwait(pd_deadline));
+    hastimeout = !(pd_strand->rdcond.timedwait(pd_deadline));
   }
 
   pd_strand->rd_n_justwaiting--;
@@ -715,7 +715,7 @@ giopStream::errorOnReceive(int rc, const char* filename, CORBA::ULong lineno,
 	<< (void*)pd_strand << ". Will scavenge it.\n";
     }
     {
-      omni_tracedmutex_lock sync(*omniTransportLock);
+      omni_optional_lock sync(*omniTransportLock, heldlock, heldlock);
       pd_strand->startIdleCounter();
     }
   }
@@ -1162,7 +1162,7 @@ giopStream::errorOnSend(int rc, const char* filename, CORBA::ULong lineno,
 	<< (void*)pd_strand << ". Will scavenge it.\n";
     }
     {
-      omni_tracedmutex_lock sync(*omniTransportLock);
+      omni_optional_lock sync(*omniTransportLock, heldlock, heldlock);
       pd_strand->startIdleCounter();
     }
   }
