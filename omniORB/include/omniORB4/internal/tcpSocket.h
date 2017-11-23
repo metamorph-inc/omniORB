@@ -296,14 +296,14 @@ public:
 	return 1;
       }
 #if defined(USE_FAKE_INTERRUPTABLE_RECV)
-      if (t.tv_sec > orbParameters::scanGranularity) {
-	t.tv_sec = orbParameters::scanGranularity;
+      if (t.tv_sec > (time_t)orbParameters::scanGranularity) {
+	t.tv_sec = (time_t)orbParameters::scanGranularity;
       }
 #endif
     }
     else {
 #if defined(USE_FAKE_INTERRUPTABLE_RECV)
-      t.tv_sec = orbParameters::scanGranularity;
+      t.tv_sec  = (time_t)orbParameters::scanGranularity;
       t.tv_usec = 0;
 #else
       t.tv_sec = t.tv_usec = 0;
@@ -335,7 +335,7 @@ public:
     FD_SET(sock,&efds);
     struct timeval* tp = &t;
     if (t.tv_sec == 0 && t.tv_usec == 0) tp = 0;
-    rc = select(sock+1, 0, &fds, &efds, tp);
+    rc = select((int)sock+1, 0, &fds, &efds, tp);
 #endif
     return rc;
   }
@@ -362,7 +362,7 @@ public:
     FD_SET(sock,&efds);
     struct timeval* tp = &t;
     if (t.tv_sec == 0 && t.tv_usec == 0) tp = 0;
-    rc = select(sock+1, &fds, 0, &efds, tp);
+    rc = select((int)sock+1, &fds, 0, &efds, tp);
 #endif
     return rc;
   }

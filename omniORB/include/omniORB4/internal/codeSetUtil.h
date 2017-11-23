@@ -206,7 +206,7 @@ public:
 	pd_buf = reallocW(pd_buf, pd_len, newlen);
 	pd_len = newlen;
       }
-      pd_buf[pd_i++] = c;
+      pd_buf[pd_i++] = (_CORBA_WChar)c;
     }
     inline _CORBA_ULong  length() { return pd_i; }
     inline _CORBA_WChar* buffer() { return pd_buf; }

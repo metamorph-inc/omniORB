@@ -120,7 +120,7 @@ cdrStream::marshalRawString(const char* s)
     // No characters from the string will fit in the current buffer.
     // The length might fit, but we can't put it in this buffer since
     // in a chunked stream it must stay with the string contents.
-    len = strlen(s) + 1;
+    len = (CORBA::ULong)strlen(s) + 1;
     declareArrayLength(omni::ALIGN_4, len+4);
     len >>= *this;
     put_octet_array((const _CORBA_Octet*)s, len);
@@ -137,16 +137,18 @@ cdrStream::marshalRawString(const char* s)
     // Good -- the whole string fit in the buffer.
     *current++ = *s;
 
-    len = (omni::ptr_arith_t)current - (omni::ptr_arith_t)pd_outb_mkr;
+    len = (_CORBA_ULong)((omni::ptr_arith_t)current -
+                         (omni::ptr_arith_t)pd_outb_mkr);
     pd_outb_mkr = (void*)current;
 
     *lenp = pd_marshal_byte_swap ? Swap32(len) : len;
   }
   else {
     // Some of the string did not fit.
-    len = (omni::ptr_arith_t)current - (omni::ptr_arith_t)pd_outb_mkr;
+    len = (_CORBA_ULong)((omni::ptr_arith_t)current -
+                         (omni::ptr_arith_t)pd_outb_mkr);
     pd_outb_mkr = (void*)current;
-    _CORBA_ULong rest = strlen(s) + 1;
+    _CORBA_ULong rest = (_CORBA_ULong)strlen(s) + 1;
 
     len += rest;
     if ((omni::ptr_arith_t)lenp < (omni::ptr_arith_t)pd_outb_end)

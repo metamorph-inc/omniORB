@@ -225,7 +225,7 @@ deactivate_thread_fn(void* args)
 
   omniOrbPOAManager::POASeq* ppoas = (omniOrbPOAManager::POASeq*) targs[0];
   omniOrbPOAManager::POASeq& poas = *ppoas;
-  CORBA::Boolean etherealise = (CORBA::Boolean) (unsigned long) targs[1];
+  CORBA::Boolean etherealise = (CORBA::Boolean) (omni::ptr_arith_t) targs[1];
   int* deactivated = (int*)targs[2];
   delete[] targs;
 

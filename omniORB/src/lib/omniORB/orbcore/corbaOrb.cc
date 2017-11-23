@@ -348,7 +348,7 @@ CORBA::ORB_init(int& argc, char** argv, const char* orb_identifier,
 	l << "omniORB:   " << (const char*)currentSet[i] << "\n";
     }
   }
-  catch (CORBA::INITIALIZE &ex) {
+  catch (CORBA::INITIALIZE&) {
     throw;
   }
   catch (...) {
@@ -1037,7 +1037,7 @@ public:
 
 
   void visit(const char* value,orbOptions::Source) throw (orbOptions::BadParam) {
-    CORBA::ULong l = strlen(value) + 1;
+    CORBA::ULong l = (CORBA::ULong)strlen(value) + 1;
     omni::myPrincipalID.length(l);
     for (CORBA::ULong i = 0; i < l; i++)
       omni::myPrincipalID[i] = value[i];

@@ -165,7 +165,7 @@ public:
     unsigned i = new_entry();
     pd_table[i]->type = it_simple;
     pd_table[i]->simple.alignment = a;
-    pd_table[i]->simple.size = s;
+    pd_table[i]->simple.size = (CORBA::ULong)s;
   }
   inline void addNasty(TypeCode_base* tc) {
     unsigned i = new_entry();

@@ -124,7 +124,9 @@ CORBA::ULong
 CORBA::Object::_hash(CORBA::ULong maximum)
 {
   if( _NP_is_nil() || maximum == 0 )  return 0;
-  if( _NP_is_pseudo() )  return CORBA::ULong((unsigned long) this) % maximum;
+
+  if( _NP_is_pseudo() )
+    return CORBA::ULong((omni::ptr_arith_t) this) % maximum;
 
   return _PR_getobj()->__hash(maximum);
 }

@@ -1155,7 +1155,7 @@ omniORB::generateNewKey(omniORB::objectKey& k)
 #ifndef __BCPLUSPLUS__
       struct _timeb v;
       _ftime(&v);
-      omniORB_seed.hi = v.time;
+      omniORB_seed.hi = (CORBA::ULong)v.time;
       omniORB_seed.med = v.millitm + _getpid();
       omniORB_seed.lo = 0;
 #else

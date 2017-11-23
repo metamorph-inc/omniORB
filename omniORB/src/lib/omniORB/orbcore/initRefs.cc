@@ -859,7 +859,7 @@ public:
       throw orbOptions::BadParam(key(),value,
 				 "Invalid value, expect 1-65535");
     }
-    orbParameters::bootstrapAgentPort = v;
+    orbParameters::bootstrapAgentPort = (CORBA::UShort)v;
   }
 
   void dump(orbOptions::sequenceString& result) {

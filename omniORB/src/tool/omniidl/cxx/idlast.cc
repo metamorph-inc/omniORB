@@ -1714,7 +1714,7 @@ finishConstruction(IdlType* switchType, IDL_Boolean constrType,
   case IdlType::tk_short:
     UNION_SWITCH(IDL_Short, Short, -0x8000, defVal==0x7fff, ++defVal)
   case IdlType::tk_long:
-    UNION_SWITCH(IDL_Long, Long, -0x80000000, defVal==0x7fffffff, ++defVal)
+    UNION_SWITCH(IDL_Long, Long, (-0x7fffffff)-1, defVal==0x7fffffff, ++defVal)
   case IdlType::tk_ushort:
     UNION_SWITCH(IDL_UShort, UShort, 0xffff, defVal==0, --defVal)
   case IdlType::tk_ulong:
@@ -1726,7 +1726,7 @@ finishConstruction(IdlType* switchType, IDL_Boolean constrType,
 #ifdef HAS_LongLong
   case IdlType::tk_longlong:
     UNION_SWITCH(IDL_LongLong, LongLong,
-		 _CORBA_LONGLONG_CONST(-0x8000000000000000),
+		 _CORBA_LONGLONG_CONST(-0x7fffffffffffffff) - 1,
 		 defVal==_CORBA_LONGLONG_CONST(0x7fffffffffffffff), ++defVal)
   case IdlType::tk_ulonglong:
     UNION_SWITCH(IDL_ULongLong, ULongLong,

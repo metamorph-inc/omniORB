@@ -76,7 +76,7 @@ struct giopStream_Buffer {
 
   inline void setLast(void* mkr)
   {
-    last = (omni::ptr_arith_t)mkr - (omni::ptr_arith_t)this;
+    last = (CORBA::ULong)((omni::ptr_arith_t)mkr - (omni::ptr_arith_t)this);
   }
 
   inline CORBA::ULong dataSize()
@@ -559,7 +559,8 @@ private:
   }
 
   inline CORBA::ULong bufferedOutputSize() {
-    return (omni::ptr_arith_t)pd_outb_mkr - pd_currentOutputBuffer->bufStart();
+    return (CORBA::ULong)((omni::ptr_arith_t)pd_outb_mkr -
+                          pd_currentOutputBuffer->bufStart());
   }
 
   inline void setOutputLastOffset() {

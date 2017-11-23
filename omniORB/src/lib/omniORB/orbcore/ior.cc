@@ -369,7 +369,7 @@ omniIOR::unmarshal_TAG_SSL_SEC_TRANS(const IOP::TaggedComponent& c,
   cdrEncapsulationStream e(c.component_data.get_buffer(),
 			   c.component_data.length(),1);
 
-  CORBA::UShort target_supports,target_requires, port;
+  CORBA::UShort target_supports, target_requires, port;
 
   try {
     switch (c.component_data.length()) {
@@ -389,8 +389,8 @@ omniIOR::unmarshal_TAG_SSL_SEC_TRANS(const IOP::TaggedComponent& c,
 		      "Warning: Wrong component size. Attempt to decode "
                       "it as the Visibroker non-compilant format");
 	CORBA::ULong v;
-	v <<= e; target_supports = v;
-	v <<= e; target_requires = v;
+	v <<= e; target_supports = (CORBA::UShort)v;
+	v <<= e; target_requires = (CORBA::UShort)v;
 	port <<= e;
 	break;
       }

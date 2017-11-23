@@ -1,3 +1,27 @@
+Thu 23 Nov 13:32:50 GMT 2017
+============================
+
+- Avoid some compiler warnings about word sizes.
+
+include/omniORB4/internal/codeSetUtil.h
+include/omniORB4/internal/giopStream.h
+include/omniORB4/internal/tcpSocket.h
+include/omniORB4/internal/typecode.h
+src/lib/omniORB/dynamic/context.cc
+src/lib/omniORB/dynamic/dynAny.cc
+src/lib/omniORB/orbcore/corbaBoa.cc
+src/lib/omniORB/orbcore/corbaFixed.cc
+src/lib/omniORB/orbcore/corbaObject.cc
+src/lib/omniORB/orbcore/corbaOrb.cc
+src/lib/omniORB/orbcore/corbaString.cc
+src/lib/omniORB/orbcore/initRefs.cc
+src/lib/omniORB/orbcore/ior.cc
+src/lib/omniORB/orbcore/poa.cc
+src/lib/omniORB/orbcore/poamanager.cc
+src/tool/omniidl/cxx/idlast.cc
+src/tool/omniidl/cxx/idlexpr.cc
+
+
 Thu 23 Nov 11:30:29 GMT 2017
 ============================
 

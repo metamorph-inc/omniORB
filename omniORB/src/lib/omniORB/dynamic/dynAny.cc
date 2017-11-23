@@ -676,7 +676,6 @@ DynAnyImpl::get_string()
   CHECK_NOT_DESTROYED;
   cdrAnyMemoryStream& buf = doRead(CORBA::tk_string);
 
-  CORBA::ULong length;
   CORBA::ULong maxlen = actualTc()->NP_length();
   try {
     char* value = buf.unmarshalString(maxlen);
@@ -754,7 +753,6 @@ DynAnyImpl::get_wstring()
   CHECK_NOT_DESTROYED;
   cdrAnyMemoryStream& buf = doRead(CORBA::tk_wstring);
 
-  CORBA::ULong length;
   CORBA::ULong maxlen = actualTc()->NP_length();
   CORBA::WChar* value = buf.unmarshalWString(maxlen);
   return value;

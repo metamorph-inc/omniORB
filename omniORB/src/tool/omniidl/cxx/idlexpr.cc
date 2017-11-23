@@ -288,7 +288,7 @@ IdlLongVal ConstExpr::evalAsLongV() {
   case IdlType::tk_longlong:
     {
       IDL_LongLong v = c_->constAsLongLong();
-      if (v < -0x80000000 || v > 0xffffffff) goto precision_error;
+      if (v < (-0x7fffffff) - 1 || v > 0xffffffff) goto precision_error;
       if (v >= 0)
 	return IdlLongVal(IDL_ULong(v));
       else
@@ -801,13 +801,13 @@ IdlLongVal SubExpr::evalAsLongV() {
       if (a.u >= b.u) return IdlLongVal(a.u - b.u);
       IDL_ULong mr = b.u - a.u;
       if (mr > 0x80000000) goto overflow;
-      return IdlLongVal(IDL_Long(-mr));
+      return IdlLongVal(-IDL_Long(mr));
     }
   case 1:
     {
       IDL_ULong mr = IDL_ULong(-a.s) + b.s;
       if (mr > 0x80000000) goto overflow;
-      return IdlLongVal(IDL_Long(-mr));
+      return IdlLongVal(-IDL_Long(mr));
     }
   case 2:
     {
@@ -838,13 +838,13 @@ IdlLongLongVal SubExpr::evalAsLongLongV() {
       if (a.u >= b.u) return IdlLongLongVal(a.u - b.u);
       IDL_ULongLong mr = b.u - a.u;
       if (mr > _CORBA_LONGLONG_CONST(0x8000000000000000)) goto overflow;
-      return IdlLongLongVal(IDL_LongLong(-mr));
+      return IdlLongLongVal(-IDL_LongLong(mr));
     }
   case 1:
     {
       IDL_ULongLong mr = IDL_ULongLong(-a.s) + b.s;
       if (mr > _CORBA_LONGLONG_CONST(0x8000000000000000)) goto overflow;
-      return IdlLongLongVal(IDL_LongLong(-mr));
+      return IdlLongLongVal(-IDL_LongLong(mr));
     }
   case 2:
     {
@@ -1023,13 +1023,13 @@ IdlLongVal DivExpr::evalAsLongV() {
   case 1:
     {
       IDL_ULong mr = IDL_ULong(-a.s) / b.u;
-      return IdlLongVal(IDL_Long(-mr));
+      return IdlLongVal(-IDL_Long(mr));
     }
   case 2:
     {
       IDL_ULong mr = a.u / IDL_ULong(-b.s);
       if (mr > 0x80000000) goto overflow;
-      return IdlLongVal(IDL_Long(-mr));
+      return IdlLongVal(-IDL_Long(mr));
     }
   case 3:
     {
@@ -1060,13 +1060,13 @@ IdlLongLongVal DivExpr::evalAsLongLongV() {
   case 1:
     {
       IDL_ULongLong mr = IDL_ULongLong(-a.s) / b.u;
-      return IdlLongLongVal(IDL_LongLong(-mr));
+      return IdlLongLongVal(-IDL_LongLong(mr));
     }
   case 2:
     {
       IDL_ULongLong mr = a.u / IDL_ULongLong(-b.s);
       if (mr > _CORBA_LONGLONG_CONST(0x8000000000000000)) goto overflow;
-      return IdlLongLongVal(IDL_LongLong(-mr));
+      return IdlLongLongVal(-IDL_LongLong(mr));
     }
   case 3:
     {
@@ -1143,7 +1143,7 @@ IdlLongVal MinusExpr::evalAsLongV() {
   else {
     if (e.u > 0x80000000)
       IdlError(file(), line(), "Result of unary minus overflows");
-    return IdlLongVal(IDL_Long(-e.u));
+    return IdlLongVal(-IDL_Long(e.u));
   }
 }
 
@@ -1156,7 +1156,7 @@ IdlLongLongVal MinusExpr::evalAsLongLongV() {
   else {
     if (e.u > _CORBA_LONGLONG_CONST(0x8000000000000000))
       IdlError(file(), line(), "Result of unary minus overflows");
-    return IdlLongLongVal(IDL_LongLong(-e.u));
+    return IdlLongLongVal(-IDL_LongLong(e.u));
   }
 }
 #endif

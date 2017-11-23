@@ -919,7 +919,7 @@ divDigit(CORBA::Octet* av, int ad, const CORBA::Octet* bv, int bd, int pos)
 static CORBA::Fixed
 realDiv(const CORBA::Fixed& a, const CORBA::Fixed& b, CORBA::Boolean negative)
 {
-  int i, ai, bi, wi, ri, digits, scale, unscale, v, ad, bd, carry = 0;
+  int i, ai, wi, ri, digits, scale, unscale, ad, bd, carry = 0;
 
   // This division algorithm basically does classic long division. The
   // numerator, a, is loaded into the top digits of "running". The

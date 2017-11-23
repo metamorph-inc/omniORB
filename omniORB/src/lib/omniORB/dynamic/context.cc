@@ -653,7 +653,7 @@ CORBA::Context::filterContext(CORBA::Context_ptr ctxt,
   do {
     omni_tracedmutex_lock sync(c->pd_lock);
     int i;
-    CORBA::ULong top, bottom, j, z1, z2;
+    CORBA::ULong top, bottom, z1, z2;
 
     for (i=0; i < whichlen; i++) {
 
