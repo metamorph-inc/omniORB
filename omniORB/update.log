@@ -1,3 +1,19 @@
+Thu 23 Nov 11:30:29 GMT 2017
+============================
+
+- Fix minor issues found by static analysis.
+
+include/omniORB4/CORBA_UnknownUserException.h
+include/omniORB4/ami.h
+include/omniORB4/internal/giopMonitor.h
+include/omniORB4/templatedecls.h
+src/appl/utils/genior/genior.cc
+
+- Error trying to use bi-directional strand after delete folowing a timeout.
+
+src/lib/omniORB/orbcore/giopRope.cc
+
+
 Thu 16 Nov 14:22:29 GMT 2017
 ============================
 

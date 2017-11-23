@@ -378,13 +378,32 @@ giopRope::releaseClient(IOP_C* iop_c)
     s->state(giopStrand::DYING);
   }
 
-  if (s->state()== giopStrand::DYING) {
-    remove = 1;
-    avail = s->safeDelete(); // If safeDelete() returns 1, this strand
-                             // can be regarded as deleted. Therefore, we
-                             // flag avail to 1 to wake up any threads waiting
-                             // on the rope to have a chance to create
-                             // another strand.
+  if (s->state() == giopStrand::DYING) {
+
+    if (s->isBiDir() && s->isClient() && s->connection) {
+      // This is the client side of a bidirectional connection. There
+      // may be another thread using the strand on behalf of the
+      // client, so we do not delete the strand yet. Instead we
+      // re-insert the GIOP_C and start the strand's idle counter so
+      // it can be scavenged.
+      
+      if (omniORB::trace(25)) {
+        omniORB::logger log;
+        log << "Strand " << (void*)s
+            << " in bi-directional client rope is dying.\n";
+      }
+      giop_c->giopStreamList::insert(s->clients);
+      s->startIdleCounter();
+    }
+    else {
+      remove = 1;
+
+      // If safeDelete() returns 1, this strand can be regarded as
+      // deleted. Therefore, we flag avail to 1 to wake up any threads
+      // waiting on the rope to have a chance to create another
+      // strand.
+      avail = s->safeDelete();
+    }
   }
   else if ((s->isBiDir() && !s->isClient()) || 
 	    !giopStreamList::is_empty(s->clients)) {
