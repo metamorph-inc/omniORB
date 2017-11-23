@@ -273,6 +273,7 @@ genRef(const char* IRTypeId, const char* hostname, int port,
 	  lo = curr - 'a' + 10;
 	else {
 	  cerr << "Hexadecimal key is corrupted." << endl;
+          delete keySeed;
 	  return 0;
 	}
 	(*keySeed)[(j/2)-1] = (CORBA::Octet) (hi + lo);

@@ -56,4 +56,4 @@ private:
 
 OMNI_NAMESPACE_END(omni)
 
-#endif // __GIOPRENDEZVOUSER_H__
+#endif // __GIOPMONITOR_H__

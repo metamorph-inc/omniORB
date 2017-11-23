@@ -178,7 +178,7 @@ public:
 					  _CORBA_ULong length_,
 					  T** value,
 					  _CORBA_Boolean release_ = 0)
-    : pd_max(max), pd_len(length_)
+    : pd_max(max), pd_len(length_), pd_rel(release_)
   {
     if( length_ > max )  _CORBA_bound_check_error();
     pd_buf = new ElemT[length_];

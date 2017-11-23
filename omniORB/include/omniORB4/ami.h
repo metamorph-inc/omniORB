@@ -151,10 +151,10 @@ public:
   {
     ASSERT_OMNI_TRACEDMUTEX_HELD(omniAsyncCallDescriptor::sd_lock, 1);
 
-    if (pd_set_cond)
+    if (pd_set_cond != set_cond)
       return 0;
     
-    pd_set_cond = set_cond;
+    pd_set_cond = 0;
     return 1;
   }
 

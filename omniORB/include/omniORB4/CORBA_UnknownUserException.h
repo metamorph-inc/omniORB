@@ -45,9 +45,11 @@ public:
     pd_exception = new Any(*ex.pd_exception);
   }
   UnknownUserException& operator=(const UnknownUserException& ex) {
-    UserException::operator=(ex);
-    if (pd_exception) delete pd_exception;
-    pd_exception = new Any(*ex.pd_exception);
+    if (&ex != this) {
+      UserException::operator=(ex);
+      if (pd_exception) delete pd_exception;
+      pd_exception = new Any(*ex.pd_exception);
+    }
     return *this;
   }
 
