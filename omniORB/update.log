@@ -1,3 +1,12 @@
+Thu 28 Dec 10:04:45 GMT 2017
+============================
+
+- Update configure with newer aclocal.
+
+aclocal.m4
+configure
+
+
 Thu 28 Dec 00:12:47 GMT 2017
 ============================
 
