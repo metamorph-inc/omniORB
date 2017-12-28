@@ -1,3 +1,28 @@
+Thu 28 Dec 00:12:47 GMT 2017
+============================
+
+- New retainAddressOrder and resolveNamesForTransportRules options
+  (functionality in ORB core).
+
+doc/omniORBpy.pdf
+doc/omniORBpy/index.html
+doc/omniORBpy/omniORBpy.html
+doc/omniORBpy/omniORBpy001.html
+doc/omniORBpy/omniORBpy002.html
+doc/omniORBpy/omniORBpy003.html
+doc/omniORBpy/omniORBpy004.html
+doc/omniORBpy/omniORBpy005.html
+doc/omniORBpy/omniORBpy006.html
+doc/omniORBpy/omniORBpy007.html
+doc/omniORBpy/omniORBpy008.html
+doc/omniORBpy/omniORBpy009.html
+doc/omniORBpy/omniORBpy010.html
+doc/omniORBpy/omniORBpy011.html
+doc/omniORBpy/omniORBpy012.html
+doc/omniORBpy/omniORBpy013.html
+doc/tex/omniORBpy.tex
+
+
 Thu 11 May 16:08:37 BST 2017
 ============================
 

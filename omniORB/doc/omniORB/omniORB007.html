@@ -2,7 +2,7 @@
 <html >
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<meta name="generator" content="hevea 2.29">
+<meta name="generator" content="hevea 2.30">
 <link rel="stylesheet" type="text/css" href="omniORB.css">
 <title>Interoperable Naming Service</title>
 </head>
@@ -192,12 +192,14 @@ prefixed with a &#X2018;<span style="font-family:monospace">#</span>&#X2019; cha
 <pre class="verbatim"># Example omniMapper.cfg
 NameService         IOR:000f...
 InterfaceRepository IOR:0100...
-</pre></blockquote><p>omniMapper can either be run on a single machine, in much the same way
+</pre>
+</blockquote><p>omniMapper can either be run on a single machine, in much the same way
 as omniNames, or it can be run on <em>every</em> machine, with a common
 configuration file. That way, each machine&#X2019;s omniORB configuration
 file could contain the line:</p><blockquote class="quote">
 <pre class="verbatim">ORBDefaultInitRef corbaloc::localhost
-</pre></blockquote>
+</pre>
+</blockquote>
 <h2 id="sec133" class="section">7.5&#XA0;&#XA0;Creating objects with simple object keys</h2>
 <p>In normal use, omniORB creates object keys containing various
 information including POA names and various non-ASCII characters.

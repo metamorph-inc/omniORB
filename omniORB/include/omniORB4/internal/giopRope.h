@@ -154,6 +154,28 @@ public:
   //    Internally, omniTransportLock is used for synchronisation, if
   //    <heldlock> is true, the caller already holds the lock.
 
+  void resetAddressOrder(CORBA::Boolean heldlock);
+  // If the retainAddressOrder parameter is not set true, reset the
+  // address order to ensure the next connection attempt uses the
+  // highest priority address. If names were resolved to addresses,
+  // clears the resolved names so they are re-resolved next call.
+  //
+  // Thread Safety preconditions:
+  //    Internally, omniTransportLock is used for synchronisation, if
+  //    <heldlock> is true, the caller already holds the lock.
+
+
+  static void resetIdleRopeAddresses();
+  // If the retainAddressOrder parameter is not set true, reset the
+  // address order in any idle ropes, to ensure the next connection
+  // attempt uses the highest priority address. If names were resolved
+  // to addresses, clears the resolved names so they are re-resolved
+  // next call.
+  //
+  // Thread Safety preconditions:
+  //    Caller must not hold omniTransportLock.
+  
+  
   // Access functions to change the rope parameters. Notice that these
   // functions does not perform any mutual exclusion internally. It is
   // however safe to change the parameters while the rope is in use.  The
@@ -233,7 +255,7 @@ public:
   // pd_addresses are resolved and the resulting addresses are added
   // to pd_addresses.
   //
-  // Called with no locks held, but serialised for a particular rope.
+  // Caller holds omniTransportLock.
 
  private:
   giopRope();

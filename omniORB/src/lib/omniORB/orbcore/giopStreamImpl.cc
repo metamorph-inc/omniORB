@@ -137,12 +137,6 @@ CORBA::Boolean orbParameters::strictIIOP = 1;
 //
 //   Valid values = 0 or 1
 
-CORBA::Boolean orbParameters::immediateRopeSwitch = 0;
-//   Switch rope to use a new address immediately, rather than
-//   retrying with the existing one.
-//
-//   Valid values = 0 or 1
-
 
 ////////////////////////////////////////////////////////////////////////
 static giopStreamImpl* implHead = 0;
@@ -541,36 +535,6 @@ public:
 
 static strictIIOPHandler strictIIOPHandler_;
 
-/////////////////////////////////////////////////////////////////////////////
-class immediateRopeSwitchHandler : public orbOptions::Handler {
-public:
-
-  immediateRopeSwitchHandler() : 
-    orbOptions::Handler("immediateAddressSwitch",
-			"immediateAddressSwitch = 0 or 1",
-			1,
-			"-ORBimmediateAddressSwitch < 0 | 1 >") {}
-
-
-  void visit(const char* value,orbOptions::Source) throw (orbOptions::BadParam) {
-
-    CORBA::Boolean v;
-    if (!orbOptions::getBoolean(value,v)) {
-      throw orbOptions::BadParam(key(),value,
-				 orbOptions::expect_boolean_msg);
-    }
-    orbParameters::immediateRopeSwitch = v;
-  }
-
-  void dump(orbOptions::sequenceString& result) {
-    orbOptions::addKVBoolean(key(),orbParameters::immediateRopeSwitch,
-			     result);
-  }
-};
-
-static immediateRopeSwitchHandler immediateRopeSwitchHandler_;
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 //            Module initialiser                                           //
@@ -593,7 +557,6 @@ public:
     orbOptions::singleton().registerHandler(maxInterleavedCallsPerConnectionHandler_);
     orbOptions::singleton().registerHandler(giopTargetAddressModeHandler_);
     orbOptions::singleton().registerHandler(strictIIOPHandler_);
-    orbOptions::singleton().registerHandler(immediateRopeSwitchHandler_);
   }
 
   void attach() {

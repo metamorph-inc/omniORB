@@ -66,6 +66,7 @@ CORBA::ULong orbParameters::inConScanPeriod = 180;
 //   Valid values = (n >= 0 in seconds) 
 //                   0 --> do not close idle connections.
 
+
 ////////////////////////////////////////////////////////////////////////
 class Scavenger : public omniTask {
 public:
@@ -680,9 +681,13 @@ Scavenger::execute()
     }
 
     // Now go through the list to delete them all
+    CORBA::Boolean scavenged_client_strands = 0;
     {
       StrandList* p = client_shutdown_list.next;
       while ( p != &client_shutdown_list ) {
+
+        scavenged_client_strands = 1;
+
 	giopStrand* s = (giopStrand*)p;
 	p = p->next;
 	s->StrandList::remove();
@@ -700,6 +705,12 @@ Scavenger::execute()
       }
     }
 
+    if (scavenged_client_strands) {
+      // We have scavenged at least one client strand, so we reset any
+      // idle giopRope address orders.
+      giopRope::resetIdleRopeAddresses();
+    }
+    
     {
       // We have to hold <omniTransportLock> while disposing of the
       // server strands, since other threads may be dealing with them.

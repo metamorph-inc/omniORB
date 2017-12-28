@@ -1856,6 +1856,32 @@ address to contact an object after a failure. If \code{false} (the
 default), the current address will be retried in certain
 circumstances.
 
+\confopt{resolveNamesForTransportRules}{1}
+
+If \code{true}, names in IORs will be resolved when evaluating client
+transport rules, and remembered from then on; if \code{false}, names
+will not be resolved until connect time. Client transport rules based
+on IP address will therefore not match, but some platforms can use
+external knowledge to pick the best address to use if given a name to
+connect to.
+
+\confopt{retainAddressOrder}{1}
+
+For IORs with multiple addresses, determines how the address to
+connect to is chosen. When first estabilishing a connection, the
+addresses are ordered according to the client transport rules (after
+resolving names if \code{resolveNamesFor\dsc{}TransportRules} is
+\code{true}), and the addresses are tried in priority order until one
+connects successfully. For as long as there is at least one connection
+open to the address, new connections continue to use the same address.
+
+After a failure, or after all open connections have been scavenged and
+closed, this parameter determines the address used to reconnect on the
+next call. If this parameter is \code{true} (the default), the address
+order and chosen address within the order is remembered; if
+\code{false}, a new connection attempt causes re-evaluation of the
+order (in case name resolutions change), and the highest priority
+address is tried first.
 
 \confopt{bootstrapAgentHostname}{\textit{none}}
 

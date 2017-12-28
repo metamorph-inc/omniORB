@@ -107,6 +107,10 @@ public:
     finish -= (last - first);
     return first;
   }
+  inline void clear() {
+    finish = start;
+  }
+
 #if 0
   void resize(size_type new_size, const T& x) {
     if (new_size < size())
