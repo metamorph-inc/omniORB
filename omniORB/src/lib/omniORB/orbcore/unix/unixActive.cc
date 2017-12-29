@@ -62,7 +62,6 @@ unixActiveCollection::Monitor(giopConnection::notifyReadable_t func,
   pd_callback_func = func;
   pd_callback_cookie = cookie;
 
-  CORBA::Boolean doit;
   while (!isEmpty()) {
     if (!Select()) break;
   }

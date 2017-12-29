@@ -64,7 +64,7 @@ public:
 
   void setSelectable(int now,
 		     CORBA::Boolean data_in_buffer,
-		     CORBA::Boolean hold_lock=0);
+		     CORBA::Boolean deprecated_hold_lock=0);
   // Indicate that this socket should be watched for readability.
   //
   // If now is 1, immediately make the socket selectable (if the
@@ -78,8 +78,10 @@ public:
   // If data_in_buffer is true, the socket is considered to already
   // have data available to read.
   //
-  // If hold_lock is true, the associated SocketCollection's lock is
-  // already held.
+  // deprecated_hold_lock used to be used to indicate that the caller
+  // already held the associated SocketCollection's lock during a
+  // notifyReadable callback. The lock is no longer held in callbacks,
+  // but the parameter is retained for backwards compatibility.
 
   void clearSelectable();
   // Indicate that this socket should not be watched any more.
@@ -136,6 +138,8 @@ private:
   SocketHolder**       	pd_prev;
 };
 
+typedef omnivector<SocketHolder*> SocketHolderVec;
+
 
 //
 // SocketCollection manages a collection of sockets.
@@ -150,7 +154,7 @@ public:
   virtual CORBA::Boolean notifyReadable(SocketHolder*) = 0;
   // Callback used by Select(). If it returns false, something has
   // gone very wrong with the collection and exits the Select loop.
-  // This method is called while holding pd_collection_lock.
+  // No locks are held during the call.
 
   CORBA::Boolean isSelectable(SocketHandle_t sock);
   // Indicates whether the given socket can be selected upon.
@@ -231,6 +235,17 @@ private:
   SocketHolder*        pd_collection;
   CORBA::Boolean       pd_changed;
 
+  inline void sendNotifications(SocketHolderVec& to_notify)
+  {
+    SocketHolderVec::iterator it  = to_notify.begin();
+    SocketHolderVec::iterator end = to_notify.end();
+  
+    for (; it != end; ++it)
+      notifyReadable(*it);
+
+    to_notify.clear();
+  }
+  
   friend class SocketHolder;
 };
 

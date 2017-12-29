@@ -310,7 +310,7 @@ sslEndpoint::AcceptAndMonitor(giopConnection::notifyReadable_t func,
 
   pd_callback_func = func;
   pd_callback_cookie = cookie;
-  setSelectable(1,0,0);
+  setSelectable(1,0);
 
   while (pd_go) {
     pd_new_conn_socket = RC_INVALID_SOCKET;
@@ -371,7 +371,7 @@ again:
 
       pd_new_conn_socket = sock;
     }
-    setSelectable(1,0,1);
+    setSelectable(1,0);
     return 1;
   }
   else {

@@ -691,7 +691,10 @@ omni::createIdentity(omniIOR* ior, const char* target, CORBA::Boolean locked)
 
     if (result) {
       holder._retn();
+
+      omni_optional_lock sync(*internalLock,locked,locked);
       result->gainRef();
+
       return result;
     }
   }

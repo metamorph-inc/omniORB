@@ -181,11 +181,12 @@ SocketCollection::growPollLists()
 CORBA::Boolean
 SocketCollection::Select() {
 
-  struct timeval timeout;
-  int timeout_millis;
-  int count;
-  unsigned index, pollfd_n;
-
+  struct timeval  timeout;
+  int             timeout_millis;
+  int             count;
+  unsigned        index, pollfd_n;
+  SocketHolderVec to_notify;
+  
   // pd_abs_time defines the absolute time at which we process the
   // socket list.
   tcpSocket::setTimeout(pd_abs_time, timeout);
@@ -220,7 +221,7 @@ SocketCollection::Select() {
 	      // Socket is readable now
 	      s->pd_selectable = s->pd_data_in_buffer = 0;
               s->pd_fd_index = -1;
-	      notifyReadable(s);
+              to_notify.push_back(s);
 	    }
 	    else {
 	      // Add to the pollfds
@@ -251,6 +252,7 @@ SocketCollection::Select() {
       }
       pollfd_n = pd_pollfd_n;
     }
+    sendNotifications(to_notify);
   }
   else {
     timeout_millis = timeout.tv_sec * 1000 + timeout.tv_usec / 1000;
@@ -264,82 +266,85 @@ SocketCollection::Select() {
 
   if (count > 0) {
     // Some sockets are readable
-    omni_tracedmutex_lock sync(pd_collection_lock);
+    {
+      omni_tracedmutex_lock sync(pd_collection_lock);
 
-    pd_idle_count = idle_scans;
+      pd_idle_count = idle_scans;
 
-    index = 0;
-    while (count) {
-      if (index == pd_pollfd_n) {
-	if (omniORB::trace(1)) {
-	  omniORB::logger log;
-	  log << "Warning: unable to find all fds reported by poll(). "
-	      << count << " remaining.\n";
-	}
-	break;
-      }
-      short revents = pd_pollfds[index].revents;
+      index = 0;
+      while (count) {
+        if (index == pd_pollfd_n) {
+          if (omniORB::trace(1)) {
+            omniORB::logger log;
+            log << "Warning: unable to find all fds reported by poll(). "
+                << count << " remaining.\n";
+          }
+          break;
+        }
+        short revents = pd_pollfds[index].revents;
 
-      if (revents) {
-	count--;
+        if (revents) {
+          count--;
 
-	if (revents & (POLLIN | POLLHUP)) {
-	  SocketHolder* s = pd_pollsockets[index];
+          if (revents & (POLLIN | POLLHUP)) {
+            SocketHolder* s = pd_pollsockets[index];
 
-	  if (s) {
-	    // Remove from pollfds by swapping in the last item in the array
-	    pd_pollfd_n--;
-	    s->pd_fd_index = -1;
-	    if (index < pd_pollfd_n) {
-	      pd_pollfds[index]     = pd_pollfds[pd_pollfd_n];
-	      pd_pollsockets[index] = pd_pollsockets[pd_pollfd_n];
-	      if (pd_pollsockets[index]) {
-		pd_pollsockets[index]->pd_fd_index = index;
-	      }
-	    }
-	    if (s->pd_peeking) {
-	      // A thread is monitoring the socket with Peek(). We do
-	      // not notify from this thread, otherwise a thread would
-	      // be dispatched to handle the data, and either that
-	      // thread or the peeker would find itself with nothing
-	      // to do. To avoid a race condition where the Peek()
-	      // thread has timed out, we set a flag to tell it there
-	      // is data available.
-	      s->pd_peek_go = 1;
-	    }
-	    else {
-	      if (s->pd_selectable) {
-		s->pd_selectable = s->pd_data_in_buffer = 0;
-		notifyReadable(s);
-	      }
-	    }
-	    continue; // without incrementing index
-	  }
-	  else if (pd_pollfds[index].fd == pd_pipe_read) {
+            if (s) {
+              // Remove from pollfds by swapping in the last item in the array
+              pd_pollfd_n--;
+              s->pd_fd_index = -1;
+              if (index < pd_pollfd_n) {
+                pd_pollfds[index]     = pd_pollfds[pd_pollfd_n];
+                pd_pollsockets[index] = pd_pollsockets[pd_pollfd_n];
+                if (pd_pollsockets[index]) {
+                  pd_pollsockets[index]->pd_fd_index = index;
+                }
+              }
+              if (s->pd_peeking) {
+                // A thread is monitoring the socket with Peek(). We do
+                // not notify from this thread, otherwise a thread would
+                // be dispatched to handle the data, and either that
+                // thread or the peeker would find itself with nothing
+                // to do. To avoid a race condition where the Peek()
+                // thread has timed out, we set a flag to tell it there
+                // is data available.
+                s->pd_peek_go = 1;
+              }
+              else {
+                if (s->pd_selectable) {
+                  s->pd_selectable = s->pd_data_in_buffer = 0;
+                  to_notify.push_back(s);
+                }
+              }
+              continue; // without incrementing index
+            }
+            else if (pd_pollfds[index].fd == pd_pipe_read) {
 #ifdef UnixArchitecture
-	    char data;
-	    read(pd_pipe_read, &data, 1);
-	    pd_pipe_full = 0;
+              char data;
+              read(pd_pipe_read, &data, 1);
+              pd_pipe_full = 0;
 #endif
-	  }
-	  else {
-	    // Socket is no longer selectable -- remove from pollfds.
-	    pd_pollfd_n--;
-	    pd_pollfds[index]     = pd_pollfds[pd_pollfd_n];
-	    pd_pollsockets[index] = pd_pollsockets[pd_pollfd_n];
-	    if (pd_pollsockets[index])
-	      pd_pollsockets[index]->pd_fd_index = index;
-	    continue; // without incrementing index
-	  }
-	}
-	else {
-	  // Force a list scan next time
-	  pd_changed = 1;
-	  pd_abs_time.assign(0,0);
-	}
+            }
+            else {
+              // Socket is no longer selectable -- remove from pollfds.
+              pd_pollfd_n--;
+              pd_pollfds[index]     = pd_pollfds[pd_pollfd_n];
+              pd_pollsockets[index] = pd_pollsockets[pd_pollfd_n];
+              if (pd_pollsockets[index])
+                pd_pollsockets[index]->pd_fd_index = index;
+              continue; // without incrementing index
+            }
+          }
+          else {
+            // Force a list scan next time
+            pd_changed = 1;
+            pd_abs_time.assign(0,0);
+          }
+        }
+        index++;
       }
-      index++;
     }
+    sendNotifications(to_notify);
   }
   else if (count == 0) {
     // Nothing to read.
@@ -395,12 +400,10 @@ void SocketCollection::wakeUp()
 void
 SocketHolder::setSelectable(int            now,
 			    CORBA::Boolean data_in_buffer,
-			    CORBA::Boolean hold_lock)
+			    CORBA::Boolean deprecated_hold_lock)
 {
   OMNIORB_ASSERT(pd_belong_to);
-  ASSERT_OMNI_TRACEDMUTEX_HELD(pd_belong_to->pd_collection_lock, hold_lock);
-
-  omni_optional_lock l(pd_belong_to->pd_collection_lock, hold_lock, hold_lock);
+  omni_tracedmutex_lock l(pd_belong_to->pd_collection_lock);
 
   if (now == 2 && !pd_selectable)
     return;
@@ -436,8 +439,7 @@ SocketHolder::setSelectable(int            now,
   }
 
 #ifdef UnixArchitecture
-  if (!hold_lock &&
-      (now || pd_belong_to->pd_idle_count == 0)) {
+  if (now || pd_belong_to->pd_idle_count == 0) {
 
     // Wake up the Select thread by writing to the pipe.
     if (pd_belong_to->pd_pipe_write >= 0 && !pd_belong_to->pd_pipe_full) {
@@ -630,8 +632,9 @@ CORBA::Boolean
 SocketCollection::Select() {
 
   struct timeval  timeout;
-  int count;
-  unsigned index;
+  int             count;
+  unsigned        index;
+  SocketHolderVec to_notify;
 
   // pd_abs_time defines the absolute time at which we process the
   // socket list.
@@ -660,7 +663,7 @@ SocketCollection::Select() {
 	    if (s->pd_data_in_buffer) {
 	      // Socket is readable now
 	      s->pd_selectable = s->pd_data_in_buffer = 0;
-	      notifyReadable(s);
+              to_notify.push_back(s);
 	    }
 	    else {
 	      // Add to the fd_set
@@ -680,6 +683,7 @@ SocketCollection::Select() {
       }
       rfds = pd_fd_set;
     }
+    sendNotifications(to_notify);
   }
   else {
     omni_tracedmutex_lock sync(pd_collection_lock);
@@ -700,47 +704,50 @@ SocketCollection::Select() {
 
   if (count > 0) {
     // Some sockets are readable
-    omni_tracedmutex_lock sync(pd_collection_lock);
+    {
+      omni_tracedmutex_lock sync(pd_collection_lock);
 
-    for (SocketHolder* s = pd_collection; s && count; s = s->pd_next) {
+      for (SocketHolder* s = pd_collection; s && count; s = s->pd_next) {
 
-      if (s->pd_selectable) {
+        if (s->pd_selectable) {
 
-	// The call to FD_ISSET here is a linear search through all
-	// the readable sockets, but that should usually be a
-	// reasonably small number, so it's probably OK.
+          // The call to FD_ISSET here is a linear search through all
+          // the readable sockets, but that should usually be a
+          // reasonably small number, so it's probably OK.
 
-	if (s->pd_fd_index >= 0 && FD_ISSET(s->pd_socket, &rfds)) {
-	  // Remove socket from pd_fd_set by swapping last item.
-	  // We don't use FD_CLR since that is incredibly inefficient
-	  // with large sets.
-	  int to_i   = s->pd_fd_index;
-	  int from_i = --pd_fd_set.fd_count;
+          if (s->pd_fd_index >= 0 && FD_ISSET(s->pd_socket, &rfds)) {
+            // Remove socket from pd_fd_set by swapping last item.
+            // We don't use FD_CLR since that is incredibly inefficient
+            // with large sets.
+            int to_i   = s->pd_fd_index;
+            int from_i = --pd_fd_set.fd_count;
 	  
-	  pd_fd_set.fd_array[to_i] = pd_fd_set.fd_array[from_i];
-	  pd_fd_sockets[to_i] = pd_fd_sockets[from_i];
-	  pd_fd_sockets[to_i]->pd_fd_index = to_i;
+            pd_fd_set.fd_array[to_i] = pd_fd_set.fd_array[from_i];
+            pd_fd_sockets[to_i] = pd_fd_sockets[from_i];
+            pd_fd_sockets[to_i]->pd_fd_index = to_i;
 
-	  s->pd_fd_index = -1;
+            s->pd_fd_index = -1;
 
-	  if (s->pd_peeking) {
-	    // A thread is monitoring the socket with Peek(). We do
-	    // not notify from this thread, otherwise a thread would
-	    // be dispatched to handle the data, and either that
-	    // thread or the peeker would find itself with nothing
-	    // to do. To avoid a race condition where the Peek()
-	    // thread has timed out, we set a flag to tell it there
-	    // is data available.
-	    s->pd_peek_go = 1;
-	  }
-	  else {
-	    s->pd_selectable = s->pd_data_in_buffer = 0;
-	    notifyReadable(s);
-	  }
-	  count--;
-	}
+            if (s->pd_peeking) {
+              // A thread is monitoring the socket with Peek(). We do
+              // not notify from this thread, otherwise a thread would
+              // be dispatched to handle the data, and either that
+              // thread or the peeker would find itself with nothing
+              // to do. To avoid a race condition where the Peek()
+              // thread has timed out, we set a flag to tell it there
+              // is data available.
+              s->pd_peek_go = 1;
+            }
+            else {
+              s->pd_selectable = s->pd_data_in_buffer = 0;
+              to_notify.push_back(s);
+            }
+            count--;
+          }
+        }
       }
     }
+    sendNotifications(to_notify);
   }
   else if (count == 0) {
     // Nothing to read.
@@ -780,12 +787,10 @@ void SocketCollection::wakeUp()
 void
 SocketHolder::setSelectable(int            now,
 			    CORBA::Boolean data_in_buffer,
-			    CORBA::Boolean hold_lock)
+			    CORBA::Boolean deprecated_hold_lock)
 {
   OMNIORB_ASSERT(pd_belong_to);
-  ASSERT_OMNI_TRACEDMUTEX_HELD(pd_belong_to->pd_collection_lock, hold_lock);
-
-  omni_optional_lock l(pd_belong_to->pd_collection_lock, hold_lock, hold_lock);
+  omni_tracedmutex_lock l(pd_belong_to->pd_collection_lock);
 
   if (now == 2 && !pd_selectable)
     return;
@@ -802,7 +807,7 @@ SocketHolder::setSelectable(int            now,
       pd_belong_to->pd_fd_sockets[pd_fd_index] = this;
       pd_belong_to->pd_fd_set.fd_count++;
 
-      if (!hold_lock && pd_belong_to->pd_fd_set.fd_count == 1) {
+      if (pd_belong_to->pd_fd_set.fd_count == 1) {
 	// Select() thread may be waiting on the condition variable.
 	pd_belong_to->pd_select_cond.signal();
       }
@@ -988,8 +993,9 @@ SocketCollection::Select() {
 
   struct timeval  timeout;
   struct timeval* timeout_p;
-  int count;
-  unsigned index;
+  int             count;
+  unsigned        index;
+  SocketHolderVec to_notify;
 
   // pd_abs_time defines the absolute time at which we process the
   // socket list.
@@ -1025,7 +1031,7 @@ SocketCollection::Select() {
 	    if (s->pd_data_in_buffer) {
 	      // Socket is readable now
 	      s->pd_selectable = s->pd_data_in_buffer = 0;
-	      notifyReadable(s);
+              to_notify.push_back(s);
 	    }
 	    else {
 	      // Add to the fd_set
@@ -1050,6 +1056,7 @@ SocketCollection::Select() {
       }
       rfds = pd_fd_set;
     }
+    sendNotifications(to_notify);
   }
   else {
     timeout_p = &timeout;
@@ -1063,50 +1070,53 @@ SocketCollection::Select() {
 
   if (count > 0) {
     // Some sockets are readable
-    omni_tracedmutex_lock sync(pd_collection_lock);
+    {
+      omni_tracedmutex_lock sync(pd_collection_lock);
 
-    pd_idle_count = idle_scans;
+      pd_idle_count = idle_scans;
 
-    pd_fd_set_n = 0;
+      pd_fd_set_n = 0;
 
 #ifdef UnixArchitecture
-    if (pd_pipe_read >= 0) {
-      if (FD_ISSET(pd_pipe_read, &rfds)) {
-	char data;
-	read(pd_pipe_read, &data, 1);
-	pd_pipe_full = 0;
+      if (pd_pipe_read >= 0) {
+        if (FD_ISSET(pd_pipe_read, &rfds)) {
+          char data;
+          read(pd_pipe_read, &data, 1);
+          pd_pipe_full = 0;
+        }
+        pd_fd_set_n = pd_pipe_read + 1;
       }
-      pd_fd_set_n = pd_pipe_read + 1;
-    }
 #endif
 
-    for (SocketHolder* s = pd_collection; s; s = s->pd_next) {
+      for (SocketHolder* s = pd_collection; s; s = s->pd_next) {
 
-      if (s->pd_selectable) {
-	if (FD_ISSET(s->pd_socket, &rfds)) {
-	  s->pd_fd_index = -1;
-	  FD_CLR(s->pd_socket, &pd_fd_set);
+        if (s->pd_selectable) {
+          if (FD_ISSET(s->pd_socket, &rfds)) {
+            s->pd_fd_index = -1;
+            FD_CLR(s->pd_socket, &pd_fd_set);
 	  
-	  if (s->pd_peeking) {
-	    // A thread is monitoring the socket with Peek(). We do
-	    // not notify from this thread, otherwise a thread would
-	    // be dispatched to handle the data, and either that
-	    // thread or the peeker would find itself with nothing
-	    // to do. To avoid a race condition where the Peek()
-	    // thread has timed out, we set a flag to tell it there
-	    // is data available.
-	    s->pd_peek_go = 1;
-	  }
-	  else {
-	    s->pd_selectable = s->pd_data_in_buffer = 0;
-	    notifyReadable(s);
-	  }
-	}
-	else if (pd_fd_set_n <= s->pd_socket) {
-	  pd_fd_set_n = s->pd_socket + 1;
-	}
+            if (s->pd_peeking) {
+              // A thread is monitoring the socket with Peek(). We do
+              // not notify from this thread, otherwise a thread would
+              // be dispatched to handle the data, and either that
+              // thread or the peeker would find itself with nothing
+              // to do. To avoid a race condition where the Peek()
+              // thread has timed out, we set a flag to tell it there
+              // is data available.
+              s->pd_peek_go = 1;
+            }
+            else {
+              s->pd_selectable = s->pd_data_in_buffer = 0;
+              to_notify.push_back(s);
+            }
+          }
+          else if (pd_fd_set_n <= s->pd_socket) {
+            pd_fd_set_n = s->pd_socket + 1;
+          }
+        }
       }
     }
+    sendNotifications(to_notify);
   }
   else if (count == 0) {
     // Nothing to read.
@@ -1161,12 +1171,10 @@ void SocketCollection::wakeUp()
 void
 SocketHolder::setSelectable(int            now,
 			    CORBA::Boolean data_in_buffer,
-			    CORBA::Boolean hold_lock)
+			    CORBA::Boolean deprecated_hold_lock)
 {
   OMNIORB_ASSERT(pd_belong_to);
-  ASSERT_OMNI_TRACEDMUTEX_HELD(pd_belong_to->pd_collection_lock, hold_lock);
-
-  omni_optional_lock l(pd_belong_to->pd_collection_lock, hold_lock, hold_lock);
+  omni_tracedmutex_lock l(pd_belong_to->pd_collection_lock);
 
   if (now == 2 && !pd_selectable)
     return;
@@ -1193,8 +1201,7 @@ SocketHolder::setSelectable(int            now,
   }
 
 #ifdef UnixArchitecture
-  if (!hold_lock &&
-      (now || pd_belong_to->pd_idle_count == 0)) {
+  if (now || pd_belong_to->pd_idle_count == 0) {
 
     // Wake up the Select thread by writing to the pipe.
     if (pd_belong_to->pd_pipe_write >= 0 && !pd_belong_to->pd_pipe_full) {

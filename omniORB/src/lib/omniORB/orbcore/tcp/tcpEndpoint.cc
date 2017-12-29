@@ -307,7 +307,7 @@ tcpEndpoint::AcceptAndMonitor(giopConnection::notifyReadable_t func,
 
   pd_callback_func = func;
   pd_callback_cookie = cookie;
-  setSelectable(1,0,0);
+  setSelectable(1,0);
 
   while (1) {
     pd_new_conn_socket = RC_INVALID_SOCKET;
@@ -365,7 +365,7 @@ again:
 
       pd_new_conn_socket = sock;
     }
-    setSelectable(1,0,1);
+    setSelectable(1,0);
     return 1;
   }
   else {

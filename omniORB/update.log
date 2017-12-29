@@ -1,3 +1,19 @@
+Fri 29 Dec 12:58:07 GMT 2017
+============================
+
+- Resolve partial lock order violation.
+
+include/omniORB4/internal/SocketCollection.h
+include/omniORB4/tracedthread.h
+src/lib/omniORB/orbcore/SocketCollection.cc
+src/lib/omniORB/orbcore/omniInternal.cc
+src/lib/omniORB/orbcore/ssl/sslActive.cc
+src/lib/omniORB/orbcore/ssl/sslEndpoint.cc
+src/lib/omniORB/orbcore/tcp/tcpEndpoint.cc
+src/lib/omniORB/orbcore/unix/unixActive.cc
+src/lib/omniORB/orbcore/unix/unixEndpoint.cc
+
+
 Thu 28 Dec 10:04:45 GMT 2017
 ============================
 
