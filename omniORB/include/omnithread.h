@@ -214,7 +214,7 @@ struct omni_time_t {
     return *this;
   }
 
-  inline const omni_time_t operator+(const omni_time_t& o)
+  inline omni_time_t operator+(const omni_time_t& o) const
   {
     omni_time_t n(*this);
     n += o;
@@ -232,7 +232,7 @@ struct omni_time_t {
     return *this;
   }
 
-  inline const omni_time_t operator-(const omni_time_t& o)
+  inline omni_time_t operator-(const omni_time_t& o) const
   {
     omni_time_t n(*this);
     n -= o;

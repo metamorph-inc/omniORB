@@ -1,3 +1,15 @@
+Wed  3 Jan 15:46:33 GMT 2018
+============================
+
+- Operator constness fix.
+
+include/omnithread.h
+
+- Mac build rule tweak.
+
+mk/beforeauto.mk.in
+
+
 Fri 29 Dec 12:58:07 GMT 2017
 ============================
 
