@@ -175,6 +175,11 @@ sslContext::set_CA() {
     OMNIORB_THROW(INITIALIZE,INITIALIZE_TransportError,CORBA::COMPLETED_NO);
   }
 
+  if (pd_cafile) {
+    // Set the client CA list
+    SSL_CTX_set_client_CA_list(pd_ctx, SSL_load_client_CA_file(pd_cafile));
+  }
+  
   // We no longer set the verify depth to 1, to use the default of 9.
   //  SSL_CTX_set_verify_depth(pd_ctx,1);
 }
