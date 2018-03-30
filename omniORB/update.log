@@ -1,3 +1,23 @@
+Fri 30 Mar 22:56:57 BST 2018
+============================
+
+- Set client CA list.
+
+src/lib/omniORB/orbcore/ssl/sslContext.cc
+
+- Fail connection if socket is not selectable; experimental support
+  for Mac / iOS CFNetwork.
+
+acinclude.m4
+configure.ac
+configure
+include/omniORB4/acconfig.h.in
+include/omniORB4/internal/tcpSocket.h
+mk/beforeauto.mk.in
+src/lib/omniORB/orbcore/tcpSocket.cc
+src/lib/omniORB/orbcore/unix/unixAddress.cc
+
+
 Wed  3 Jan 15:46:33 GMT 2018
 ============================
 

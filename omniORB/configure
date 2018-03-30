@@ -630,6 +630,7 @@ OSVERSION
 PLATFORM_DEFINE
 PLATFORM_NAME
 COMPILER_NAME
+OMNI_USE_CFNETWORK_CONNECT
 ENABLE_ZIOP
 ENABLE_LONGDOUBLE
 ENABLE_STATIC
@@ -734,6 +735,7 @@ enable_ipv6
 enable_alloca
 enable_longdouble
 enable_atomic
+enable_cfnetwork
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1377,6 +1379,8 @@ Optional Features:
   --disable-longdouble    disable long double support (default
                           enable-longdouble)
   --disable-atomic        disable atomic operations (default enable-atomic)
+  --enable-cfnetwork      enable use of Mac / iOS CFNetwork (default
+                          disable-cfnetwork)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -7487,6 +7491,30 @@ else
 fi
 
 ENABLE_ZIOP=$omni_cv_enable_ziop
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use CFNetwork" >&5
+$as_echo_n "checking whether to use CFNetwork... " >&6; }
+if ${omni_cv_enable_cfnetwork+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  # Check whether --enable-cfnetwork was given.
+if test "${enable_cfnetwork+set}" = set; then :
+  enableval=$enable_cfnetwork; omni_cv_enable_cfnetwork=$enableval
+else
+  omni_cv_enable_cfnetwork=no
+fi
+
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $omni_cv_enable_cfnetwork" >&5
+$as_echo "$omni_cv_enable_cfnetwork" >&6; }
+if test "$omni_cv_enable_cfnetwork" = "yes"; then
+
+$as_echo "#define OMNI_USE_CFNETWORK_CONNECT /**/" >>confdefs.h
+
+fi
+OMNI_USE_CFNETWORK_CONNECT=$omni_cv_enable_cfnetwork
+
 
 
 

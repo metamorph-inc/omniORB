@@ -1078,6 +1078,10 @@ OMNITHREAD_POSIX_CPPFLAGS = -DPthreadDraftVersion=10 \
 CXXOPTIONS = -fno-common @EXTRA_GCC_CXXFLAGS@
 SHAREDLIB_SUFFIX = dylib
 
+ifeq (@OMNI_USE_CFNETWORK_CONNECT@,yes)
+CXXLINKOPTIONS += -framework CoreFoundation
+endif
+
 SharedLibraryFullNameTemplate = lib$$1$$2.$$3.$$4.$(SHAREDLIB_SUFFIX)
 SharedLibrarySoNameTemplate = lib$$1$$2.$$3.$(SHAREDLIB_SUFFIX)
 SharedLibraryLibNameTemplate = lib$$1$$2.$(SHAREDLIB_SUFFIX)

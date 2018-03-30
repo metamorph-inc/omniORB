@@ -246,6 +246,9 @@
 /* Define to the type of getsockname's third argument */
 #undef OMNI_SOCKNAME_SIZE_T
 
+/* define if you want to use CFNetwork */
+#undef OMNI_USE_CFNETWORK_CONNECT
+
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 

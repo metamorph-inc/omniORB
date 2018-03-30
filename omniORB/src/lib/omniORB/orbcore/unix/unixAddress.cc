@@ -144,12 +144,23 @@ unixAddress::Connect(const omni_time_t& deadline,
       return 0;
 #endif
     }
-    if (rc != RC_SOCKET_ERROR) {
-      // Check to make sure that the socket is connected.
-      OMNI_SOCKADDR_STORAGE peer;
-      SOCKNAME_SIZE_T len = sizeof(peer);
-      rc = getpeername(sock, (struct sockaddr*)&peer, &len);
+    else if (rc == RC_SOCKET_ERROR) {
+      if (ERRNO == RC_EINTR) {
+	continue;
+      }
+      else {
+        omniORB::logs(25, "Failed to connect to Unix socket "
+                      "(waiting for writable socket)");
+	CLOSESOCKET(sock);
+	return 0;
+      }
     }
+
+    // Check to make sure that the socket is connected.
+    OMNI_SOCKADDR_STORAGE peer;
+    SOCKNAME_SIZE_T len = sizeof(peer);
+    rc = getpeername(sock, (struct sockaddr*)&peer, &len);
+
     if (rc == RC_SOCKET_ERROR) {
       if (ERRNO == RC_EINTR) {
 	continue;

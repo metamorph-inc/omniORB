@@ -328,6 +328,12 @@ public:
       rc = RC_SOCKET_ERROR;
     }
 #else
+
+#  if !defined(__WIN32__)
+    if (sock >= FD_SETSIZE)
+      return RC_SOCKET_ERROR;
+#  endif
+
     fd_set fds, efds;
     FD_ZERO(&fds);
     FD_ZERO(&efds);
@@ -355,6 +361,12 @@ public:
       rc = RC_SOCKET_ERROR;
     }
 #else
+
+#  if !defined(__WIN32__)
+    if (sock >= FD_SETSIZE)
+      return RC_SOCKET_ERROR;
+#  endif
+
     fd_set fds, efds;
     FD_ZERO(&fds);
     FD_ZERO(&efds);
