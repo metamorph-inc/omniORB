@@ -559,6 +559,17 @@ lib_depend := $(patsubst %,$(LibPattern),omniZIOPDynamic$(OMNIORB_MAJOR_VERSION)
 OMNIORB_ZIOP_DYNAMIC_LIB_DEPEND := $(GENERATE_LIB_DEPEND)
 
 
+# COS
+OMNIORB_COS_LIB = $(patsubst %,$(LibSearchPattern),COS$(OMNIORB_MAJOR_VERSION))
+lib_depend := $(patsubst %,$(LibPattern),COS$(OMNIORB_MAJOR_VERSION))
+OMNIORB_COS_LIB_DEPEND := $(GENERATE_LIB_DEPEND)
+
+OMNIORB_COS_DYNAMIC_LIB = $(patsubst %,$(LibSearchPattern),COSDynamic$(OMNIORB_MAJOR_VERSION))
+lib_depend := $(patsubst %,$(LibPattern),COSDynamic$(OMNIORB_MAJOR_VERSION))
+OMNIORB_COS_DYNAMIC_LIB_DEPEND := $(GENERATE_LIB_DEPEND)
+
+
+
 ##########################################################################
 #
 # Shared library support stuff
@@ -1027,10 +1038,6 @@ SharedLibraryPlatformLinkFlagsTemplate = -G -qmkshrobj \
 endif
 
 ifdef Compiler_GCC
-# A lot of this is stolen from the mk/platform/powerpc_aix4.3_gcc
-# platform file, some of it is made up.  This is tested on AIX 5.3
-# with gcc 4.2.0 (as included in the AIX Toolbox for Linux
-# Applications 4/2008 (they really mean GNU applications!)).
 
 IMPORT_CPPFLAGS += -D__aix__
 CMAKEDEPEND     += -D_AIX
@@ -1043,19 +1050,21 @@ LibPattern = lib%-ar.a
 LibDebugPattern = lib%-ar.a
 LibNoDebugPattern = lib%-ar.a
 LibSuffixPattern = %-ar.a
-LibSearchPattern = -l%-ar
 
 # Name all shared libraries with .a suffix
 LibSharedPattern = lib%.a
 LibSharedSuffixPattern = %.a
 LibSharedSearchPattern = -l%
 
+# Link with shared libraries
+LibSearchPattern = -l%$(OMNIORB_MINOR_VERSION)
+
 # OMNI thread stuff
 ThreadSystem = Posix
 OMNITHREAD_POSIX_CPPFLAGS = -DNoNanoSleep -DPthreadDraftVersion=10
 OMNITHREAD_CPPFLAGS = -D_REENTRANT -D_THREAD_SAFE
 OMNITHREAD_PLATFORM_LIB = -lpthreads
-OMNITHREAD_LIB = -lomnithread$(OMNITHREAD_MAJOR_VERSION)$(OMNITHREAD_MINOR_VERSION) $(OMNITHREAD_PLATFORM_LIB)
+OMNITHREAD_LIB = -lomnithread$(OMNITHREAD_MAJOR_VERSION) $(OMNITHREAD_PLATFORM_LIB)
 
 # Shared library support stuff
 SHAREDLIB_SUFFIX   = a
@@ -1063,7 +1072,7 @@ PythonSHAREDLIB_SUFFIX = so
 SharedLibraryFullNameTemplate = lib$$1$$2$$3$$4.$(SHAREDLIB_SUFFIX)
 SharedLibrarySoNameTemplate = lib$$1$$2.$(SHAREDLIB_SUFFIX).$$3
 SharedLibraryLibNameTemplate = lib$$1$$2$$3.$(SHAREDLIB_SUFFIX)
-SharedLibraryPlatformLinkFlagsTemplate = -shared -fPIC -Wl,-brtl -Wl,-bexpfull -Wl,-blibpath:/lib:/usr/lib:$(prefix)/lib
+SharedLibraryPlatformLinkFlagsTemplate = -shared -fPIC -Wl,-brtl -Wl,-blibpath:/lib:/usr/lib:$(prefix)/lib
 
 endif	# Compiler_GCC
 endif	# AIX

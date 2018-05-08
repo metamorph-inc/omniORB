@@ -77,7 +77,7 @@ ifdef Win32Platform
 dynimps := COS$(OMNIORB_MAJOR_VERSION)$(OMNIORB_MINOR_VERSION)$(OMNIORB_MICRO_VERSION)_rt.lib \
            $(patsubst $(DLLDebugSearchPattern),$(DLLNoDebugSearchPattern), $(OMNIORB_LIB))
 else
-dynimps := -lCOS$(OMNIORB_MAJOR_VERSION) $(OMNIORB_LIB)
+dynimps := $(OMNIORB_COS_LIB) $(OMNIORB_LIB)
 endif
 
 mkshared::

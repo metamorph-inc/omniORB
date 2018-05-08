@@ -160,7 +160,7 @@ int main() {
 }
 ],
  omni_cv_cxx_catch_by_base=yes, omni_cv_cxx_catch_by_base=no,
- omni_cv_cxx_catch_by_base=no)
+ omni_cv_cxx_catch_by_base=yes)
  AC_LANG_POP(C++)
 ])
 if test "$omni_cv_cxx_catch_by_base" = yes; then
@@ -371,7 +371,7 @@ AC_SUBST(ENABLE_STATIC, $omni_cv_enable_static)
 
 dnl Enable ZIOP
 AC_DEFUN([OMNI_ENABLE_ZIOP],
-[AC_CHECK_LIB(z,compress2,omni_cv_enable_ziop=yes,omni_cv_enable_ziop=no)
+[AC_CHECK_LIB(z,compressBound,omni_cv_enable_ziop=yes,omni_cv_enable_ziop=no)
 AC_SUBST(ENABLE_ZIOP, $omni_cv_enable_ziop)])
 
 

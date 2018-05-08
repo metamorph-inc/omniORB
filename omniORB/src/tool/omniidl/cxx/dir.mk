@@ -101,7 +101,6 @@ DIR_CPPFLAGS += $(SHAREDLIB_CPPFLAGS)
 ifdef AIX
 
 DIR_CPPFLAGS += -I. -I/usr/local/include -DNO_STRCASECMP
-CXXLINK = makeC++SharedLib_r
 
 libinit = init_omniidl
 py_exp = $(PYPREFIX)/lib/python$(PYVERSION)/config/python.exp
@@ -120,19 +119,29 @@ $(shlib): $(OBJS) $(PYOBJS)
 		$(filter-out $(LibSuffixPattern),$^); \
 	)
 else
+
+
+# Previously, xlc builds used this, but modern xlc works correctly
+# with the standard rule.
+
+# CXXLINK = makeC++SharedLib_r
+#
+# $(shlib): $(OBJS) $(PYOBJS)
+# 	@(set -x; \
+# 	$(RM) $@; \
+# 	$(CXXLINK) \
+# 		-n $(libinit) \
+# 		-o $(shlib) \
+# 		-bI:$(py_exp) \
+# 		$(IMPORT_LIBRARY_FLAGS) \
+# 		-bhalt:4 -T512 -H512 \
+# 		$(filter-out $(LibSuffixPattern),$^) \
+# 		-p 40 \
+# 		; \
+# 	)
 $(shlib): $(OBJS) $(PYOBJS)
-	@(set -x; \
-	$(RM) $@; \
-	$(CXXLINK) \
-		-n $(libinit) \
-		-o $(shlib) \
-		-bI:$(py_exp) \
-		$(IMPORT_LIBRARY_FLAGS) \
-		-bhalt:4 -T512 -H512 \
-		$(filter-out $(LibSuffixPattern),$^) \
-		-p 40 \
-		; \
-	)
+	@(namespec="$(namespec)"; extralibs="$(extralibs)"; $(MakeCXXSharedLibrary))
+
 endif
 
 else

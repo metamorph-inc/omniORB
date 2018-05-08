@@ -56,6 +56,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define const /**/
 typedef int Bool;

@@ -29,7 +29,7 @@ endif
 
 ifdef AIX
 ifdef Compiler_GCC
-extralibs += $(OMNITHREAD_LIB)
+extralibs += $(OMNIORB_LIB_NODYN)
 endif
 endif
 

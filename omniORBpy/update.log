@@ -1,3 +1,16 @@
+Tue  8 May 17:49:07 BST 2018
+============================
+
+- Avoid use of ancient zlib; AIX build fixes.
+
+acinclude.m4
+configure
+mk/beforeauto.mk.in
+mk/python.mk
+modules/connections/dir.mk
+modules/ziop/dir.mk
+
+
 Wed 18 Apr 18:01:39 BST 2018
 ============================
 

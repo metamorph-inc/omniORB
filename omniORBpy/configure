@@ -3980,9 +3980,9 @@ OPEN_SSL_LIB=$open_ssl_lib
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for compress2 in -lz" >&5
-$as_echo_n "checking for compress2 in -lz... " >&6; }
-if ${ac_cv_lib_z_compress2+:} false; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for compressBound in -lz" >&5
+$as_echo_n "checking for compressBound in -lz... " >&6; }
+if ${ac_cv_lib_z_compressBound+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -3996,27 +3996,27 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char compress2 ();
+char compressBound ();
 int
 main ()
 {
-return compress2 ();
+return compressBound ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_z_compress2=yes
+  ac_cv_lib_z_compressBound=yes
 else
-  ac_cv_lib_z_compress2=no
+  ac_cv_lib_z_compressBound=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_compress2" >&5
-$as_echo "$ac_cv_lib_z_compress2" >&6; }
-if test "x$ac_cv_lib_z_compress2" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_compressBound" >&5
+$as_echo "$ac_cv_lib_z_compressBound" >&6; }
+if test "x$ac_cv_lib_z_compressBound" = xyes; then :
   omni_cv_enable_ziop=yes
 else
   omni_cv_enable_ziop=no

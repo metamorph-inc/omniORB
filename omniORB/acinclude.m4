@@ -433,7 +433,7 @@ AC_SUBST(ENABLE_LONGDOUBLE, $omni_cv_enable_longdouble)
 
 dnl Enable ZIOP
 AC_DEFUN([OMNI_ENABLE_ZIOP],
-[AC_CHECK_LIB(z,compress2,omni_cv_enable_ziop=yes,omni_cv_enable_ziop=no)
+[AC_CHECK_LIB(z,compressBound,omni_cv_enable_ziop=yes,omni_cv_enable_ziop=no)
 AC_SUBST(ENABLE_ZIOP, $omni_cv_enable_ziop)])
 
 dnl Atomic operations
