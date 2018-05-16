@@ -1,7 +1,7 @@
 Wed 16 May 13:50:17 BST 2018
 ============================
 
-- retainAddressOrder fails to reset addresses if initial name resoluion fails.
+- retainAddressOrder fails to reset addresses if initial name resolution fails.
 
 src/lib/omniORB/orbcore/giopRope.cc
 
