@@ -1,3 +1,11 @@
+Wed 16 May 13:49:34 BST 2018
+============================
+
+- Correct API instructions for Python 3.x.
+
+include/omniORBpy.h
+
+
 Tue  8 May 17:49:07 BST 2018
 ============================
 

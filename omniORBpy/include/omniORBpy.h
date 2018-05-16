@@ -3,7 +3,7 @@
 // omniORBpy.h                Created on: 2002/05/25
 //                            Author    : Duncan Grisby (dgrisby)
 //
-//    Copyright (C) 2002 Duncan Grisby
+//    Copyright (C) 2002-2018 Duncan Grisby
 //
 //    This file is part of the omniORBpy library
 //
@@ -34,9 +34,16 @@
 #include <omniORB4/CORBA.h>
 
 // The omniORBpy C++ API consists of a singleton structure containing
-// function pointers. A pointer to the API struct is stored as a
-// PyCObject in the _omnipy module with the name API. Access it with
-// code like:
+// function pointers.
+//
+// In Python 3.x, a pointer to the API struct is stored in a PyCapsule
+// named "_omnipy.API". Access it with code like:
+//
+//      omniORBpyAPI* api = (omniORBpyAPI*)PyCapsule_Import("_omnipy.API", 0);
+// 
+//
+// In Python 2.x, a pointer to the API struct is stored as a PyCObject
+// in the _omnipy module with the name API. Access it with code like:
 //
 //      PyObject*     omnipy = PyImport_ImportModule((char*)"_omnipy");
 //      PyObject*     pyapi  = PyObject_GetAttrString(omnipy, (char*)"API");
