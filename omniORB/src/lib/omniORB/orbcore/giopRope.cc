@@ -3,7 +3,7 @@
 // giopRope.cc                Created on: 16/01/2001
 //                            Author    : Sai Lai Lo (sll)
 //
-//    Copyright (C) 2002-2012 Apasphere Ltd
+//    Copyright (C) 2002-2018 Apasphere Ltd
 //    Copyright (C) 2001 AT&T Laboratories Cambridge
 //
 //    This file is part of the omniORB library
@@ -622,28 +622,32 @@ giopRope::resetAddressOrder(CORBA::Boolean heldlock)
 
   omni_optional_lock sync(*omniTransportLock, heldlock, heldlock);
 
-  if (!pd_addrs_filtered || pd_filtering || pd_addresses.size() == 1)
+  if (!pd_addrs_filtered || pd_filtering)
     return;
 
   if (omniORB::trace(25)) {
-    const giopAddress* addr =
-      pd_addresses[pd_addresses_order[pd_address_in_use]];
-
     omniORB::logger log;
-    log << "Reset rope addresses (current address " << addr->address() << ")\n";
+    if (pd_addresses_order.size() > pd_address_in_use) {
+      const giopAddress* addr =
+        pd_addresses[pd_addresses_order[pd_address_in_use]];
+
+      log << "Reset rope addresses (current address "
+          << addr->address() << ")\n";
+    }
+    else {
+      log << "Reset rope addresses (no current address)\n";
+    }
   }
 
-  if (pd_addresses.size() != pd_ior_addr_size) {
-    // Some names were resolved to addresses, so we remove the
-    // resolved addresses from the end of pd_addresses, and invalidate
-    // the address order.
-    while (pd_addresses.size() > pd_ior_addr_size) {
-      delete pd_addresses.back();
-      pd_addresses.pop_back();
-    }
-    pd_addresses_order.clear();
-    pd_addrs_filtered = 0;
+  // Names may have been resolved to addresses, so we remove the
+  // resolved addresses from the end of pd_addresses.
+  while (pd_addresses.size() > pd_ior_addr_size) {
+    delete pd_addresses.back();
+    pd_addresses.pop_back();
   }
+
+  pd_addresses_order.clear();
+  pd_addrs_filtered = 0;
   pd_address_in_use = 0;
 }
 
