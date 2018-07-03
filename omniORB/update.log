@@ -1,3 +1,12 @@
+Tue  3 Jul 18:17:02 BST 2018
+============================
+
+- Logging could attempt to access deleted address.
+
+include/omniORB4/internal/giopStream.h
+src/lib/omniORB/orbcore/giopStream.cc
+
+
 Wed 16 May 13:50:17 BST 2018
 ============================
 
