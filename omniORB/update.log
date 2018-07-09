@@ -1,3 +1,15 @@
+Mon  9 Jul 11:19:50 BST 2018
+============================
+
+- Update Windows platform files for modern OpenSSL and zlib.
+
+mk/platforms/x86_win32_vs_10.mk
+mk/platforms/x86_win32_vs_11.mk
+mk/platforms/x86_win32_vs_12.mk
+mk/platforms/x86_win32_vs_14.mk
+mk/platforms/x86_win32_vs_15.mk
+
+
 Tue  3 Jul 18:17:02 BST 2018
 ============================
 
