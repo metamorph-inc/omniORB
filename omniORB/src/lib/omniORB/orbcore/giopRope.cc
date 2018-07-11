@@ -181,14 +181,18 @@ giopRope::acquireClient(const omniIOR*      ior,
 
   omni_tracedmutex_lock sync(*omniTransportLock);
 
-  if (!pd_addrs_filtered) {
+  while (!pd_addrs_filtered) {
 
     if (pd_filtering) {
       // Another thread is filtering. Wait until it is done
       while (pd_filtering)
         pd_cond.wait();
 
-      OMNIORB_ASSERT(pd_addrs_filtered);
+      // The thread doing the filtering will have filtered the
+      // addresses and set pd_addrs_filtered to 1. However, by the
+      // time this thread runs, it is possible for the addresses to
+      // have been reset again by resetAddressOrder, so we loop to
+      // check again.
     }
     else {
       pd_filtering = 1;
@@ -198,6 +202,7 @@ giopRope::acquireClient(const omniIOR*      ior,
       pd_addrs_filtered = 1;
 
       pd_cond.broadcast();
+      break;
     }
   }
 

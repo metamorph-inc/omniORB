@@ -1,3 +1,13 @@
+Wed 11 Jul 17:35:16 BST 2018
+============================
+
+- With retainAddressOrder false, an immediately failed connection on a
+  resolved address racing with a second thread trying to open a
+  connection to the same server, could lead to an assertion failure.
+
+src/lib/omniORB/orbcore/giopRope.cc
+
+
 Mon  9 Jul 11:19:50 BST 2018
 ============================
 
