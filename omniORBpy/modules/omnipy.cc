@@ -627,8 +627,9 @@ extern "C" {
   {
     PyObject* d = PyModule_GetDict(m);
 
-    PyDict_SetItemString(d, (char*)"__version__",
-			 String_FromString(OMNIPY_VERSION_STRING));
+    PyObject* ver = String_FromString(OMNIPY_VERSION_STRING);
+    PyDict_SetItemString(d, (char*)"__version__", ver);
+    Py_DECREF(ver);
 
     PyObject* excs = generateExceptionList();
     PyDict_SetItemString(d, (char*)"system_exceptions", excs);

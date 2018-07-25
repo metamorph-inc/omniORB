@@ -1,3 +1,14 @@
+Wed 25 Jul 15:39:28 BST 2018
+============================
+
+- Fix some reference count leaks inserting objects into dicts.
+
+modules/omnipy.cc
+modules/pyInterceptors.cc
+modules/pyObjectRef.cc
+modules/pyTypeCode.cc
+
+
 Wed 16 May 13:49:34 BST 2018
 ============================
 

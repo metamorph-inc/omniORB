@@ -1012,7 +1012,8 @@ r_unmarshalTypeCode(cdrStream& stream, OffsetDescriptorMap& odm)
 	    PyTuple_SET_ITEM(d_o, 7, mem);
 	  }
 	  else {
-	    PyDict_SetItem(dict, label, mem);
+            PyDict_SetItem(dict, label, mem);
+            Py_DECREF(mem);
 	  }
 	}
 

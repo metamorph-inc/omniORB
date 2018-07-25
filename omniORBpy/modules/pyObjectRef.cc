@@ -214,7 +214,7 @@ omniPy::createPyPseudoObjRef(const CORBA::Object_ptr objref)
 #else
       if (!PyCapsule_CheckExact(pyf)) {
 	omniORB::logs(1, "WARNING: Entry in _omnipy.pseudoFns "
-		      "is not a PyCObject.");
+		      "is not a PyCapsule.");
 	continue;
       }
       omniORBpyPseudoFn f = (omniORBpyPseudoFn)PyCapsule_GetPointer(pyf, 0);

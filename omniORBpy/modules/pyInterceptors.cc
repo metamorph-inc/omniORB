@@ -147,6 +147,8 @@ getContextsAndCallInterceptors(PyObject*                fnlist,
       value = Py_None;
     }
     PyDict_SetItemString(peer_info, "address", value);
+    Py_DECREF(value);
+
     if (peer_identity) {
       value = String_FromString(peer_identity);
     }
@@ -155,6 +157,8 @@ getContextsAndCallInterceptors(PyObject*                fnlist,
       value = Py_None;
     }
     PyDict_SetItemString(peer_info, "identity", value);
+    Py_DECREF(value);
+
     PyTuple_SET_ITEM(argtuple, 2, peer_info);
   }
 
