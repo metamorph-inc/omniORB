@@ -1,3 +1,13 @@
+Wed  5 Sep 16:17:59 BST 2018
+============================
+
+- Fix race condition leading to use of deleted giopAddress object.
+
+include/omniORB4/internal/giopRope.h
+src/lib/omniORB/orbcore/GIOP_C.cc
+src/lib/omniORB/orbcore/giopRope.cc
+
+
 Wed 11 Jul 17:35:16 BST 2018
 ============================
 

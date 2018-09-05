@@ -254,7 +254,7 @@ GIOP_C::notifyCommFailure(CORBA::Boolean  heldlock,
 
       if (currentaddr == firstaddr) {
         // Run out of addresses to try.
-        pd_rope->resetAddressOrder(heldlock);
+        pd_rope->resetAddressOrder(heldlock, pd_strand);
 	retry = 0;
 	pd_calldescriptor->firstAddressUsed(0);
 	pd_calldescriptor->currentAddress(0);
@@ -280,7 +280,7 @@ GIOP_C::notifyCommFailure(CORBA::Boolean  heldlock,
     // Strand has been re-used from a previous invocation. Have
     // another go with a new strand in case something was broken in
     // the current one.
-    pd_rope->resetAddressOrder(heldlock);
+    pd_rope->resetAddressOrder(heldlock, pd_strand);
     retry = 1;
   }
 

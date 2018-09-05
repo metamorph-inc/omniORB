@@ -154,11 +154,14 @@ public:
   //    Internally, omniTransportLock is used for synchronisation, if
   //    <heldlock> is true, the caller already holds the lock.
 
-  void resetAddressOrder(CORBA::Boolean heldlock);
+  void resetAddressOrder(CORBA::Boolean heldlock, giopStrand* strand);
   // If the retainAddressOrder parameter is not set true, reset the
   // address order to ensure the next connection attempt uses the
   // highest priority address. If names were resolved to addresses,
   // clears the resolved names so they are re-resolved next call.
+  //
+  // strand is a pointer to the strand that encountered an error
+  // leading to this call, or null in the case of an idle rope.
   //
   // Thread Safety preconditions:
   //    Internally, omniTransportLock is used for synchronisation, if
