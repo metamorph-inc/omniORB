@@ -375,7 +375,9 @@ public:
     if (_pd_val != b._pd_val) {
       if (_pd_val)
 	_pd_val->_remove_ref();
-      if ((_pd_val = b._pd_val))
+
+      _pd_val = b._pd_val;
+      if (_pd_val)
 	_pd_val->_add_ref();
     }
     return *this; 

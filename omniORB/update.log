@@ -1,3 +1,12 @@
+Tue 30 Oct 17:14:21 GMT 2018
+============================
+
+- Avoid warnings about assignments in conditional expressions.
+
+include/omniORB4/CORBA_ValueBase_vartypes.h
+include/omniORB4/poa.h
+
+
 Wed  5 Sep 16:17:59 BST 2018
 ============================
 

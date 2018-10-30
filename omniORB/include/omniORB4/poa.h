@@ -632,15 +632,20 @@ _CORBA_MODULE_BEG
 
     inline Servant_var& operator= (T* p) {
       if (pd_data != p) {
-	if (pd_data) pd_data->_remove_ref();
+	if (pd_data)
+          pd_data->_remove_ref();
 	pd_data = p;
       }
       return *this;
     }
     inline Servant_var& operator= (const Servant_var& v) {
       if (v.pd_data != pd_data) {
-	if (pd_data) pd_data->_remove_ref();
-	if ((pd_data = v.pd_data)) pd_data->_add_ref();
+	if (pd_data)
+          pd_data->_remove_ref();
+
+        pd_data = v.pd_data;
+        if (pd_data)
+          pd_data->_add_ref();
       }
       return *this;
     }
