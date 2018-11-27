@@ -37,7 +37,7 @@ DIR_CPPFLAGS   = -I. -I$(TOP)\include
 # interfaces are used. We use the small library here. If you prefer
 # to link with the dynamic library, swap the comment on the next 2
 # lines.
-#OMNI_DYNAMIC_LIB = omniDynamic321_rt.lib
+#OMNI_DYNAMIC_LIB = omniDynamic4_rt.lib
 OMNI_DYNAMIC_LIB = msvcstub.lib -NODEFAULTLIB:libcmt.lib -NODEFAULTLIB:libcmtd.lib 
 
 CORBA_CPPFLAGS = -D__WIN32__ -D_WIN32_WINNT=0x0400 -D__x86__ -D__NT__ \
@@ -69,7 +69,7 @@ CXXLINKOPTIONS =
 
 all:: shortcut.exe
 
-shortcut.exe: echoSK.obj shortcut.obj
+shortcut.exe: shortcutSK.obj shortcut.obj
   link -nologo $(CXXLINKOPTIONS) -out:$@ $** $(CORBA_LIB)
 
 clean::
@@ -79,12 +79,9 @@ clean::
 
 veryclean::
   -del *.obj
-  -del echoSK.* echo.hh
+  -del shortcutSK.* shortcut.hh
   -del *.exe
 
 
-echo.hh echoSK.cc: echo.idl
-	$(TOP)\bin\x86_win32\omniidl -T -bcxx -Wbh=.hh -Wbs=SK.cc echo.idl
-
-echo.idl: $(TOP)\idl\echo.idl
-	copy $(TOP)\idl\echo.idl .
+shortcut.hh shortcutSK.cc: shortcut.idl
+	$(TOP)\bin\x86_win32\omniidl -T -bcxx -Wbh=.hh -Wbs=SK.cc shortcut.idl

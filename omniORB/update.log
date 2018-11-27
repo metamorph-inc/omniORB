@@ -1,3 +1,13 @@
+Tue 27 Nov 12:23:53 GMT 2018
+============================
+
+- Fix some MSVC makefiles.
+
+src/examples/ami/dir.mak
+src/examples/boa/dir.mak
+src/examples/poa/shortcut/dir.mak
+
+
 Tue 30 Oct 17:14:21 GMT 2018
 ============================
 

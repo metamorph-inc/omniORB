@@ -68,10 +68,7 @@ CXXLINKOPTIONS =
 #CXXFLAGS       = -MDd -GX -Z7 -Od  $(CORBA_CPPFLAGS) $(DIR_CPPFLAGS)
 #CXXLINKOPTIONS = -debug -PDB:NONE	
 
-all:: eg2_clt.exe eg2_impl.exe
-
-eg2_clt.exe: bechoSK.obj eg2_clt.obj
-  link -nologo $(CXXLINKOPTIONS) -out:$@ $** $(CORBA_LIB)
+all:: eg2_impl.exe
 
 eg2_impl.exe: bechoSK.obj eg2_impl.obj
   link -nologo $(CXXLINKOPTIONS) -out:$@ $** $(CORBA_LIB)
