@@ -1,3 +1,11 @@
+Thu 29 Nov 17:10:43 GMT 2018
+============================
+
+- Avoid clash with std::empty.
+
+src/examples/thread/prodcons.cc
+
+
 Tue 27 Nov 12:23:53 GMT 2018
 ============================
 
