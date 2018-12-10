@@ -13,7 +13,7 @@
 
 Summary: Object Request Broker (ORB)
 Name:    %{_name}
-Version: 4.2.2
+Version: 4.2.3
 Release: 1
 License: GPL / LGPL
 Group:   System/Libraries

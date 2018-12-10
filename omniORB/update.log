@@ -1,3 +1,20 @@
+Mon 10 Dec 23:35:46 GMT 2018
+============================
+
+- Updates for 4.2.3.
+
+README.FIRST.txt
+ReleaseNotes.txt
+THIS_IS_OMNIORB_4_2_2
+THIS_IS_OMNIORB_4_2_3
+aclocal.m4
+configure.ac
+configure
+contrib/RPMs/omniORB.spec
+contrib/RPMs/omniORB_new.spec
+mk/version.mk
+
+
 Thu 29 Nov 17:10:43 GMT 2018
 ============================
 

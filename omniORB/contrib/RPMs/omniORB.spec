@@ -5,7 +5,7 @@
 
 %define version_major 4
 %define version_minor 2
-%define version_micro 2
+%define version_micro 3
 %define version_full %{version_major}.%{version_minor}.%{version_micro}
 %define version_brief %{version_major}.%{version_minor}
 
@@ -55,7 +55,7 @@ Provides:  libomniConnectionMgmt%{version_major}.so.%{version_minor}
 Provides:  libomniDynamic%{version_major}.so.%{version_minor}
 Provides:  libomniORB%{version_major}.so.%{version_minor}
 Provides:  libomnisslTP%{version_major}.so.%{version_minor}
-Provides:  libomnithread.so.3
+Provides:  libomnithread.so.4
 
 %description -n %{lib_name}
 %{name} is an Object Request Broker (ORB) which implements

@@ -1,10 +1,25 @@
 RELEASE NOTES
 =============
 
-This is omniORB 4.2.2
+This is omniORB 4.2.3
 
 See README.unix.txt or README.win32.txt for building instructions.
 See the documentation in the doc directory for more information.
+
+
+Changes since omniORB 4.2.2
+---------------------------
+
+omniORB 4.2.3 is primarily a bug fix release. See update.log for full
+details of changes. Highlights include:
+
+ - New retainAddressOrder and resolveNamesForTransportRules options.
+
+ - Experimental support for Mac / iOS CFNetwork connections.
+
+ - Fixed a lock order violation that could lead to a deadlock if
+   multiple connections were being opened and closed simultaneously in
+   thread pool mode.
 
 
 Changes since omniORB 4.2.1
