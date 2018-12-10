@@ -153,7 +153,7 @@ omniPy::produceSystemException(PyObject* eobj, PyObject* erepoId,
   // Clear any errors raised by the GetAttrs
   if (PyErr_Occurred()) PyErr_Clear();
 
-  char* repoId = String_AS_STRING(erepoId);
+  const char* repoId = String_AS_STRING(erepoId);
 
 #define THROW_SYSTEM_EXCEPTION_IF_MATCH(ex) \
   if (omni::strMatch(repoId, "IDL:omg.org/CORBA/" #ex ":1.0")) { \

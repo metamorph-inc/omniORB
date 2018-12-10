@@ -375,7 +375,7 @@ extern "C" {
 	delete[] argv;
 	return 0;
       }
-      argv[i] = String_AsString(o);
+      argv[i] = (char*)String_AsString(o);
     }
 
     int orig_argc = argc;
@@ -402,7 +402,7 @@ extern "C" {
 
 	while (1) {
 	  o = PyList_GetItem(pyargv, i); OMNIORB_ASSERT(o != 0);
-	  t = String_AsString(o);
+	  t = (char*)String_AsString(o);
 	  if (s == t) break;
 	  r = PySequence_DelItem(pyargv, i);
 	  OMNIORB_ASSERT(r != -1);

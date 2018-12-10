@@ -1013,7 +1013,7 @@ Py_AdapterActivatorSvt::_ptrToInterface(const char* repoId)
 
 static
 omniPy::Py_omniServant*
-newSpecialServant(PyObject* pyservant, PyObject* opdict, char* repoId)
+newSpecialServant(PyObject* pyservant, PyObject* opdict, const char* repoId)
 {
   if (omni::ptrStrMatch(repoId, PortableServer::ServantActivator::_PD_repoId))
     return new Py_ServantActivatorSvt(pyservant, opdict, repoId);
