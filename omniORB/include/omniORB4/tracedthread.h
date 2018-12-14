@@ -54,7 +54,7 @@
 //   Protects CORBA::ORB existence and state.
 //   Synchronises ORB::run().
 //   Held while calling module attach() and detach().
-//   Nefore omniTransportLock.
+//   Before omniTransportLock.
 //   Before omni::poRcLock.
 //
 // giopServer::pd_lock
