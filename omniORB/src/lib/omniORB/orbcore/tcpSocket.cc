@@ -26,6 +26,7 @@
 //    Utility functions for managing TCP sockets
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <omniORB4/CORBA.h>
 #include <omniORB4/omniURI.h>
 #include <SocketCollection.h>
