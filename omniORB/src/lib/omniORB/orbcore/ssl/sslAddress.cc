@@ -111,6 +111,9 @@ sslAddress::Connect(const omni_time_t& deadline,
   SSL_set_fd(ssl, sock);
   SSL_set_connect_state(ssl);
 
+  if (!LibcWrapper::isipaddr(pd_address.host))
+    SSL_set_tlsext_host_name(ssl, (const char*)pd_address.host);
+  
   struct timeval t;
   int rc;
 

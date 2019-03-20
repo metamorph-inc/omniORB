@@ -1,3 +1,15 @@
+Wed 20 Mar 16:39:02 GMT 2019
+============================
+
+- Add missing #include <stdio.h>.
+
+src/lib/omniORB/orbcore/tcpSocket.cc
+
+- Set hostname extension in TLS connections.
+
+src/lib/omniORB/orbcore/ssl/sslAddress.cc
+
+
 Fri 14 Dec 10:29:29 GMT 2018
 ============================
 
