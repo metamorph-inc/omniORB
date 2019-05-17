@@ -1,3 +1,15 @@
+Fri 17 May 10:50:02 BST 2019
+============================
+
+- Python 3 fixes -- method docstring setting; avoid ImportWarning in
+  IDL-generated modules.
+
+python/omniORB/__init__.py
+python/omniidl_be/python.py
+python3/omniORB/__init__.py
+python3/omniidl_be/python.py
+
+
 Fri 15 Feb 21:32:28 GMT 2019
 ============================
 

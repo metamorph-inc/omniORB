@@ -1980,7 +1980,7 @@ class DocstringVisitor (idlvisitor.AstVisitor):
             nsn = fixupScopedName(nsn)
             dsn = fixupScopedName(dsn)
 
-            self.st.out("@node@.__doc__ = @doc@",
+            self.st.out("omniORB.setDocString(@node@, @doc@)",
                         node=dotName(nsn), doc=dotName(dsn))
             
         if self.docs:
@@ -2060,21 +2060,21 @@ class DocstringVisitor (idlvisitor.AstVisitor):
 
     def visitOperation(self, node):
         if node.identifier() == self.target_id:
-            sn = node.scopedName() + ["im_func"]
-            sn[-3] = "_objref_" + sn[-3]
+            sn = node.scopedName()[:]
+            sn[-2] = "_objref_" + sn[-2]
             self.docs.append((sn, self.target_node.scopedName()))
             self.ok = 1
 
     def visitAttribute(self, node):
         for n in node.declarators():
             if n.identifier() == self.target_id:
-                sn = n.scopedName() + ["im_func"]
-                sn[-3] = "_objref_" + sn[-3]
-                sn[-2] = "_get_"    + sn[-2]
+                sn = n.scopedName()[:]
+                sn[-2] = "_objref_" + sn[-2]
+                sn[-1] = "_get_"    + sn[-1]
                 self.docs.append((sn, self.target_node.scopedName()))
                 if not node.readonly():
                     sn = sn[:]
-                    sn[-2] = "_set_" + n.identifier()
+                    sn[-1] = "_set_" + n.identifier()
                     self.docs.append((sn, self.target_node.scopedName()))
                 self.ok = 1
 

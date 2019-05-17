@@ -452,7 +452,19 @@ def newEmptyClass():
     class __dummy(object): pass
     return __dummy
 
- 
+
+# Docstring setting
+def setDocString(obj, doc):
+    try:
+        if isinstance(obj, types.UnboundMethodType):
+            obj = obj.im_func
+        obj.__doc__ = doc
+
+    except AttributeError:
+        # Python 2 does not permit __doc__ assignment to a new-style class
+        pass
+
+
 # Classes to support IDL type mapping
 
 class EnumItem(object):

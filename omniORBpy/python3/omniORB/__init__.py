@@ -171,8 +171,7 @@ sys.modules."""
             for m in (mod, skeletonModuleName(mod)):
                 if m in _partialModules:
                     if m in sys.modules:
-                        sys.modules[m].__dict__.update(
-                            _partialModules[m].__dict__)
+                        updateModuleDict(sys.modules[m], _partialModules[m])
                     else:
                         sys.modules[m] = _partialModules[m]
                     del _partialModules[m]
@@ -377,7 +376,7 @@ def openModule(mname, fname=None):
 
         if mname in _partialModules:
             pmod = _partialModules[mname]
-            mod.__dict__.update(pmod.__dict__)
+            updateModuleDict(mod, pmod)
             del _partialModules[mname]
             
     elif mname in _partialModules:
@@ -427,8 +426,17 @@ def updateModule(mname):
     if mname in _partialModules:
         pmod = _partialModules[mname]
         mod  = sys.modules[mname]
-        mod.__dict__.update(pmod.__dict__)
+        updateModuleDict(mod, pmod)
         del _partialModules[mname]
+
+
+def updateModuleDict(dest, source):
+    dd = dest.__dict__
+    sd = source.__dict__
+    
+    for k, v in sd.items():
+        if not (k.startswith("__") and k.endswith("__")):
+            dd[k] = v
 
 
 def promotePartialModule(mname):
@@ -453,6 +461,11 @@ def newEmptyClass():
     return __dummy
 
  
+# Docstring setting
+def setDocString(obj, doc):
+    obj.__doc__ = doc
+
+
 # Classes to support IDL type mapping
 
 class EnumItem(object):
