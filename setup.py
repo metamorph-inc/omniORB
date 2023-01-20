@@ -7,11 +7,14 @@ import os.path
 import platform
 import struct
 import shutil
+import setuptools
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(this_dir)
+
+python_dir = 'omniORB/src/lib/omniORBpy/' + ('python' if sys.version_info[0] == 2 else 'python3')
 
 setup_args = dict(
     name='omniorb',
@@ -23,8 +26,8 @@ setup_args = dict(
     url='https://github.com/metamorph-inc/omniORB',
     license='LGPL for libraries, GPL for tools',
 
-    packages=['omniORB'],
-    package_dir = {'': 'omniORB/src/lib/omniORBpy/' + ('python' if sys.version_info[0] == 2 else 'python3')},
+    packages=setuptools.find_packages(where=python_dir),  # ['omniORB', 'COS'],
+    package_dir={'': python_dir},
     # package_data={"omniORB": [r"omniORB\bin\x86_win32\omniORB423_vc14_rt.dll"]},
     data_files=[("lib\\site-packages", [r"omniORB\bin\x86_win32\omniORB423_vc14_rt.dll", r"omniORB\bin\x86_win32\omnithread41_vc14_rt.dll"])],
 
