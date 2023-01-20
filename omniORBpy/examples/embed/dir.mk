@@ -15,7 +15,7 @@ CXXSRCS = embed.cc
 ifdef UnixPlatform
 CXXDEBUGFLAGS = -g
 PYPREFIX  := $(shell $(PYTHON) -c 'import sys; print sys.exec_prefix')
-PYVERSION := $(shell $(PYTHON) -c 'import sys; print sys.version[:3]')
+PYVERSION := $(shell $(PYTHON) -c 'import sys; print chr(46).join(map(str,sys.version_info[0:2]))')
 PYINCDIR  := $(PYPREFIX)/include
 PYINCFILE := "<python$(PYVERSION)/Python.h>"
 DIR_CPPFLAGS += -I$(PYINCDIR) -DPYTHON_INCLUDE=$(PYINCFILE)
@@ -99,7 +99,7 @@ ifdef Win32Platform
 
 PYPREFIX1 := "$(shell $(PYTHON) -c 'import sys,string; sys.stdout.write(string.lower(sys.prefix))')"
 PYPREFIX  := $(subst program files,progra~1,$(subst \,/,$(PYPREFIX1)))
-PYVERSION := $(shell $(PYTHON) -c 'import sys; sys.stdout.write(sys.version[:3])')
+PYVERSION := $(shell $(PYTHON) -c 'import sys; sys.stdout.write(chr(46).join(map(str,sys.version_info[0:2])))')
 PYINCDIR  := $(PYPREFIX)/include
 PYLIBDIR  := $(PYPREFIX)/libs
 PYLIB     := python$(subst .,,$(PYVERSION)).lib

@@ -135,7 +135,7 @@ ifdef Win32Platform
 
 PYPREFIX1 := "$(shell $(PYTHON) -c 'import sys,string; sys.stdout.write(sys.prefix.lower())')"
 PYPREFIX  := $(subst program files,progra~1,$(subst \,/,$(PYPREFIX1)))
-PYVERSION := $(shell $(PYTHON) -c 'import sys; sys.stdout.write(sys.version[:3])')
+PYVERSION := $(shell $(PYTHON) -c 'import sys; sys.stdout.write(chr(46).join(map(str,sys.version_info[0:2])))')
 PYINCDIR  := $(PYPREFIX)/include
 PYLIBDIR  := $(PYPREFIX)/libs
 PYLIB     := python$(subst .,,$(PYVERSION)).lib

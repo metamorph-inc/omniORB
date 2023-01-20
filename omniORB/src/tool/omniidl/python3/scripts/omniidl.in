@@ -44,7 +44,7 @@ pylibdir   = archlibdir = None
 binarchdir = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 # Try a path based on the installation prefix
-sppath = "@prefix@/lib/python" + sys.version[:3] + "/site-packages"
+sppath = "@prefix@/lib/python" + chr(46).join(map(str,sys.version_info[0:2])) + "/site-packages"
 
 if os.path.isdir(sppath):
     sys.path.append(sppath)
@@ -56,9 +56,9 @@ if binarchdir != "":
     treedir, bin     = os.path.split(bindir)
     if bin == "bin":
         pylibdir    = os.path.join(treedir, "lib", "python")
-        vpylibdir   = pylibdir + sys.version[:3] + "/site-packages"
+        vpylibdir   = pylibdir + chr(46).join(map(str,sys.version_info[0:2])) + "/site-packages"
         vpylib64dir = (os.path.join(treedir, "lib64", "python") +
-                       sys.version[:3] + "/site-packages")
+                       chr(46).join(map(str,sys.version_info[0:2])) + "/site-packages")
         archlibdir  = os.path.join(treedir, "lib", archname)
 
         if os.path.isdir(pylibdir):
@@ -75,9 +75,9 @@ if binarchdir != "":
 
     elif archname == "bin":
         pylibdir    = os.path.join(bindir, "lib", "python")
-        vpylibdir   = pylibdir + sys.version[:3] + "/site-packages"
+        vpylibdir   = pylibdir + chr(46).join(map(str,sys.version_info[0:2])) + "/site-packages"
         vpylib64dir = (os.path.join(bindir, "lib64", "python") +
-                       sys.version[:3] + "/site-packages")
+                       chr(46).join(map(str,sys.version_info[0:2])) + "/site-packages")
         archlibdir  = os.path.join(bindir, "lib")
 
         if os.path.isdir(pylibdir):
@@ -93,9 +93,9 @@ if binarchdir != "":
             sys.path.insert(0, archlibdir)
 
 # Last chance, try a path based on the installation prefixes
-sys.path.append("@prefix@/lib/python" + sys.version[:3] + "/site-packages")
+sys.path.append("@prefix@/lib/python" + chr(46).join(map(str,sys.version_info[0:2])) + "/site-packages")
 
-paths = [ "@exec_prefix@/lib/python" + sys.version[:3] + "/site-packages",
+paths = [ "@exec_prefix@/lib/python" + chr(46).join(map(str,sys.version_info[0:2])) + "/site-packages",
           "@pythondir@",
           "@pyexecdir@" ]
 

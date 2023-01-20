@@ -444,7 +444,7 @@ AC_DEFUN([AM_PATH_PYTHON],
   dnl library.
 
   AC_CACHE_CHECK([for $am_display_PYTHON version], [am_cv_python_version],
-    [am_cv_python_version=`$PYTHON -c "import sys; sys.stdout.write(sys.version[[:3]])"`])
+    [am_cv_python_version=`$PYTHON -c "import sys; sys.stdout.write(chr(46).join(map(str,sys.version_info[[0:2]])))"`])
   AC_SUBST([PYTHON_VERSION], [$am_cv_python_version])
 
   dnl Use the values of $prefix and $exec_prefix for the corresponding
@@ -477,7 +477,7 @@ else:
 # <https://github.com/pypa/virtualenv/issues/118>
 try:
     from platform import python_implementation
-    if python_implementation() == 'CPython' and sys.version[[:3]] == '2.7':
+    if python_implementation() == 'CPython' and chr(46).join(map(str,sys.version_info[[0:2]])) == '2.7':
         can_use_sysconfig = 0
 except ImportError:
     pass"

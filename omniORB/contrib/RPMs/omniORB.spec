@@ -11,7 +11,7 @@
 
 %define lib_name %{?mklibname:%mklibname %{name} %{version_brief}}%{!?mklibname:lib%{name}%{version_brief}}
 
-%{!?py_ver: %define py_ver %(python -c "import sys;print(sys.version[0:3])")}
+%{!?py_ver: %define py_ver %(python -c "import sys;print(chr(46).join(map(str,sys.version_info[0:2])))")}
 %{!?python_sitearch: %define python_sitearch %(python -c "from distutils.sysconfig import get_python_lib; print get_python_lib(True,0,'%{_prefix}')")}
 %{!?python_sitelib: %define python_sitelib %(python -c "from distutils.sysconfig import get_python_lib; print get_python_lib(False,0,'%{_prefix}')")}
 

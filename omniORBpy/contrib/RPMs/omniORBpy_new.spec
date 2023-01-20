@@ -2,7 +2,7 @@
 
 %define lib_name %{?mklibname:%mklibname %{_name} 4.2}%{!?mklibname:lib%{_name}4.2}
 
-%{!?py_ver: %define py_ver %(python -c "import sys;print(sys.version[0:3])")}
+%{!?py_ver: %define py_ver %(python -c "import sys;print(chr(46).join(map(str,sys.version_info[0:2])))")}
 %{!?py_sitedir: %define py_sitedir %(python -c "from distutils.sysconfig import get_python_lib; print get_python_lib(0,0,'%{_prefix}')")}
 %{!?py_sitearch: %define py_sitearch %(python -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1,0,'%{_prefix}')")}
 
