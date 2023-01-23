@@ -10,13 +10,13 @@ environment:
       BUILD_ARCH: "x86"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
 
-    - PYTHON: "Python39"
+    - PYTHON: "Python39-x64"
       BUILD_ARCH: "x64"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-    - PYTHON: "Python310"
+    - PYTHON: "Python310-x64"
       BUILD_ARCH: "x64"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-    - PYTHON: "Python311"
+    - PYTHON: "Python311-x64"
       BUILD_ARCH: "x64"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
 
