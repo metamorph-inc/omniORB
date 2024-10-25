@@ -1,5 +1,8 @@
 environment:
   matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2204
+      APPVEYOR_JOB_NAME: "linux-x64"
+
     - PYTHON: "Python39"
       BUILD_ARCH: "x86"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
@@ -20,35 +23,41 @@ environment:
       BUILD_ARCH: "x64"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
 
+stack: python 3.12
+
+install:
+  - sh: python -m pip install --upgrade pip
+  - sh: python -m pip install cibuildwheel==2.21.3
+
 build_script:
 #  - '.\venv\Scripts\python setup.py build_ext --inplace'
 #  - '.\venv\Scripts\python setup.py bdist_wheel'
-  - 'move omniORBpy omniORB\src\lib'
+  - cmd: 'move omniORBpy omniORB\src\lib'
 
-  - 'cd omniORB'
-  - 'set PATH=%PATH%;%CD%\bin\x86_win32'
+  - cmd: 'cd omniORB'
+  - cmd: 'set PATH=%PATH%;%CD%\bin\x86_win32'
 
   # doesn't work: - 'echo platform = x86_win32_vs_14>>config\config.mk'
-  - 'sed -i "s/.*Uncomment one of the following platform lines.*/platform = x86_win32_vs_14/" config/config.mk'
-  - 'echo PYTHON = /cygdrive/c/%PYTHON%/python>>mk\platforms\x86_win32_vs_14.mk'
+  - cmd: 'sed -i "s/.*Uncomment one of the following platform lines.*/platform = x86_win32_vs_14/" config/config.mk'
+  - cmd: 'echo PYTHON = /cygdrive/c/%PYTHON%/python>>mk\platforms\x86_win32_vs_14.mk'
 
 # install cygwin make
-  - '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %BUILD_ARCH%'
-  - 'set path=%path%;c:\cygwin\bin;c:\%PYTHON%'
-  - 'set path=c:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86;c:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x86\;%PATH%'
-  - 'cd src'
-  - 'make export'
-  - 'cd lib\omniORBpy'
-  - 'make export'
-  - 'cd ..\..\..\..'
-  - 'c:\%PYTHON%\python.exe -m pip install wheel'
-  - 'c:\%PYTHON%\python.exe setup.py bdist_wheel'
+  - cmd: '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %BUILD_ARCH%'
+  - cmd: 'set path=%path%;c:\cygwin\bin;c:\%PYTHON%'
+  - cmd: 'set path=c:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86;c:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x86\;%PATH%'
+  - cmd: 'cd src'
+  - cmd: 'make export'
+  - cmd: 'cd lib\omniORBpy'
+  - cmd: 'make export'
+  - cmd: 'cd ..\..\..\..'
+  - cmd: 'c:\%PYTHON%\python.exe -m pip install wheel'
+  - cmd: 'c:\%PYTHON%\python.exe setup.py bdist_wheel'
 
-# "C:\Users\kevin\Documents\omniorb-svn\actual-svn\omniORB\omniORB\src\tool\omniidl\cxx\idlpython.d"
-# replace /C/Python with /cygdrive/C/Python
-# omkdepend creates this wrong
+# Generate wheels for Linux CPython x86_64 3.7+
+  - sh: python -m cibuildwheel --output-dir dist
 
 artifacts:
   - path: 'dist/*whl'
+    name: Wheels
 
-test: off
+test: false

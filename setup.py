@@ -35,9 +35,9 @@ setup_args = dict(
 
 setup_args['ext_modules'] = [
     Extension(name,
-              ['_build_with_make.cpp'],
-              libraries=['omniorb'],
-              ) for name in  ['_omnipy', '_omniConnMgmt', '_omnicodesets',
+            ['_build_with_make.cpp'],
+            libraries=['omniorb'],
+            ) for name in  ['_omnipy', '_omniConnMgmt', '_omnicodesets',
 # FIXME do we need this or others: _omnisslTP
 ]]
 

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "omniorb"
+version = "4.2.3"
+description = "Python bindings for omniORB"
+requires-python = ">= 3.7"
+authors = [
+    { name = "Duncan Grisby et al", email = "duncan@grisby.org" },
+]
+license = {text = "LGPL for libraries, GPL for tools"}
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/metamorph-inc/omniORB"
+
+[tool.scikit-build]
+cmake.version = ">=3.15"
+cmake.build-type = "Release"
+cmake.source-dir = "."
+experimental = true
+wheel.install-dir = "/data"
+build-dir = "build/{wheel_tag}_{build_type}"
+
+[tool.cibuildwheel]
+# Produce only CPython x86_64 wheels
+build = "cp*-manylinux_x86_64"
+
+[tool.cibuildwheel.linux]
+repair-wheel-command = ""
