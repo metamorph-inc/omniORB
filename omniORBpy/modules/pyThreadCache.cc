@@ -183,8 +183,13 @@ addNewNode(long id, unsigned int hash)
   // that case, the re-entry will get a valid Python thread state,
   // albeit without a threading.Thread object.
 
+#if (PY_VERSION_HEX >= 0x03070000) // Python 3.7 or later
+  cn->workerThread = PyObject_CallObject(omniPy::pyWorkerThreadClass,
+				       omniPy::pyEmptyTuple);
+#else // Python 3.0 - 3.6
   cn->workerThread = PyEval_CallObject(omniPy::pyWorkerThreadClass,
 				       omniPy::pyEmptyTuple);
+#endif
   if (!cn->workerThread) {
     if (omniORB::trace(1)) {
       {
@@ -285,8 +290,13 @@ run_undetached(void*)
   PyThreadState_Swap(threadState_);
 #endif
 
+#if (PY_VERSION_HEX >= 0x03070000) // Python 3.7 or later
+  workerThread_ = PyObject_CallObject(omniPy::pyWorkerThreadClass,
+				    omniPy::pyEmptyTuple);
+#else // Python 3.0 - 3.6
   workerThread_ = PyEval_CallObject(omniPy::pyWorkerThreadClass,
 				    omniPy::pyEmptyTuple);
+#endif
   if (!workerThread_) {
     if (omniORB::trace(2)) {
       omniORB::logs(2, "Exception trying to create WorkerThread for thread "
