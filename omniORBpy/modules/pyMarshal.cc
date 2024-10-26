@@ -2977,11 +2977,20 @@ unmarshalPyObjectWChar(cdrStream& stream, PyObject* d_o)
 {
   OMNIORB_CHECK_TCS_W_FOR_UNMARSHAL(stream.TCS_W(), stream);
 
-  Py_UNICODE  c   = stream.TCS_W()->unmarshalWChar(stream);
-  PyObject*   r_o = PyUnicode_FromUnicode(0, 1);
-  Py_UNICODE* str = PyUnicode_AS_UNICODE(r_o);
-  str[0]          = c;
-  str[1]          = 0;
+#if (PY_VERSION_HEX < 0x03030000)
+  Py_UNICODE uc = stream.TCS_W()->unmarshalWChar(stream);
+  return  PyUnicode_FromUnicode(&uc, 1);
+
+#else
+  Py_UCS4   uc  = stream.unmarshalChar();
+  PyObject* r_o = PyUnicode_New(1, uc);
+  if (!r_o)
+    return 0;
+
+  PyUnicode_WriteChar(r_o, 0, uc);
+  return r_o;
+
+#endif
   return r_o;
 }
 
@@ -4632,7 +4641,7 @@ copyArgumentWChar(PyObject* d_o, PyObject* a_o,
 		       omniPy::formatString("Expecting unicode, got %r",
 					    "O", a_o->ob_type));
   }
-  if (PyUnicode_GET_SIZE(a_o) != 1) {
+  if (Unicode_GET_SIZE(a_o) != 1) {
     THROW_PY_BAD_PARAM(BAD_PARAM_WrongPythonType, compstatus,
 		       omniPy::formatString("Expecting unicode of length 1, "
 					    "got %r",
