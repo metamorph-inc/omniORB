@@ -382,7 +382,11 @@ Py_ServantActivator::incarnate(const PortableServer::ObjectId& oid,
 			   omniPy::createPyPOAObject(poa));
 
   // Do the up-call
+#if (PY_VERSION_HEX >= 0x03070000) // Python 3.7 or later
+  pyservant = PyObject_CallObject(method, argtuple);
+#else // Python 3.0 - 3.6
   pyservant = PyEval_CallObject(method, argtuple);
+#endif
   Py_DECREF(method);
   Py_DECREF(argtuple);
 
@@ -495,7 +499,11 @@ Py_ServantActivator::etherealize(const PortableServer::ObjectId& oid,
 			   (int)cleanup_in_progress,
 			   (int)remaining_activations);
   // Do the up-call
+#if (PY_VERSION_HEX >= 0x03070000) // Python 3.7 or later
+  result = PyObject_CallObject(method, argtuple);
+#else // Python 3.0 - 3.6
   result = PyEval_CallObject(method, argtuple);
+#endif
   Py_DECREF(method);
   Py_DECREF(argtuple);
 
@@ -541,7 +549,11 @@ Py_ServantLocator::preinvoke(const PortableServer::ObjectId& oid,
 			   operation);
 
   // Do the up-call
+#if (PY_VERSION_HEX >= 0x03070000) // Python 3.7 or later
+  rettuple = PyObject_CallObject(method, argtuple);
+#else // Python 3.0 - 3.6
   rettuple = PyEval_CallObject(method, argtuple);
+#endif
   Py_DECREF(method);
   Py_DECREF(argtuple);
 
@@ -665,7 +677,11 @@ Py_ServantLocator::postinvoke(const PortableServer::ObjectId& oid,
 			   (PyObject*)cookie,
 			   pyos->pyServant());
   // Do the up-call
+#if (PY_VERSION_HEX >= 0x03070000) // Python 3.7 or later
+  result = PyObject_CallObject(method, argtuple);
+#else // Python 3.0 - 3.6
   result = PyEval_CallObject(method, argtuple);
+#endif
   Py_DECREF(method);
   Py_DECREF(argtuple);
 
@@ -700,7 +716,11 @@ Py_AdapterActivator::unknown_adapter(PortableServer::POA_ptr parent,
 			   omniPy::createPyPOAObject(parent), name);
 
   // Do the up-call
+#if (PY_VERSION_HEX >= 0x03070000) // Python 3.7 or later
+  pyresult = PyObject_CallObject(method, argtuple);
+#else // Python 3.0 - 3.6
   pyresult = PyEval_CallObject(method, argtuple);
+#endif
   Py_DECREF(method);
   Py_DECREF(argtuple);
 
