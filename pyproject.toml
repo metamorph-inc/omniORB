@@ -29,4 +29,4 @@ build-dir = "build/{wheel_tag}_{build_type}"
 build = "cp*-manylinux_x86_64"
 
 [tool.cibuildwheel.linux]
-repair-wheel-command = ""
+# repair-wheel-command = ""
