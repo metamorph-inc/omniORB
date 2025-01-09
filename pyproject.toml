@@ -28,5 +28,3 @@ build-dir = "build/{wheel_tag}_{build_type}"
 # Produce only CPython x86_64 wheels
 build = "cp*-manylinux_x86_64"
 
-[tool.cibuildwheel.linux]
-repair-wheel-command = ""
